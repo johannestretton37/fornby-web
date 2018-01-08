@@ -64,11 +64,22 @@ class App extends Component {
             placeholder="Kursnamn"
             onInput={this.handleInput}
             value={this.state.newPageTitle}
-            style={{ display: 'block', margin: '0.5em auto', padding: '1em', textAlign: 'center', borderRadius: '0.3em', border: '1px solid #ccc', fontSize: '1em', appearance: 'none' }}
+            style={{
+              display: 'block',
+              margin: '0.5em auto',
+              padding: '1em',
+              textAlign: 'center',
+              borderRadius: '0.3em',
+              border: '1px solid #ccc',
+              fontSize: '1em',
+              appearance: 'none'
+            }}
           />
         </form>
         <ul>
-          {this.state.pages.map(page => <li key={page.id}>{page.title}</li>)}
+          {this.state.pages.map(page => {
+            return <li key={page.text.id} style={{ textAlign: 'left' }}>{page.text.title}</li>
+          })}
         </ul>
       </div>
     )
