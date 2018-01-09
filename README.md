@@ -25,7 +25,7 @@ yarn start
 ## Deploy
 
 Build and deploy by running the commands below. You might have to log in to firebase at some point.
-After deploy has completed, you'll be able to reach the app at https://fornby-web.firebaseapp.com
+After deploy has completed, you'll be able to reach the app at <https://fornby-web.firebaseapp.com>
 
 ```bash
 # Build locally
@@ -40,4 +40,4 @@ Automatically build and deploy to production by using
 yarn release
 ```
 
-To edit app settings, go to https://console.firebase.google.com/project/fornby-web/overview
+To edit app settings, go to <https://console.firebase.google.com/project/fornby-web/overview>
