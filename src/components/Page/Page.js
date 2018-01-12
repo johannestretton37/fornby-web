@@ -26,7 +26,6 @@ class Page extends Component {
     pagesRef.once('value', snapshot => {
       /* Update React state */
       let page = { text: snapshot.val(), id: snapshot.key }
-      debugger
       this.setState(prevState => ({ pages: [page].concat(prevState.pages) }))
     })
   }
