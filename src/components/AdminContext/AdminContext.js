@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import firebase from 'firebase'
 import firebaseui from 'firebaseui'
+import { withRouter } from 'react-router-dom'
 import './AdminContext.css'
 
 class AdminContext extends Component {
@@ -13,7 +14,7 @@ class AdminContext extends Component {
   componentDidMount() {
     console.warn('AdminContext loaded')
     const uiConfig = {
-      signInSuccessUrl: 'http://localhost:3000/admin/cms',
+      signInSuccessUrl: 'http://localhost:3000/admin/',
       callbacks: {
         signInSuccess: this.signInSuccess
       },
@@ -76,9 +77,30 @@ class AdminContext extends Component {
     })
     return true
   }
+  signOut = () => {
+    firebase.auth().signOut().then(() => {
+      // Sign-out successful.
+      this.setState({
+        isLoggedIn: false
+      }, () => {
+        // Go to home page
+        this.props.history.push('/')
+      })
+    }).catch(function(error) {
+      // An error happened.
+      console.error(error)
+      debugger
+    });
+  }
   render() {
-    return this.state.isLoggedIn ? this.props.children : <div id="firebaseui-auth-container">Login</div>
+    return this.state.isLoggedIn ? 
+      <div>
+        <p><button onClick={this.signOut}>Sign out</button></p>
+        {this.props.children}
+      </div>
+      :
+      <div id="firebaseui-auth-container">Login</div>
   }
 }
 
-export default AdminContext
+export default withRouter(AdminContext)

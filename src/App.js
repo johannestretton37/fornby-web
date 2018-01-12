@@ -9,7 +9,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <main>
-          <Route path='/admin/cms' component={AdminPage} />
+          <Route path='/admin' component={AdminPage} />
           <Page />
         </main>
       </BrowserRouter>

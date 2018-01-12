@@ -20,16 +20,21 @@ class Page extends Component {
       .limitToLast(100)
     pagesRef.on('value', snapshot => {
       /* Update React state */
-      let pages = []
-      snapshot.forEach(childSnapshot => {
-        let page = childSnapshot.val()
-        pages.push({
-          key: childSnapshot.key,
-          title: page.title
-        })
-      })
+      let pages = this.updatePages(snapshot)
       this.setState({ pages })
     })
+  }
+
+  updatePages = snapshot => {
+    let pages = []
+    snapshot.forEach(childSnapshot => {
+      let page = childSnapshot.val()
+      pages.push({
+        key: childSnapshot.key,
+        title: page.title
+      })
+    })
+    return pages
   }
 
   handleInput = e => {
@@ -63,6 +68,7 @@ class Page extends Component {
           <h1 className="App-title">Fornby Folkhögskola</h1>
         </header>
         <p className="App-intro">En levande mötesplats</p>
+        <p>To login on admin page, click here: <a href="/admin">Admin pages login</a></p>
         <form onSubmit={this.handleSubmit}>
           <label htmlFor="addPage">Lägg till en ny kurs</label>
           <input
