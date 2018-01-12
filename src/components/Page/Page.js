@@ -21,13 +21,13 @@ class Page extends Component {
     pagesRef.on('child_added', snapshot => {
       /* Update React state when page is added at Firebase Database */
       let page = { text: snapshot.val(), id: snapshot.key }
-      this.setState(prevState => { pages: [page].concat(prevState.pages) })
+      this.setState(prevState => ({ pages: [page].concat(prevState.pages) }))
     })
     pagesRef.once('value', snapshot => {
       /* Update React state */
       let page = { text: snapshot.val(), id: snapshot.key }
       debugger
-      this.setState(prevState => { pages: [page].concat(prevState.pages) })
+      this.setState(prevState => ({ pages: [page].concat(prevState.pages) }))
     })
   }
 
