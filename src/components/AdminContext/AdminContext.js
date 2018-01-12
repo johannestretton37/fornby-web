@@ -11,6 +11,7 @@ class AdminContext extends Component {
     }
   }
   componentDidMount() {
+    console.warn('AdminContext loaded')
     const uiConfig = {
       signInSuccessUrl: 'http://localhost:3000/admin/cms',
       callbacks: {
@@ -31,14 +32,49 @@ class AdminContext extends Component {
 
     // Initialize the FirebaseUI Widget using Firebase.
     var ui = new firebaseui.auth.AuthUI(firebase.auth())
-    // The start method will wait until the DOM is loaded.
-    ui.start('#firebaseui-auth-container', uiConfig)
+
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in.
+        var displayName = user.displayName;
+        var email = user.email;
+        var emailVerified = user.emailVerified;
+        var photoURL = user.photoURL;
+        var uid = user.uid;
+        var phoneNumber = user.phoneNumber;
+        var providerData = user.providerData;
+        user.getIdToken()
+          .then((accessToken) => {
+          console.log('sign-in-status', 'Signed in')
+          console.log('sign-in', 'Sign out')
+          console.log('account-details', JSON.stringify({
+            displayName: displayName,
+            email: email,
+            emailVerified: emailVerified,
+            phoneNumber: phoneNumber,
+            photoURL: photoURL,
+            uid: uid,
+            accessToken: accessToken,
+            providerData: providerData
+          }, null, '  '))
+          this.setState({
+            isLoggedIn: true
+          })
+        });
+      } else {
+        // User is signed out.
+        // The start method will wait until the DOM is loaded.
+        ui.start('#firebaseui-auth-container', uiConfig)
+      }
+    }, function(error) {
+      console.log(error);
+    })
   }
   signInSuccess = (currentUser, credential, redirectUrl) => {
     this.setState({
       isLoggedIn: true
     })
-    return false
+    return true
   }
   render() {
     return this.state.isLoggedIn ? this.props.children : <div id="firebaseui-auth-container">Login</div>

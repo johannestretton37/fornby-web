@@ -1,17 +1,18 @@
 import React, { Component } from 'react'
+import { BrowserRouter, Route } from 'react-router-dom'
 import './App.css'
 import Page from './components/Page'
-import AdminContext from './components/AdminContext'
+import AdminPage from './components/AdminPage'
 
 class App extends Component {
-  render () {
+  render() {
     return (
-      <main>
-        <Page />
-        <AdminContext>
-          <p>This important text is protected by authentication. If you see this, you are logged in as an Editor and can add or delete courses.</p>
-        </AdminContext>
-      </main>
+      <BrowserRouter>
+        <main>
+          <Route path='/admin/cms' component={AdminPage} />
+          <Page />
+        </main>
+      </BrowserRouter>
     )
   }
 }

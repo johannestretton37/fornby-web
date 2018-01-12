@@ -18,15 +18,17 @@ class Page extends Component {
       .ref('pages')
       .orderByKey()
       .limitToLast(100)
-    pagesRef.on('child_added', snapshot => {
-      /* Update React state when page is added at Firebase Database */
-      let page = { text: snapshot.val(), id: snapshot.key }
-      this.setState(prevState => ({ pages: [page].concat(prevState.pages) }))
-    })
-    pagesRef.once('value', snapshot => {
+    pagesRef.on('value', snapshot => {
       /* Update React state */
-      let page = { text: snapshot.val(), id: snapshot.key }
-      this.setState(prevState => ({ pages: [page].concat(prevState.pages) }))
+      let pages = []
+      snapshot.forEach(childSnapshot => {
+        let page = childSnapshot.val()
+        pages.push({
+          key: childSnapshot.key,
+          title: page.title
+        })
+      })
+      this.setState({ pages })
     })
   }
 
@@ -83,7 +85,7 @@ class Page extends Component {
         </form>
         <ul>
           {this.state.pages.map(page => {
-            return <li key={page.text.id} style={{ textAlign: 'left' }}>{page.text.title}</li>
+            return <li key={page.key} style={{ textAlign: 'left' }}>{page.title}</li>
           })}
         </ul>
       </div>
