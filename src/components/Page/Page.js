@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Fire from '../../Fire'
+import logo from '../../assets/logo.png'
 import './Page.css'
   
 class Page extends Component {
