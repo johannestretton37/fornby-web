@@ -10,12 +10,12 @@ class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <main>
-          <Route path='/admin' component={AdminPage} />
+        <div>
           <Header />
+          <Route path="/admin" component={AdminPage} />
           <Content />
           <Footer />
-        </main>
+        </div>
       </BrowserRouter>
     )
   }

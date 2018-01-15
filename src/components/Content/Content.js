@@ -5,9 +5,9 @@ import Page from '../Page'
 class Content extends Component {
   render() {
     return (
-      <div>
+      <main>
         <Page />
-      </div>
+      </main>
     )
   }
 }

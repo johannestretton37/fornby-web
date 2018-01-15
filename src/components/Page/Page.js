@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Fire from '../../Fire'
-import logo from '../../assets/logo.png'
 import './Page.css'
   
 class Page extends Component {
@@ -62,12 +61,7 @@ class Page extends Component {
 
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Fornby Folkhögskola</h1>
-        </header>
-        <p className="App-intro">En levande mötesplats</p>
+      <div>
         <p>To login on admin page, click here: <a href="/admin">Admin pages login</a></p>
         <form onSubmit={this.handleSubmit}>
           <label htmlFor="addPage">Lägg till en ny kurs</label>

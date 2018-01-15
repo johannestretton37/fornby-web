@@ -4,9 +4,9 @@ import './Footer.css'
 class Footer extends Component {
   render() {
     return (
-      <div>
-        <h3>Footer</h3>
-      </div>
+      <footer>
+        <p>Footer</p>
+      </footer>
     )
   }
 }

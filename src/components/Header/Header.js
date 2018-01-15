@@ -1,14 +1,17 @@
 import React, { Component } from 'react'
+import logo from '../../assets/logo.png'
 import './Header.css'
-  
+
 class Header extends Component {
   render() {
     return (
-      <div>
-        <h3>Header</h3>
-      </div>
+      <header>
+        <img src={logo} className="logo" alt="logo" />
+        <h1>Fornby Folkhögskola</h1>
+        <p>&mdash; En levande mötesplats</p>
+      </header>
     )
   }
 }
 
-export default Header;
+export default Header
