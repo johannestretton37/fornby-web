@@ -30,6 +30,7 @@ class Content extends Component {
   render() {
     return (
       <main>
+        <h2>Kurser</h2>
         <ul>
           {this.state.courses.map((course, i) => {
             return (

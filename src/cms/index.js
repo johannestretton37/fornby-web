@@ -11,9 +11,20 @@ import flamelink from 'flamelink'
 
 class CMS {
   constructor() {
-   this.flamelinkApp = flamelink({firebaseApp})
-   console.log('CMS Inited')
+  this.flamelinkApp = flamelink({firebaseApp})
+  console.log('CMS Inited')
   }
+
+  /**
+   * Main Menu
+   */
+  mainMenuItems = () => {
+    return new Promise(async resolve => {
+      const mainMenu = await this.flamelinkApp.nav.get('mainNavigation', { fields: ['items']})
+      resolve(mainMenu.items)
+    })
+  }
+  
   /**
    * Return an array of course objects
    * @returns - A Promise that resolves to an array of curse objects
