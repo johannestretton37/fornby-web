@@ -2,13 +2,16 @@ import Fire from './Fire'
 import React, { Component } from 'react'
 import logo from './logo.svg'
 import './App.css'
-import Page from './components/Page'
-
+import Header from './components/Header'
+import Content from './components/Content'
+import Footer from './components/Footer'
 class App extends Component {
-  render () {
+  render() {
     return (
       <main>
-        <Page />
+        <Header/>
+        <Content/>
+        <Footer/>
       </main>
     )
   }
