@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import { Link, Route } from 'react-router-dom'
-import CoursesPage from '../CoursesPage'
-import CoursePage from '../CoursePage'
 import MainPage from '../MainPage'
 import ErrorPage from '../ErrorPage'
 import './Content.css'
