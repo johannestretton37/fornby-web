@@ -1,11 +1,20 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@import 'styles/_variables.scss';
 
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+}
+
+#root {
+  padding: 0;
+}
+
+ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+.main-content {
+  margin-bottom: $footer-height;
 }

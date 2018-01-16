@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+import { Navbar, NavbarBrand, Nav, NavLink, NavItem } from 'reactstrap'
 import cms from '../../cms'
 import logo from '../../assets/logo.png'
 import './Header.css'
@@ -22,24 +23,25 @@ class Header extends Component {
       mainMenuItems
     })
   }
-  
+
   render() {
     return (
-      <header>
-        <img src={logo} className="logo" alt="logo" />
-        <h1>Fornby Folkhögskola</h1>
-        <p>&mdash; En levande mötesplats</p>
-
-        <h2>Main Menu</h2>
-        <nav>
-          {this.state.mainMenuItems.map((menuItem, i) => {
-            return (
-              <li key={i}>
-                <Link to={menuItem.url}>{menuItem.title}</Link>
-              </li>
-            )
-          })}
-        </nav>
+      <header className='container'>
+        <Navbar color="faded" light expand="md">
+          <NavbarBrand href="/">
+            <img src={logo} className="logo" alt="logo" /> Fornby Folkhögskola
+            <span><small>&mdash; En levande mötesplats</small></span>
+          </NavbarBrand>
+          <Nav className="ml-auto" navbar>
+            {this.state.mainMenuItems.map((menuItem, i) => {
+              return (
+                <NavItem key={i}>
+                  <NavLink href={menuItem.url}>{menuItem.title}</NavLink>
+                </NavItem>
+              )
+            })}
+          </Nav>
+        </Navbar>
       </header>
     )
   }

@@ -4,15 +4,15 @@ import './App.css'
 import Header from './components/Header'
 import Content from './components/Content'
 import Footer from './components/Footer'
-import AdminPage from './components/AdminPage'
 class App extends Component {
   render() {
     return (
       <BrowserRouter>
         <div>
-          <Header />
-          <Route path="/admin" component={AdminPage} />
-          <Content />
+          <div className="container wrapper main-content">
+            <Header />
+            <Route component={Content} />
+          </div>
           <Footer />
         </div>
       </BrowserRouter>

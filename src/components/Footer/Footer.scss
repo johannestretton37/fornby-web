@@ -1,0 +1,14 @@
+@import 'styles/_variables.scss';
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: $footer-height;
+  background: #500;
+  p {
+    margin: 0;
+    line-height: $footer-height;
+    color: #ddd;
+  }
+}
