@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Link, Route } from 'react-router-dom'
+import { Route } from 'react-router-dom'
+import PropTypes from 'prop-types'
 import MainPage from '../MainPage'
-import ErrorPage from '../ErrorPage'
+// import ErrorPage from '../ErrorPage'
 import './Content.css'
 
 class Content extends Component {
@@ -18,6 +19,10 @@ class Content extends Component {
       </main>
     )
   }
+}
+
+Content.propTypes = {
+  location: PropTypes.object
 }
 
 export default Content

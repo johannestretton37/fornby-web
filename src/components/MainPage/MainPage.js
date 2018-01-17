@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import GalleryPage from '../GalleryPage'
 import ContactPage from '../ContactPage'
 import ErrorPage from '../ErrorPage'

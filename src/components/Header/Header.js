@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { Navbar, NavbarBrand, Nav, NavLink, NavItem } from 'reactstrap'
+import { Navbar, NavbarBrand, Nav, NavItem } from 'reactstrap'
 import cms from '../../cms'
 import logo from '../../assets/logo.png'
 import './Header.css'
@@ -36,7 +36,7 @@ class Header extends Component {
             {this.state.mainMenuItems.map((menuItem, i) => {
               return (
                 <NavItem key={i}>
-                  <NavLink href={menuItem.url}>{menuItem.title}</NavLink>
+                  <Link className="nav-link" to={menuItem.url}>{menuItem.title}</Link>
                 </NavItem>
               )
             })}

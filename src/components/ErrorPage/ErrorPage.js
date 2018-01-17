@@ -1,16 +1,24 @@
-import React, { Component } from 'react'
+import React from 'react'
+import { string } from 'prop-types'
 import { Link } from 'react-router-dom'
 import './ErrorPage.css'
 
-const ErrorPage = ({ heading, message, linkText, href }) => {
+const ErrorPage = ({ heading, message, buttonText, buttonHref }) => {
   return (
     <div>
       <h2>404</h2>
       <p><b>{heading || 'Ooops, här finns ingenting att se.'}</b></p>
-      <p>{message || 'Tryck på knappen för att komma tillbaka till tryggheten.' }</p>
-      <Link to={href || '/'}>{linkText || 'Till startsidan'}</Link>
+      <p>{message || 'Tryck på knappen för att komma tillbaka till tryggheten.' }</p>
+      <Link to={buttonHref || '/'}>{buttonText || 'Till startsidan'}</Link>
     </div>
   )
+}
+
+ErrorPage.propTypes = {
+  heading: string,
+  message: string,
+  buttonText: string,
+  buttonHref: string
 }
 
 export default ErrorPage

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Switch, Link, Route, withRouter } from 'react-router-dom'
-import { CSSTransition } from 'react-transition-group'
+import { Switch, Route, withRouter } from 'react-router-dom'
+import PropTypes from 'prop-types'
 import { Container, Row, Col } from 'reactstrap'
 import Gallery from '../Gallery'
 import Page from '../Page'
@@ -63,9 +63,9 @@ class GalleryPage extends Component {
   }
 }
 
-GalleryPage.defaultProps = {
-  title: 'Kurser',
-  contentType: 'kurser'
+GalleryPage.propTypes = {
+  title: PropTypes.string.isRequired,
+  contentType: PropTypes.string.isRequired
 }
 
 export default withRouter(GalleryPage)
