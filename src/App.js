@@ -8,7 +8,7 @@ class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <div>
+        <div id="app">
           <div className="container wrapper main-content">
             <Header />
             <Route component={Content} />

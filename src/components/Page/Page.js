@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import cms from '../../cms'
 import './Page.css'
   
@@ -39,6 +40,12 @@ class Page extends Component {
       </div>
     )
   }
+}
+
+Page.propTypes = {
+  location: PropTypes.object,
+  match: PropTypes.object,
+  history: PropTypes.object
 }
 
 export default Page
