@@ -1,44 +1,65 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
-import { Link, withRouter } from 'react-router-dom'
-import { Row, Col } from 'reactstrap'
+import { withRouter } from 'react-router-dom'
+import placeholderImg from '../../assets/placeholderImg.svg'
+import {
+  Row,
+  Col,
+  Card,
+  CardImg,
+  CardTitle,
+  CardText,
+  CardBody,
+  CardSubtitle,
+  Button
+} from 'reactstrap'
 import './Gallery.css'
 
 /**
  * Display an overview of an array of items
  */
-const Gallery = ({ items, match }) => {
+const Gallery = ({ items, history, match }) => {
   return (
     <Row>
-      <Col>
-        <ul>
-          {items.map((item, i) => {
-            return (
-              <CSSTransition
-                in={items.length > 0}
-                key={i}
-                classNames="fade"
-                appear={true}
-                timeout={400}
-                component="li"
-              >
-                <div>
-                  <Link to={`${match.url}/${item.slug}`}>{item.name}</Link>
-                  <p>{item.shortInfo}</p>
-                </div>
-              </CSSTransition>
-            )
-          })}
-        </ul>
-      </Col>
+      {items.map((item, i) => {
+        return (
+          <Col xs="12" md="6" lg="4" xl="3" key={i}>
+            <CSSTransition
+              in={items.length > 0}
+              classNames="fade"
+              appear={true}
+              timeout={400}
+              component="li"
+            >
+              <Card>
+                <CardImg top src={item.img || placeholderImg} alt={item.name} />
+                <CardBody>
+                  <CardTitle>{item.name}</CardTitle>
+                  <CardSubtitle>{item.shortInfo}</CardSubtitle>
+                  <CardText>Mer info...</CardText>
+                  <Button
+                    block
+                    outline
+                    color="primary"
+                    onClick={() => history.push(`${match.url}/${item.slug}`)}
+                  >
+                    Läs mer
+                  </Button>
+                </CardBody>
+              </Card>
+            </CSSTransition>
+          </Col>
+        )
+      })}
     </Row>
   )
 }
 
 Gallery.propTypes = {
   items: PropTypes.array.isRequired,
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 }
 
 export default withRouter(Gallery)

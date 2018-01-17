@@ -26,17 +26,26 @@ class Header extends Component {
 
   render() {
     return (
-      <header className='container'>
+      <header className="container">
         <Navbar color="faded" light expand="md">
           <NavbarBrand href="/">
             <img src={logo} className="logo" alt="logo" /> Fornby Folkhögskola
-            <span><small>&mdash; En levande mötesplats</small></span>
+            <span>
+              <small>&mdash; En levande mötesplats</small>
+            </span>
           </NavbarBrand>
           <Nav className="ml-auto" navbar>
+            <NavItem>
+              <Link className="nav-link" to='/'>
+                Start
+              </Link>
+            </NavItem>
             {this.state.mainMenuItems.map((menuItem, i) => {
               return (
                 <NavItem key={i}>
-                  <Link className="nav-link" to={menuItem.url}>{menuItem.title}</Link>
+                  <Link className="nav-link" to={menuItem.url}>
+                    {menuItem.title}
+                  </Link>
                 </NavItem>
               )
             })}
