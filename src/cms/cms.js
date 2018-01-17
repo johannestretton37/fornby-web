@@ -1,6 +1,7 @@
 import getSlug from 'speakingurl'
 import firebaseApp from '../Fire'
 import flamelink from 'flamelink'
+import {ContentGroup} from '../constants'
 
 /**
  * CMS
@@ -12,9 +13,8 @@ import flamelink from 'flamelink'
 class CMS {
   constructor() {
   this.flamelinkApp = flamelink({firebaseApp})
-  this.index = {
-    courses: {}
-  }
+  this.index = {}
+  this.cache = {}
 }
 
   /**
@@ -22,73 +22,82 @@ class CMS {
    */
   mainMenuItems = () => {
     return new Promise(async resolve => {
+      // Return cached main menu if present
+      if (this.cache.mainMenu) return resolve(this.cache.mainMenu)
       const mainMenu = await this.flamelinkApp.nav.get('mainNavigation', { fields: ['items']})
+      this.cache.mainMenu = mainMenu.items
       resolve(mainMenu.items)
     })
   }
   
   /**
-   * Return an array of course objects
-   * @returns - A Promise that resolves to an array of course objects
-   */
-  courses = () => {
-    return new Promise(async resolve => {
-      const coursePages = await this.flamelinkApp.content.get('coursePages')
-      let courses = this.arrayFromFirebaseData(coursePages, ['id', 'name', 'shortInfo'])
-      this.registerSlugs(courses, 'courses')
-      resolve(courses)
-    })
-  }
-
-  /**
    * Return an array of content objects
+   * 
+   * @param {string} group - The name of the group to get. Defaults to `ContentGroup.COURSES` ('coursePages')
+   * @param {array} fields - The property fields to get. Defaults to `['id', 'name', 'shortInfo']`
    * @returns - A Promise that resolves to an array of objects
    */
-  getContentGroup = (group) => {
+  getContentGroup = (group = ContentGroup.COURSES, fields = ['id', 'name', 'shortInfo'], cacheResponse = true) => {
     return new Promise(async resolve => {
-      let table = 'coursePages'
-      const contentData = await this.flamelinkApp.content.get(table)
-      let content = this.arrayFromFirebaseData(contentData, ['id', 'name', 'shortInfo'])
-      this.registerSlugs(content, 'courses')
+      // Return cached group if present
+      if (this.cache[group]) return resolve(this.cache[group])
+      const contentData = await this.flamelinkApp.content.get(group, { fields })
+      let content = this.arrayFromFirebaseData(contentData)
+      if (cacheResponse) {
+        this.registerSlugs(content, group)
+        this.cache[group] = content
+      }
+      console.log('CMS Cache\n', this.cache)
+      console.log('CMS Slug Index\n', this.index)
       resolve(content)
     })
   }
 
+  /**
+   * Return a single content object
+   * @param {string} group - A string representing a group, e.g. 'kurser'
+   * @param {string} slug - A string representing a slug, e.g. 'konstkurs-VT-18'
+   * @returns - A Promise that resolves to a content object
+   */
   getContent = (group, slug) => {
-    if (group !== 'kurser') throw new Error('This is only implemented for "kurser" yet')
+    if (group !== ContentGroup.COURSES) throw new Error(`This is only implemented for "${ContentGroup.COURSES}". You requested ${group}`)
     return new Promise(async (resolve, reject) => {
-      let id = this.idFromSlug(slug)
+      let id = this.idFromSlug(group, slug)
       if (!id) {
-        await this.courses()
-        id = this.idFromSlug(slug)
-        if (!id) reject('Kunde inte hitta kurs')
+        await this.getContentGroup(group, ['name'], true)
+        id = this.idFromSlug(group, slug)
+        if (!id) reject(`Kunde inte hitta ${group}/${slug}`)
       }
-      const course = await this.flamelinkApp.content.get('coursePages', id)
-      // let course = this.arrayFromFirebaseData(coursePage, ['id', 'name', 'shortInfo'])
-      resolve(course)
+      const content = await this.flamelinkApp.content.get(group, id)
+      resolve(content)
     })
   }
 
-  /**
-   * Return a single course object
-   * @returns - A Promise that resolves to a course objects
-   */
-  course = (slug) => {
-    return new Promise(async (resolve, reject) => {
-      let id = this.idFromSlug(slug)
-      if (!id) {
-        await this.courses()
-        id = this.idFromSlug(slug)
-        if (!id) reject('Kunde inte hitta kurs')
-      }
-      const coursePage = await this.flamelinkApp.content.get('coursePages', id)
-      let course = this.arrayFromFirebaseData(coursePage, ['id', 'name', 'shortInfo'])
-      resolve(course)
+  getSlides = () => {
+    return new Promise( async (resolve, reject) => {
+      const slides = await this.getContentGroup(ContentGroup.START_PAGE_SLIDES, { fields: ['title', 'subtitle', 'image'] })
+      let slideItems = []
+      let promises = []
+      Object.values(slides).forEach(slide => {
+        let item = {
+          title: slide.title,
+          subtitle: slide.subtitle
+        }
+        promises.push(
+          this.flamelinkApp.storage.getURL(slide.image[0], { size: 'device' })
+          .then(url => {
+            item.image = url
+            slideItems.push(item)
+          })
+        )
+      })
+      await Promise.all(promises)
+      resolve(slideItems)
     })
   }
   
   subscribeToCourses = (callback) => {
-    this.flamelinkApp.content.subscribe('coursePages', (error, coursePages) => {
+    this.flamelinkApp.content.subscribe(ContentGroup.COURSES, (error, coursePages) => {
       let courses = this.arrayFromFirebaseData(coursePages, ['id', 'name', 'shortInfo'])
       callback(courses)
     })
@@ -97,31 +106,29 @@ class CMS {
   /**
    * Helper function to transform a firebase object into an array
    * @param data - The data returned from a flamelink operation, such as `get`
-   * @param fields - An array of strings, responding to the properties to extract
    * @returns - An array of objects
    */
-  arrayFromFirebaseData = (data, fields) => {
+  arrayFromFirebaseData = (data) => {
     let array = []
+    if (!data) return array
     Object.entries(data).forEach(([entry, value]) => {
       let result = {}
-      fields.forEach(field => {
-        if (field === 'name') {
-          result.slug = getSlug(value[field])
-        }
-        result[field] = value[field]
+      Object.entries(value).forEach(([field, val]) => {
+        result[field] = val
+        if (field === 'name') result.slug = getSlug(val)
       })
       array.push(result)
     })
     return array
   }
 
-  idFromSlug = (slug, itemType = 'courses') => {
-    return this.index[itemType] ? this.index[itemType][slug] : undefined
+  idFromSlug = (group, slug) => {
+    return this.index[group] ? this.index[group][slug] : undefined
   }
 
-  registerSlugs = (items, itemType = 'courses') => {
-    if (!this.index[itemType]) this.index[itemType] = {}
-    let index = this.index[itemType]
+  registerSlugs = (items, group) => {
+    if (!this.index[group]) this.index[group] = {}
+    let index = this.index[group]
     items.forEach(item => {
       index[item.slug] = item.id
     })

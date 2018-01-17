@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+import { CSSTransition } from 'react-transition-group'
 import { Navbar, NavbarBrand, Nav, NavItem } from 'reactstrap'
 import cms from '../../cms'
 import logo from '../../assets/logo.png'
@@ -35,17 +36,19 @@ class Header extends Component {
             </span>
           </NavbarBrand>
           <Nav className="ml-auto" navbar>
-            <NavItem>
-              <Link className="nav-link" to='/'>
-                Start
-              </Link>
-            </NavItem>
             {this.state.mainMenuItems.map((menuItem, i) => {
               return (
                 <NavItem key={i}>
-                  <Link className="nav-link" to={menuItem.url}>
-                    {menuItem.title}
-                  </Link>
+                  <CSSTransition
+                    in={this.state.mainMenuItems.length > 0}
+                    classNames="fade"
+                    appear={true}
+                    timeout={400}
+                  >
+                    <Link className="nav-link" to={menuItem.url}>
+                      {menuItem.title}
+                    </Link>
+                  </CSSTransition>
                 </NavItem>
               )
             })}
