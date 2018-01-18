@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import {
   Row,
   Col,
@@ -95,13 +96,13 @@ class StartPageCarousel extends Component {
         <Col>
           <div
             style={{
-              border: '1px solid red',
               opacity: this.state.show ? 1 : 0,
+              filter: this.state.show ? 'blur(0px)' : 'blur(4px)',
               overflow: 'hidden',
-              maxHeight: this.state.show ? '300px' : '0px',
-              transition: 'max-height 300ms ease-in-out, opacity 1000ms ease-out'
-            }}
-          >
+              maxHeight: this.state.show ? this.props.height + 'px' : '0px',
+              transition:
+                'max-height 300ms ease-in-out, opacity 1000ms ease-out, filter 1000ms ease-out'
+            }} >
             <Carousel
               activeIndex={activeIndex}
               next={this.next}
@@ -121,14 +122,20 @@ class StartPageCarousel extends Component {
               <CarouselControl
                 direction="next"
                 directionText="Next"
-                onClickHandler={this.next}
-              />
+                onClickHandler={this.next} />
             </Carousel>
           </div>
         </Col>
       </Row>
     )
   }
+}
+
+StartPageCarousel.propTypes = {
+  height: PropTypes.number
+}
+StartPageCarousel.defaultProps = {
+  height: 400
 }
 
 export default StartPageCarousel

@@ -35,6 +35,7 @@ class CMS {
    * 
    * @param {string} group - The name of the group to get. Defaults to `ContentGroup.COURSES` ('coursePages')
    * @param {array} fields - The property fields to get. Defaults to `['id', 'name', 'shortInfo']`
+   * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
   getContentGroup = (group = ContentGroup.COURSES, fields = ['id', 'name', 'shortInfo'], cacheResponse = true) => {
@@ -73,11 +74,22 @@ class CMS {
     })
   }
 
+  /**
+   * Fetch images for the start page carousel
+   * @returns - A Promise that resolves to an array of objects, e.g.
+   * {
+   *   title: 'Image Headline',
+   *   subtitle: 'A short text',
+   *   image: 'http://www.example.com/path/to/image/file.jpg'
+   * }
+   */
   getSlides = () => {
     return new Promise( async (resolve, reject) => {
+      // Get all slides
       const slides = await this.getContentGroup(ContentGroup.START_PAGE_SLIDES, { fields: ['title', 'subtitle', 'image'] })
       let slideItems = []
       let promises = []
+      // Loop through slides and fetch url for all images
       Object.values(slides).forEach(slide => {
         let item = {
           title: slide.title,
@@ -91,6 +103,7 @@ class CMS {
           })
         )
       })
+      // Wait for all promises to resolve
       await Promise.all(promises)
       resolve(slideItems)
     })
