@@ -1,7 +1,5 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true,
     "flamelink": {
       ".read": "auth != null",
       ".write": "auth != null"
