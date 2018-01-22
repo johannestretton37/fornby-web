@@ -4,6 +4,7 @@
   "description": "Firebase Cloud functions for Fornby web",
   "dependencies": {
     "firebase-admin": "^5.8.1",
-    "firebase-functions": "^0.8.1"
+    "firebase-functions": "^0.8.1",
+    "speakingurl": "^14.0.1"
   }
 }
