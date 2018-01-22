@@ -34,7 +34,7 @@ class StartPageCarousel extends Component {
     firstImg.onload = () => {
       this.setState({ show: true })
     }
-    firstImg.src = slides[0].image
+    firstImg.src = slides[0].image[0].url
     // Load all slides
     this.setState({
       items: slides
@@ -80,8 +80,8 @@ class StartPageCarousel extends Component {
           onExiting={this.onExiting}
           onExited={this.onExited}
           key={i}
-          src={item.image}
-          alt={item.title}
+          src={item.image[0].url}
+          alt={item.alt}
         >
           <CarouselCaption
             captionText={item.subtitle}

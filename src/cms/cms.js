@@ -13,7 +13,6 @@ import { ContentGroup } from '../constants'
 class CMS {
   constructor() {
     this.flamelinkApp = flamelink({ firebaseApp })
-    this.index = {}
     this.cache = {}
     this.getBasicInfo()
   }
@@ -44,27 +43,25 @@ class CMS {
    * Return an array of content objects
    *
    * @param {string} group - The name of the group to get. Defaults to `ContentGroup.COURSES` ('coursePages')
-   * @param {array} fields - The property fields to get. Defaults to `['id', 'name', 'shortInfo']`
+   * @param {object} options - The property fields to get. Defaults to `{ fields: ['id', 'name', 'shortInfo'] }`
    * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
   getContentGroup = (
     group = ContentGroup.COURSES,
-    fields = ['id', 'name', 'shortInfo'],
+    options = { fields: ['id', 'name', 'slug', 'shortInfo'] },
     cacheResponse = true
   ) => {
-    console.log('Getting Content for Group', group, 'isCached:', this.cache[group] !== undefined)
     return new Promise(async resolve => {
       // Return cached group if present
       if (this.cache[group]) return resolve(this.cache[group])
-      const contentData = await this.flamelinkApp.content.get(group, { fields })
+      const contentData = await this.flamelinkApp.content.get(group, options)
       let content = this.arrayFromFirebaseData(contentData)
       if (cacheResponse) {
-        this.registerSlugs(content, group)
+//        this.registerSlugs(content, group)
         this.cache[group] = content
       }
       console.log('CMS Cache\n', this.cache)
-      console.log('CMS Slug Index\n', this.index)
       resolve(content)
     })
   }
@@ -80,7 +77,7 @@ class CMS {
       try {
         let id = this.idFromSlug(group, slug)
         if (!id) {
-          await this.getContentGroup(group, ['name'], true)
+          await this.getContentGroup(group, { fields: ['name'] })
           id = this.idFromSlug(group, slug)
           if (!id) reject(`Kunde inte hitta ${group}/${slug}`)
         }
@@ -92,6 +89,9 @@ class CMS {
     })
   }
 
+  getURL = id => {
+    return this.flamelinkApp.storage.getURL(id, { size: 'device' })
+  }
   /**
    * Fetch images for the start page carousel
    * @returns - A Promise that resolves to an array of objects, e.g.
@@ -107,29 +107,12 @@ class CMS {
       try {
         const slides = await this.getContentGroup(
           ContentGroup.START_PAGE_SLIDES,
-          { fields: ['title', 'subtitle', 'image'] }
-        )
-        let slideItems = []
-        let promises = []
-        // Loop through slides and fetch url for all images
-        Object.values(slides).forEach(slide => {
-          let item = {
-            title: slide.title,
-            subtitle: slide.subtitle,
-            alt: slide.alt
+          {
+            fields: ['title', 'alt', 'subtitle', 'image'],
+            populate: ['image']
           }
-          promises.push(
-            this.flamelinkApp.storage
-              .getURL(slide.image[0], { size: 'device' })
-              .then(url => {
-                item.image = url
-                slideItems.push(item)
-              })
-          )
-        })
-        // Wait for all promises to resolve
-        await Promise.all(promises)
-        resolve(slideItems)
+        )
+        resolve(slides)
       } catch (error) {
         reject(error)
       }
@@ -143,6 +126,7 @@ class CMS {
         let courses = this.arrayFromFirebaseData(coursePages, [
           'id',
           'name',
+          'slug',
           'shortInfo'
         ])
         callback(courses)
@@ -162,24 +146,24 @@ class CMS {
       let result = {}
       Object.entries(value).forEach(([field, val]) => {
         result[field] = val
-        if (field === 'name') result.slug = getSlug(val)
       })
+      if (result.slug === undefined && result.name !== undefined) {
+        console.warn('Didn\'t find a slug - creating one from', result.name)
+        result.slug = getSlug(result.name)
+      }
       array.push(result)
     })
     return array
   }
 
   idFromSlug = (group, slug) => {
-    return this.index[group] ? this.index[group][slug] : undefined
+    if (!this.cache[group]) return undefined
+    let ids = this.cache[group].filter(member => {
+      return member.slug === slug
+    })
+    return ids.length > 0 ? ids[0].id : undefined
   }
 
-  registerSlugs = (items, group) => {
-    if (!this.index[group]) this.index[group] = {}
-    let index = this.index[group]
-    items.forEach(item => {
-      index[item.slug] = item.id
-    })
-  }
 }
 
 const cms = new CMS()
