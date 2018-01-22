@@ -8,7 +8,7 @@ class BannerBox extends Component {
     const { content } = this.props
     return (
       <Col xs="12" md="6" lg="4" className='banner-box'>
-        <img src={content.src} className="rounded-circle" />
+        <img src={content.src} alt={content.alt} className="rounded-circle" />
         <h2>{content.heading}</h2>
         <p>{content.body}</p>
         <Button>{content.btnText}</Button>

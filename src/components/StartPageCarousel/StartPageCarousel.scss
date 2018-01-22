@@ -10,7 +10,7 @@ $transparent-dark: rgba(0, 0, 0, 0);
     right: 0;
     bottom: 0;
     left: 0;
-    background: linear-gradient(top, $transparent-dark 20%, $solid-dark 90%);
+    background: linear-gradient(to bottom, $transparent-dark 20%, $solid-dark 90%);
     h3,
     p {
       max-width: 600px;
