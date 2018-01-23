@@ -60,6 +60,7 @@ class ImagePreLoader extends Component {
         <div
           className="preview-container"
           style={{
+            backgroundColor: this.props.bgColor,
             backgroundImage: `url(${this.props.previewImg})`,
             opacity: showPreview ? 1 : 0,
             filter: showFinal ? 'blur(0px)' : 'blur(15px)'
@@ -72,11 +73,13 @@ class ImagePreLoader extends Component {
 }
 
 ImagePreLoader.defaultProps = {
-  initialHeight: '200px'
+  initialHeight: '200px',
+  bgColor: '#500'
 }
 
 ImagePreLoader.propTypes = {
   initialHeight: PropTypes.number,
+  bgColor: PropTypes.string,
   previewImg: PropTypes.string,
   children: PropTypes.element
 }

@@ -1,5 +1,56 @@
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
+
 header {
-  .logo {
-    width: 100px;
+  .brand-header {
+    .logo {
+      display: block;
+      margin: 0 auto;
+      width: 200px;
+    }
+  }
+  .main-menu {
+    /* small */
+    display: flex;
+    flex-direction: column;
+    /* TODO: Remove when mobile menu is in place */
+    &:before {
+      display: block;
+      padding: 1em;
+      background: red;
+      color: white;
+      content: "TODO: This will be a mobile menu soon...";
+    }
+    @include media-breakpoint-up(md) {
+      /* large */
+      flex-direction: row;
+      margin-bottom: 3rem;
+      /* TODO: Remove when mobile menu is in place */
+      &:before { display:none; }
+    }
+    ul,
+    li {
+      margin: auto;
+    }
+    .nav-item {
+      flex-grow: 1;
+      .nav-link {
+        text-align: center;
+        text-decoration: none;
+        text-transform: uppercase;
+        outline: none;
+        color: #555;
+        transition: color 300ms ease-out;
+        border-right: 1px solid #eee;
+        &.last {
+          border-right: none;
+        }
+        &:hover,
+        &:active {
+          color: #500;
+        }
+      }
+    }
   }
 }

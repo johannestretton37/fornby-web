@@ -1,2 +1,41 @@
-header .logo {
-  width: 100px; }
+header .brand-header .logo {
+  display: block;
+  margin: 0 auto;
+  width: 200px; }
+
+header .main-menu {
+  /* small */
+  display: flex;
+  flex-direction: column;
+  /* TODO: Remove when mobile menu is in place */ }
+  header .main-menu:before {
+    display: block;
+    padding: 1em;
+    background: red;
+    color: white;
+    content: "TODO: This will be a mobile menu soon..."; }
+  @media (min-width: 768px) {
+    header .main-menu {
+      /* large */
+      flex-direction: row;
+      margin-bottom: 3rem;
+      /* TODO: Remove when mobile menu is in place */ }
+      header .main-menu:before {
+        display: none; } }
+  header .main-menu ul,
+  header .main-menu li {
+    margin: auto; }
+  header .main-menu .nav-item {
+    flex-grow: 1; }
+    header .main-menu .nav-item .nav-link {
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+      outline: none;
+      color: #555;
+      transition: color 300ms ease-out;
+      border-right: 1px solid #eee; }
+      header .main-menu .nav-item .nav-link.last {
+        border-right: none; }
+      header .main-menu .nav-item .nav-link:hover, header .main-menu .nav-item .nav-link:active {
+        color: #500; }
