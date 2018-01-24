@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { Container, Row, Col } from 'reactstrap'
 import StartPageCarousel from '../StartPageCarousel'
 import BannerBox from '../BannerBox'
@@ -7,6 +8,20 @@ import './StartPage.css'
 
 class StartPage extends Component {
   render() {
+    const cities = [
+      {
+        title: 'FALUN',
+        url: '/falun'
+      },
+      {
+        title: 'BORLÄNGE',
+        url: '/'
+      },
+      {
+        title: 'LUDVIKA',
+        url: '/ludvika'
+      },
+    ]
     return (
       <div>
         <Container>
@@ -20,6 +35,17 @@ class StartPage extends Component {
           </Row>
         </Container>
         <StartPageCarousel />
+        <Container className='city-links'>
+          <Row>
+            {cities.map((city, i) => {
+              return (
+                <Col key={i}>
+                  <Link className={i == cities.length - 1 ? 'last' : ''} to={city.url}>{city.title}</Link>
+                </Col>
+              )
+            })}
+          </Row>
+        </Container>
         <Container>
           <Row>
             {this.props.content.boxes.map((contentBox, i) => {

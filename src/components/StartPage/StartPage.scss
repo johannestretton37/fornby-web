@@ -1,0 +1,37 @@
+@import 'styles/_colors.scss';
+
+.city-links {
+  .row {
+    margin-bottom: 3rem;
+    .col {
+      padding: 0;
+      a {
+        display: block;
+        color: #ddd;
+        text-decoration: none;
+        text-align: center;
+        background-color: $brand-primary;
+        font-size: 1.5em;
+        line-height: 3em;
+        transition: background-color 600ms ease-out;
+        &:after {
+          display: block;
+          position: absolute;
+          top: 25%;
+          right: 0;
+          height: 50%;
+          border-right: 1px solid rgba(255,255,255,0.5);
+          content: '';
+        }
+        &.last:after {
+          display: none;
+        }
+        &:hover,
+        &:active {
+          color: #fff;
+          background-color: $brand-secondary;
+        }
+      }
+    }
+  }
+}
