@@ -22,7 +22,9 @@ ul, li {
 #app {
   display: flex;
   flex-direction: column;
-  & > .main-content {
+  & > .main-content, main {
+    display: flex;
     flex: 1 0 auto;
+    flex-direction: column;
   }
 }
