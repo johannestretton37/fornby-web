@@ -1,12 +1,12 @@
 
-@mixin gradient($direction, $color-stop-1, $color-stop-2) {
-  background: $color;
-  background: -moz-linear-gradient($direction, $color-stop-1, $color-stop-2 100%);
-  background: -webkit-linear-gradient($direction, $color-stop-1, $color-stop-2 100%);
-  background: -o-linear-gradient($direction, $color-stop-1, $color-stop-2 100%);
-  background: -ms-linear-gradient($direction, $color-stop-1, $color-stop-2 100%);
-  background: linear-gradient($direction, $color-stop-1, $color-stop-2 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$color}', endColorstr='#{$color-stop-2}', GradientType=1 );
+@mixin gradient($direction, $stop-color-1, $stop-pos-1, $stop-color-2, $stop-pos-2) {
+  background: $stop-color-1;
+  background: -moz-linear-gradient($direction, $stop-color-1 $stop-pos-1, $stop-color-2 $stop-pos-2 100%);
+  background: -webkit-linear-gradient($direction, $stop-color-1 $stop-pos-1, $stop-color-2 $stop-pos-2 100%);
+  background: -o-linear-gradient($direction, $stop-color-1 $stop-pos-1, $stop-color-2 $stop-pos-2 100%);
+  background: -ms-linear-gradient($direction, $stop-color-1 $stop-pos-1, $stop-color-2 $stop-pos-2 100%);
+  background: linear-gradient($direction, $stop-color-1 $stop-pos-1, $stop-color-2 $stop-pos-2 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$stop-color-1}', endColorstr='#{$stop-color-2}', GradientType=1 );
 }
 
 @mixin gradient-darker($color) {
