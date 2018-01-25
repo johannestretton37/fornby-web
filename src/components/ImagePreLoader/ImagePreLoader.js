@@ -17,12 +17,12 @@ class ImagePreLoader extends Component {
   }
 
   static propTypes = {
-    initialHeight: PropTypes.number,
+    initialHeight: PropTypes.string,
     bgColor: PropTypes.string,
     previewImg: PropTypes.string,
     children: PropTypes.element
   }
-  
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.previewImg !== this.props.previewImg) {
       let previewImg = new Image()
