@@ -21,7 +21,10 @@ class CMS {
    * Get basic info, such as navigation, page headlines and such
    */
   getBasicInfo = () => {
-    return Promise.all([this.mainMenuItems(), this.getSlides()])
+    return Promise.all([
+      this.mainMenuItems(),
+      this.getSlides()
+    ])
   }
 
   /**
@@ -31,12 +34,55 @@ class CMS {
     return new Promise(async resolve => {
       // Return cached main menu if present
       if (this.cache.mainMenu) return resolve(this.cache.mainMenu)
-      const mainMenu = await this.flamelinkApp.nav.get('mainNavigation', {
+      const mainNavigation = await this.flamelinkApp.nav.get('mainNavigation', {
         fields: ['items']
       })
-      this.cache.mainMenu = mainMenu.items
-      resolve(mainMenu.items)
+      // Structure menu
+      let mainMenu = []
+      mainNavigation.items.forEach(item => {
+        if (item.parentIndex === 0) {
+          // This is a root link, e.g. '/kurser'
+          let { id, title, url, cssClass } = item
+          mainMenu.push({
+            id,
+            title,
+            url,
+            cssClass
+          })
+        } else {
+          // This is a sub link, e.g. '/kurser/mer-info'
+          // Find parent and add child to parent's subItems array
+          // We can assume that the parent is already added to mainMenu
+          let parent = this.findParent(mainMenu, item.parentIndex)
+          if (parent) {
+            if (!parent.subItems) parent.subItems = []
+            let { id, title, url, cssClass } = item
+            parent.subItems.push({
+              id,
+              title,
+              url: parent.url + url,
+              cssClass
+            })
+          } else {
+            console.log('Couldn\'t find parent')
+          }
+        }
+      })
+      this.cache.mainMenu = mainMenu
+      resolve(mainMenu)
     })
+  }
+
+  findParent = (array, parentIndex) => {
+    let parent = array.find(subItem => {
+      if (subItem.id === parentIndex) {
+        return true
+      }
+      if (subItem.subItems) {
+        return this.findParent(subItem.subItems, parentIndex)
+      }
+    })
+    return parent
   }
 
   /**

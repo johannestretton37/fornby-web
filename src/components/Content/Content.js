@@ -7,7 +7,6 @@ import StartPage from '../StartPage'
 import './Content.css'
 
 class Content extends Component {
-  
   static propTypes = {
     location: PropTypes.object
   }
@@ -28,7 +27,5 @@ class Content extends Component {
     )
   }
 }
-
-
 
 export default Content

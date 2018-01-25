@@ -1,0 +1,12 @@
+@import 'styles/_colors.scss';
+
+ul.nav {
+  padding-left: 1rem;
+  a {
+    color: $default-text-color;
+    &.main-item {
+      font-size: 1.1em;
+      color: $brand-primary;
+    }
+  }
+}
