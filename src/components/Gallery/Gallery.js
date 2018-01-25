@@ -25,7 +25,7 @@ Gallery.propTypes = {
 /**
  * Display an overview of an array of items
  */
-const Gallery = ({ items, history, match }) => {
+function Gallery ({ items, history, match }) {
   return (
     <Row>
       {items.map((item, i) => {

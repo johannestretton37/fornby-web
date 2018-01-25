@@ -10,7 +10,7 @@ ErrorPage.propTypes = {
   buttonHref: string
 }
 
-const ErrorPage = ({ heading, message, buttonText, buttonHref }) => {
+function ErrorPage({ heading, message, buttonText, buttonHref }) {
   return (
     <div>
       <h2>404</h2>
