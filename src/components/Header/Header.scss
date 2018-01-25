@@ -1,3 +1,4 @@
+@import 'styles/_colors.scss';
 @import 'bootstrap/scss/_functions';
 @import 'bootstrap/scss/_variables';
 @import 'bootstrap/scss/mixins/_breakpoints';
@@ -49,6 +50,9 @@ header {
         &:hover,
         &:active {
           color: #500;
+        }
+        &.active {
+          color: $brand-primary;
         }
       }
     }

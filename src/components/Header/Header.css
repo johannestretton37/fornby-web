@@ -1,3 +1,5 @@
+/* Font colors */
+/* Brand colors */
 header .brand-header .logo {
   display: block;
   margin: 0 auto;
@@ -39,3 +41,5 @@ header .main-menu {
         border-right: none; }
       header .main-menu .nav-item .nav-link:hover, header .main-menu .nav-item .nav-link:active {
         color: #500; }
+      header .main-menu .nav-item .nav-link.active {
+        color: #ac285c; }

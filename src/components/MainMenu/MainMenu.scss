@@ -1,0 +1,15 @@
+@import 'styles/_colors.scss';
+
+.main-menu-container {
+  position: relative;
+  #main-menu-indicator {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 80px;
+    bottom: 0;
+    opacity: 0.8;
+    background-color: $brand-primary;
+    transition: all 250ms ease-out;
+  }
+}
