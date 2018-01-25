@@ -16,6 +16,12 @@ import {
 } from 'reactstrap'
 import './Gallery.css'
 
+
+Gallery.propTypes = {
+  items: PropTypes.array.isRequired,
+  match: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
+}
 /**
  * Display an overview of an array of items
  */
@@ -56,10 +62,6 @@ const Gallery = ({ items, history, match }) => {
   )
 }
 
-Gallery.propTypes = {
-  items: PropTypes.array.isRequired,
-  match: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired
-}
+
 
 export default withRouter(Gallery)

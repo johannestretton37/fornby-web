@@ -11,7 +11,18 @@ class ImagePreLoader extends Component {
       maxHeight: '100%'
     }
   }
+  static defaultProps = {
+    initialHeight: '200px',
+    bgColor: '#500'
+  }
 
+  static propTypes = {
+    initialHeight: PropTypes.number,
+    bgColor: PropTypes.string,
+    previewImg: PropTypes.string,
+    children: PropTypes.element
+  }
+  
   componentWillReceiveProps(nextProps) {
     if (nextProps.previewImg !== this.props.previewImg) {
       let previewImg = new Image()
@@ -72,16 +83,6 @@ class ImagePreLoader extends Component {
   }
 }
 
-ImagePreLoader.defaultProps = {
-  initialHeight: '200px',
-  bgColor: '#500'
-}
 
-ImagePreLoader.propTypes = {
-  initialHeight: PropTypes.number,
-  bgColor: PropTypes.string,
-  previewImg: PropTypes.string,
-  children: PropTypes.element
-}
 
 export default ImagePreLoader

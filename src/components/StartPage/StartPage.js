@@ -1,12 +1,40 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import {  Link } from 'react-router-dom'
 import { Container, Row, Col } from 'reactstrap'
 import StartPageCarousel from '../StartPageCarousel'
 import BannerBox from '../BannerBox'
 import './StartPage.css'
 
 class StartPage extends Component {
+
+
+  static propTypes = {
+    content: PropTypes.object
+  }
+
+  static defaultProps = {
+    content: {
+      boxes: [
+        {
+          heading: 'Heading 1',
+          body: 'Body 1',
+          btnText: 'Ansök nu'
+        },
+        {
+          heading: 'Heading 2',
+          body: 'Body 2',
+          btnText: 'Ansök nu'
+        },
+        {
+          heading: 'Heading 3',
+          body: 'Body 3',
+          btnText: 'Ansök nu'
+        }
+      ]
+    }
+  }
+
   render() {
     const cities = [
       {
@@ -55,32 +83,6 @@ class StartPage extends Component {
         </Container>
       </div>
     )
-  }
-}
-
-StartPage.propTypes = {
-  content: PropTypes.object
-}
-
-StartPage.defaultProps = {
-  content: {
-    boxes: [
-      {
-        heading: 'Heading 1',
-        body: 'Body 1',
-        btnText: 'Ansök nu'
-      },
-      {
-        heading: 'Heading 2',
-        body: 'Body 2',
-        btnText: 'Ansök nu'
-      },
-      {
-        heading: 'Heading 3',
-        body: 'Body 3',
-        btnText: 'Ansök nu'
-      }
-    ]
   }
 }
 

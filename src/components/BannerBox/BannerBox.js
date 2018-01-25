@@ -4,6 +4,11 @@ import PropTypes from 'prop-types'
 import './BannerBox.css'
 
 class BannerBox extends Component {
+  
+  static propTypes = {
+    content: PropTypes.object.isRequired
+  }
+
   render() {
     const { content } = this.props
     return (
@@ -17,8 +22,5 @@ class BannerBox extends Component {
   }
 }
 
-BannerBox.propTypes = {
-  content: PropTypes.object.isRequired
-}
 
 export default BannerBox

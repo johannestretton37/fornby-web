@@ -16,7 +16,11 @@ class Page extends Component {
       mainImageURL: ''
     }
   }
-
+  static propTypes = {
+    location: PropTypes.object,
+    match: PropTypes.object,
+    history: PropTypes.object,
+  }
   componentDidMount() {
     this.getContent(this.props.match.params.page, this.props.match.params.slug)
   }
@@ -57,10 +61,6 @@ class Page extends Component {
   }
 }
 
-Page.propTypes = {
-  location: PropTypes.object,
-  match: PropTypes.object,
-  history: PropTypes.object
-}
+
 
 export default Page

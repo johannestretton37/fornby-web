@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {  Component } from 'react'
 import PropTypes from 'prop-types'
 import GalleryPage from '../GalleryPage'
 import Loading from '../Loading'
@@ -15,6 +15,10 @@ class MainPage extends Component {
     }
   }
 
+  static propTypes = {
+    match: PropTypes.object.isRequired
+  }
+
   componentDidMount() {
     this.loadPages()
   }
@@ -28,23 +32,20 @@ class MainPage extends Component {
     })
     this.setState({
       pages,
-      isLoading : false
+      isLoading: false
     })
   }
   render() {
-    let {isLoading, pages} = this.state
+    let { isLoading, pages } = this.state
     const page = this.props.match.params.page
     return (
       isLoading ?
         <Loading />
-      : 
+        :
         pages[page] || <ErrorPage />
     )
   }
 }
 
-MainPage.propTypes = {
-  match: PropTypes.object.isRequired
-}
 
 export default MainPage

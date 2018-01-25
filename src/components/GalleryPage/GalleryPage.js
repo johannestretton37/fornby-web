@@ -18,6 +18,10 @@ class GalleryPage extends Component {
       galleryItems: []
     }
   }
+  static propTypes = {
+    title: PropTypes.string.isRequired,
+    contentType: PropTypes.string.isRequired
+  }
 
   componentDidMount() {
     this.getContent(this.props.contentType)
@@ -63,9 +67,6 @@ class GalleryPage extends Component {
   }
 }
 
-GalleryPage.propTypes = {
-  title: PropTypes.string.isRequired,
-  contentType: PropTypes.string.isRequired
-}
+
 
 export default withRouter(GalleryPage)
