@@ -77,7 +77,7 @@ class CMS {
       try {
         let id = this.idFromSlug(group, slug)
         if (!id) {
-          await this.getContentGroup(group, { fields: ['name'] })
+          await this.getContentGroup(group, { fields: ['id', 'name'] })
           id = this.idFromSlug(group, slug)
           if (!id) reject(`Kunde inte hitta ${group}/${slug}`)
         }

@@ -6,6 +6,7 @@ class MainMenuItem extends Component {
   static propTypes = {
     item: object.isRequired,
     navigate: func.isRequired,
+    moveIndicator: func.isRequired,
     order: number.isRequired,
     isActive: bool,
     isLast: bool
@@ -16,12 +17,30 @@ class MainMenuItem extends Component {
     isLast: false
   }
 
+  componentDidMount() {
+    if (this.props.isActive) this.moveIndicator()
+  }
+
   handleClick = e => {
     e.preventDefault()
-    const href = e.currentTarget.attributes.href.nodeValue
-    const left = e.currentTarget.childNodes[0].offsetLeft + 'px'
-    const width = e.currentTarget.childNodes[0].offsetWidth + 'px'
-    this.props.navigate(href, this.props.order, {left, width})
+    this.moveIndicator()
+    this.navigate()
+  }
+  
+  titleSpanMeasurements = () => {
+    const left = this.titleSpan.offsetLeft + 'px'
+    const width = this.titleSpan.offsetWidth + 'px'
+    return {left, width}
+  }
+  
+  navigate = () => {
+    const { navigate, item: { url } } = this.props
+    navigate(url)
+  }
+
+  moveIndicator = () => {
+    const { order } = this.props
+    this.props.moveIndicator(order, this.titleSpanMeasurements())
   }
 
   render() {
@@ -33,7 +52,7 @@ class MainMenuItem extends Component {
           className={`nav-link${isLast ? ' last' : ''}${isActive ? ' active' : ''}`}
           href={item.url}
         >
-          <span>{item.title}</span>
+          <span ref={(titleSpan) => { this.titleSpan = titleSpan }}>{item.title}</span>
         </a>
       </div>
     )
