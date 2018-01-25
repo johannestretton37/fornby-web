@@ -22,7 +22,7 @@ class ImagePreLoader extends Component {
     previewImg: PropTypes.string,
     children: PropTypes.element
   }
-  
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.previewImg !== this.props.previewImg) {
       let previewImg = new Image()
