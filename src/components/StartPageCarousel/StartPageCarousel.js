@@ -21,6 +21,12 @@ class StartPageCarousel extends Component {
       show: false
     }
   }
+  static propTypes = {
+    height: PropTypes.number
+  }
+  static defaultProps = {
+    height: 400
+  }
 
   componentDidMount() {
     this.getSlides()
@@ -131,11 +137,6 @@ class StartPageCarousel extends Component {
   }
 }
 
-StartPageCarousel.propTypes = {
-  height: PropTypes.number
-}
-StartPageCarousel.defaultProps = {
-  height: 400
-}
+
 
 export default StartPageCarousel
