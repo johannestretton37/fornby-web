@@ -6,7 +6,7 @@ admin.initializeApp(functions.config().firebase)
 
 const updateSlug = (id, eventSnapshot) => {
   const addedCourse = eventSnapshot.val()
-  const slug = getSlug(addedCourse.name)
+  const slug = getSlug(addedCourse.name, { lang: 'sv' })
   return eventSnapshot.ref.child('slug').set(slug)
 }
 

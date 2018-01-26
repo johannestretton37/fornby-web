@@ -27,6 +27,19 @@ class CMS {
     ])
   }
 
+  createMainMenuItem = (item, parent) => {
+    let { id, title, cssClass } = item
+    let slug = '/' + getSlug(title, { lang: 'sv' })
+    if (parent) {
+      slug = parent.url + slug
+    }
+    return {
+      id,
+      title,
+      url: slug,
+      cssClass
+    }
+  }
   /**
    * Main Menu
    */
@@ -42,13 +55,7 @@ class CMS {
       mainNavigation.items.forEach(item => {
         if (item.parentIndex === 0) {
           // This is a root link, e.g. '/kurser'
-          let { id, title, url, cssClass } = item
-          mainMenu.push({
-            id,
-            title,
-            url,
-            cssClass
-          })
+          mainMenu.push(this.createMainMenuItem(item))
         } else {
           // This is a sub link, e.g. '/kurser/mer-info'
           // Find parent and add child to parent's subItems array
@@ -58,13 +65,7 @@ class CMS {
           let parent = this.findParentFor(item, array)
           if (parent) {
             if (!parent.subItems) parent.subItems = []
-            let { id, title, url, cssClass } = item
-            parent.subItems.push({
-              id,
-              title,
-              url: parent.url + url,
-              cssClass
-            })
+            parent.subItems.push(this.createMainMenuItem(item, parent))
           }
         }
       })
@@ -138,7 +139,7 @@ class CMS {
         if (!id) {
           await this.getContentGroup(group, { fields: ['id', 'name'] })
           id = this.idFromSlug(group, slug)
-          if (!id) reject(`Kunde inte hitta ${group}/${slug}`)
+          if (!id) reject(`Kunde inte hitta /${group}/${slug}`)
         }
         const content = await this.flamelinkApp.content.get(group, id)
         resolve(content)
