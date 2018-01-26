@@ -1,10 +1,22 @@
 @import 'styles/_colors.scss';
 
 .sub-menu {
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+  overflow-y: auto;
   ul.nav {
     padding-left: 1rem;
+    li {
+      padding: 0.15em 0;
+    }
+  }
+  & > .nav-item > a {
+    /* First level */
+    display: block;
+    padding: 0.5em 0 0.15em;
   }
   & > .nav-item {
+    /* Second level */
     a {
       font-size: 1.2em;
       color: $brand-primary;
@@ -14,6 +26,7 @@
       }
     }
     & ul > .nav-item {
+      /* Third level */
       a {
         font-size: 1em;
         color: $default-text-color;
