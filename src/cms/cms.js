@@ -52,8 +52,10 @@ class CMS {
         } else {
           // This is a sub link, e.g. '/kurser/mer-info'
           // Find parent and add child to parent's subItems array
-          // We can assume that the parent is already added to mainMenu
-          let parent = this.findParent(mainMenu, item.parentIndex)
+          // We can assume that the parent is already added to mainMenu, 
+          // search from end of array
+          const array = mainMenu
+          let parent = this.findParentFor(item, array)
           if (parent) {
             if (!parent.subItems) parent.subItems = []
             let { id, title, url, cssClass } = item
@@ -63,8 +65,6 @@ class CMS {
               url: parent.url + url,
               cssClass
             })
-          } else {
-            console.log('Couldn\'t find parent')
           }
         }
       })
@@ -73,15 +73,28 @@ class CMS {
     })
   }
 
-  findParent = (array, parentIndex) => {
-    let parent = array.find(subItem => {
-      if (subItem.id === parentIndex) {
-        return true
+  /**
+   * Helper function to find a parent for a child
+   * This method will search recursively through passed
+   * array and return a parent object if found
+   * 
+   * @param {object} item - The child that searches for its' parent
+   * @param {array} array - The array to search through
+   * 
+   * @returns - An `object` that is the child's parent, or `undefined` if search fails
+   */
+  findParentFor = (item, array) => {
+    let parent
+    let i = array.length - 1
+    while (parent === undefined && i >= 0) {
+      const possibleParent = array[i]
+      if (possibleParent.id === item.parentIndex) {
+        parent = possibleParent
+      } else if (possibleParent.subItems) {
+        return this.findParentFor(item, possibleParent.subItems)
       }
-      if (subItem.subItems) {
-        return this.findParent(subItem.subItems, parentIndex)
-      }
-    })
+      i--
+    }
     return parent
   }
 

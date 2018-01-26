@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
-import { Nav, NavItem, NavLink } from 'reactstrap'
+import { Nav, NavItem, Col } from 'reactstrap'
 import { object } from 'prop-types'
 import cms from '../../cms'
 import './SubMenu.css'
@@ -22,7 +22,8 @@ class SubMenu extends Component {
     return new Promise(async resolve => {
       const mainMenuItems = await cms.mainMenuItems()
       const pageMenuItems = mainMenuItems.find(mainItem => mainItem.url === '/' + page)
-      this.setState({ menuItems: pageMenuItems.subItems })
+      const menuItems = pageMenuItems.subItems || []
+      this.setState({ menuItems })
       resolve()
     })
   }
@@ -43,9 +44,14 @@ class SubMenu extends Component {
   render() {
     const { menuItems } = this.state
     return (
-      <Nav vertical>
-        {menuItems.map(this.menuItem)}
-      </Nav>
+      menuItems && menuItems.length > 0 ?
+      <Col md="2">
+        <Nav className='sub-menu' vertical>
+          {menuItems.map(this.menuItem)}
+        </Nav>
+      </Col>
+      :
+      null
     )
   }
 }

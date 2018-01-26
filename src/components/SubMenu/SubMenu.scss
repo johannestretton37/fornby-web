@@ -1,12 +1,37 @@
 @import 'styles/_colors.scss';
 
-ul.nav {
-  padding-left: 1rem;
-  a {
-    color: $default-text-color;
-    &.main-item {
-      font-size: 1.1em;
+.sub-menu {
+  ul.nav {
+    padding-left: 1rem;
+  }
+  & > .nav-item {
+    a {
+      font-size: 1.2em;
       color: $brand-primary;
+      &:hover {
+        color: lighten($brand-primary, 10%);
+        text-decoration: none;
+      }
     }
+    & ul > .nav-item {
+      a {
+        font-size: 1em;
+        color: $default-text-color;
+        &:hover {
+          color: lighten($default-text-color, 15%);
+          text-decoration: none;
+        }
+     }
+     & ul > .nav-item {
+       a {
+         font-size: 0.95em;
+         color: $brand-secondary;
+       }
+       &:hover {
+          color: lighten($brand-secondary, 50%);
+          text-decoration: none;
+       }
+     }
+   }
   }
 }

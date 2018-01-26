@@ -42,9 +42,7 @@ class MainPage extends Component {
     const page = this.props.match.params.page
     return (
       <Row>
-        <Col md="2">
-          <SubMenu />
-        </Col>
+        <SubMenu />
         <Col>
           {isLoading ? <Loading /> : pages[page] || <ErrorPage />}
         </Col>
