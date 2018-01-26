@@ -2,6 +2,7 @@ import getSlug from 'speakingurl'
 import firebaseApp from '../Fire'
 import flamelink from 'flamelink'
 import { ContentGroup } from '../constants'
+import { camelCase } from '../Helpers'
 
 /**
  * CMS
@@ -21,24 +22,23 @@ class CMS {
    * Get basic info, such as navigation, page headlines and such
    */
   getBasicInfo = () => {
-    return Promise.all([
-      this.mainMenuItems(),
-      this.getSlides()
-    ])
+    return Promise.all([this.mainMenuItems(), this.getSlides()])
   }
 
   createMainMenuItem = (item, parent) => {
-    let { id, title, url, cssClass } = item
-    let separator = (url.indexOf('#') !== -1) ? '#' : '/'
+    let { id, title, url, cssClass, order } = item
+    let separator = url.indexOf('#') !== -1 ? '#' : '/'
     let slug = separator + getSlug(title, { lang: 'sv' })
     if (parent) {
       slug = parent.url + slug
     }
+    if (title === 'Start') slug = '/'
     return {
       id,
       title,
       url: slug,
-      cssClass
+      cssClass,
+      order
     }
   }
   /**
@@ -60,7 +60,7 @@ class CMS {
         } else {
           // This is a sub link, e.g. '/kurser/mer-info'
           // Find parent and add child to parent's subItems array
-          // We can assume that the parent is already added to mainMenu, 
+          // We can assume that the parent is already added to mainMenu,
           // search from end of array
           const array = mainMenu
           let parent = this.findParentFor(item, array)
@@ -79,10 +79,10 @@ class CMS {
    * Helper function to find a parent for a child
    * This method will search recursively through passed
    * array and return a parent object if found
-   * 
+   *
    * @param {object} item - The child that searches for its' parent
    * @param {array} array - The array to search through
-   * 
+   *
    * @returns - An `object` that is the child's parent, or `undefined` if search fails
    */
   findParentFor = (item, array) => {
@@ -103,39 +103,32 @@ class CMS {
   /**
    * Return an array of content objects
    *
-   * @param {string} group - The name of the group to get. Defaults to `ContentGroup.COURSES` ('kurser')
-   * @param {object} options - The property fields to get. Defaults to `{ fields: ['id', 'name', 'shortInfo'] }`
+   * @param {string} group - The name of the group to get. Example `ContentGroup.COURSES` ('kurser')
+   * @param {object} options - The property fields to get. Example `{ fields: ['id', 'name', 'shortInfo'] }`
    * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
   getContentGroup = (
-    group = ContentGroup.COURSES,
-    options = { fields: ['id', 'name', 'slug', 'shortInfo'] },
+    group,
+    options = {},
     cacheResponse = true
   ) => {
     // Convert group name from friendly URL to camelCase
-    group = this.camelCase(group)
+    group = camelCase(group)
     return new Promise(async resolve => {
       // Return cached group if present
       if (this.cache[group]) return resolve(this.cache[group])
       const contentData = await this.flamelinkApp.content.get(group, options)
       let content = this.arrayFromFirebaseData(contentData)
       if (cacheResponse) {
-//        this.registerSlugs(content, group)
+        //        this.registerSlugs(content, group)
         this.cache[group] = content
       }
-      console.log('CMS Cache\n', this.cache)
+      console.log(`[${group}] CMS Cache\n`, this.cache)
       resolve(content)
     })
   }
 
-  camelCase = string => {
-    const words = string.toLowerCase().split('-')
-    return words.map((word, i) => {
-      if (i === 0) return word
-      return word[0].toUpperCase() + word.substr(1)
-    }).join('')
-  }
   /**
    * Return a single content object
    * @param {string} group - A string representing a group, e.g. 'kurser'
@@ -143,7 +136,16 @@ class CMS {
    * @returns - A Promise that resolves to a content object
    */
   getContent = (group, slug) => {
+    // Convert group name from friendly URL to camelCase
+    group = camelCase(group)
     return new Promise(async (resolve, reject) => {
+      // Return cached group if present
+      if (this.cache[group]) {
+        let cachedItem = this.cache[group].find(item => item.slug === slug)
+        if (cachedItem) {
+          return resolve(cachedItem)
+        }
+      }
       try {
         let id = this.idFromSlug(group, slug)
         if (!id) {
@@ -151,7 +153,33 @@ class CMS {
           id = this.idFromSlug(group, slug)
           if (!id) reject(`Kunde inte hitta /${group}/${slug}`)
         }
+        // Get data from flamelink
         const content = await this.flamelinkApp.content.get(group, id)
+        if (content.subPages) {
+          // Page has subPages - an array of slugs that we need to fetch from
+          // flamelink collection `detailPages`
+          let subPagesSlugs = []
+          content.subPages.forEach(subPage => {
+            subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
+          })
+          // Fetch detailPages
+          const detailPagesData = await this.flamelinkApp.content.get(
+            ContentGroup.DETAIL_PAGES
+          )
+          // Convert result to array
+          const detailPages = this.arrayFromFirebaseData(detailPagesData)
+          // Add relevant pages to content.subContent
+          const subContent = detailPages.filter(detailPage => subPagesSlugs.includes(detailPage.slug))
+          content.subContent = subContent
+        }
+        if (this.cache[group]) {
+          let cachedGroupIndex = this.cache[group].findIndex(page => page.slug === slug)
+          if (cachedGroupIndex !== -1) {
+            this.cache[group][cachedGroupIndex] = content
+          } else {
+            this.cache[group].push(content)
+          }
+        }
         resolve(content)
       } catch (error) {
         reject(error)
@@ -162,11 +190,13 @@ class CMS {
   getURL = id => {
     return this.flamelinkApp.storage.getURL(id, { size: 'device' })
   }
+
   /**
    * Fetch images for the start page carousel
    * @returns - A Promise that resolves to an array of objects, e.g.
    * {
    *   title: 'Image Headline',
+   *   alt: 'Image caption text',
    *   subtitle: 'A short text',
    *   image: 'http://www.example.com/path/to/image/file.jpg'
    * }
@@ -189,21 +219,6 @@ class CMS {
     })
   }
 
-  subscribeToCourses = callback => {
-    this.flamelinkApp.content.subscribe(
-      ContentGroup.COURSES,
-      (error, coursePages) => {
-        let courses = this.arrayFromFirebaseData(coursePages, [
-          'id',
-          'name',
-          'slug',
-          'shortInfo'
-        ])
-        callback(courses)
-      }
-    )
-  }
-
   /**
    * Helper function to transform a firebase object into an array
    * @param data - The data returned from a flamelink operation, such as `get`
@@ -218,8 +233,8 @@ class CMS {
         result[field] = val
       })
       if (result.slug === undefined && result.name !== undefined) {
-        console.warn('Didn\'t find a slug - creating one from', result.name)
-        result.slug = getSlug(result.name)
+        console.warn("Didn't find a slug - creating one from", result.name)
+        result.slug = getSlug(result.name, { lang: 'sv' })
       }
       array.push(result)
     })
@@ -233,7 +248,6 @@ class CMS {
     })
     return ids.length > 0 ? ids[0].id : undefined
   }
-
 }
 
 const cms = new CMS()

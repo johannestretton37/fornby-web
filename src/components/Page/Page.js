@@ -1,31 +1,28 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import cms from '../../cms'
-import ImagePreLoader from '../ImagePreLoader'
 import './Page.css'
-import CoursePage from '../CoursePage'
 import ErrorPage from '../ErrorPage'
-import { ContentGroup } from '../../constants'
+import { pageTypes } from '../../constants'
+import { camelCase } from '../../Helpers'
 /**
  * A generic component that will display detailed information about
  * something, e.g. a course
  */
 class Page extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      content: {},
-      mainImageURL: ''
-    }
+  state = {
+    content: {},
+    mainImageURL: ''
   }
+
   static propTypes = {
     location: PropTypes.object,
     match: PropTypes.object,
-    history: PropTypes.object,
+    history: PropTypes.object
   }
 
   componentDidMount() {
-    this.getContent(this.props.match.params.page, this.props.match.params.slug)
+    this.getContent(this.groupName(), this.props.match.params.slug)
   }
 
   getContent = async (group, id) => {
@@ -43,26 +40,24 @@ class Page extends Component {
     }
   }
 
-  subPage = () => {
-    switch (this.props.match.params.page) {
-      case ContentGroup.COURSES:
-        return <CoursePage content={this.state.content} mainImageURL={this.state.mainImageURL} />
-      default:
-        return <ErrorPage />
-    }
+  groupName = () => {
+    return camelCase(this.props.match.params.page)
+  }
+
+  pageType = () => {
+    const PageType = pageTypes[this.groupName()] || ErrorPage
+    const { content, mainImageURL } = this.state
+    return <PageType content={content} mainImageURL={mainImageURL} />
   }
 
   render() {
     return (
       <div>
-        <h1>{this.state.content.name}</h1>
-        {this.subPage()}
-
+        <h2>{this.state.content.name}</h2>
+        {this.pageType()}
       </div>
     )
   }
 }
-
-
 
 export default Page

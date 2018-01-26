@@ -1,8 +1,9 @@
 @import 'styles/_colors.scss';
 
 .sub-menu {
-  margin-top: 4rem;
-  margin-bottom: 4rem;
+  border-top: 1px solid #eee;
+  margin-bottom: 3rem;
+  padding: 1.5rem 1rem;
   overflow-y: auto;
   ul.nav {
     padding-left: 1rem;
