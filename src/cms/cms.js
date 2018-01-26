@@ -28,8 +28,9 @@ class CMS {
   }
 
   createMainMenuItem = (item, parent) => {
-    let { id, title, cssClass } = item
-    let slug = '/' + getSlug(title, { lang: 'sv' })
+    let { id, title, url, cssClass } = item
+    let separator = (url.indexOf('#') !== -1) ? '#' : '/'
+    let slug = separator + getSlug(title, { lang: 'sv' })
     if (parent) {
       slug = parent.url + slug
     }
@@ -102,7 +103,7 @@ class CMS {
   /**
    * Return an array of content objects
    *
-   * @param {string} group - The name of the group to get. Defaults to `ContentGroup.COURSES` ('coursePages')
+   * @param {string} group - The name of the group to get. Defaults to `ContentGroup.COURSES` ('kurser')
    * @param {object} options - The property fields to get. Defaults to `{ fields: ['id', 'name', 'shortInfo'] }`
    * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
@@ -112,6 +113,8 @@ class CMS {
     options = { fields: ['id', 'name', 'slug', 'shortInfo'] },
     cacheResponse = true
   ) => {
+    // Convert group name from friendly URL to camelCase
+    group = this.camelCase(group)
     return new Promise(async resolve => {
       // Return cached group if present
       if (this.cache[group]) return resolve(this.cache[group])
@@ -126,6 +129,13 @@ class CMS {
     })
   }
 
+  camelCase = string => {
+    const words = string.toLowerCase().split('-')
+    return words.map((word, i) => {
+      if (i === 0) return word
+      return word[0].toUpperCase() + word.substr(1)
+    }).join('')
+  }
   /**
    * Return a single content object
    * @param {string} group - A string representing a group, e.g. 'kurser'

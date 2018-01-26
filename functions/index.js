@@ -5,23 +5,23 @@ const getSlug = require('speakingurl')
 admin.initializeApp(functions.config().firebase)
 
 const updateSlug = (id, eventSnapshot) => {
-  const addedCourse = eventSnapshot.val()
-  const slug = getSlug(addedCourse.name, { lang: 'sv' })
+  const addedItem = eventSnapshot.val()
+  const slug = getSlug(addedItem.name, { lang: 'sv' })
   return eventSnapshot.ref.child('slug').set(slug)
 }
 
 // Add slug when new courses are added
 exports.addSlugToCourse = functions.database
-  .ref('/flamelink/environments/production/content/kurser/en-US/{courseId}')
+  .ref('/flamelink/environments/production/content/{page}/en-US/{contentId}')
   .onWrite(event => {
     const eventSnapshot = event.data
     if (!eventSnapshot.exists()) {
       // This is a delete action, do nothing
-      console.log('Course deleted - no need for slug creation')
+      console.log('Item deleted - no need for slug creation')
       return null
     }
 
-    const id = event.params.courseId
+    const id = event.params.contentId
     // Create/update slug whenever something changes
     return updateSlug(id, eventSnapshot)
   })
