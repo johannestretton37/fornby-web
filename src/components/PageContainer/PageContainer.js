@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import cms from '../../cms'
-import './Page.css'
+//import ImagePreLoader from '../ImagePreLoader'
+import './PageContainer.css'
+//import CoursePage from '../CoursePage'
 import ErrorPage from '../ErrorPage'
 import { pageTypes } from '../../constants'
 import { camelCase } from '../../Helpers'
@@ -9,7 +11,7 @@ import { camelCase } from '../../Helpers'
  * A generic component that will display detailed information about
  * something, e.g. a course
  */
-class Page extends Component {
+class PageContainer extends Component {
   state = {
     content: {},
     mainImageURL: ''
@@ -60,4 +62,6 @@ class Page extends Component {
   }
 }
 
-export default Page
+
+
+export default PageContainer
