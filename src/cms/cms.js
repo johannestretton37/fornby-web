@@ -120,6 +120,12 @@ class CMS {
       if (this.cache[group]) return resolve(this.cache[group])
       const contentData = await this.flamelinkApp.content.get(group, options)
       let content = this.arrayFromFirebaseData(contentData)
+      let contentWithSubPages = content.filter(item => item.subPages !== undefined)
+      let promises = contentWithSubPages.map(contentItem => {
+        console.log('fetch subPages for', contentItem)
+        return this.populateSubPages(contentItem)
+      })
+      await Promise.all(promises)
       if (cacheResponse) {
         //        this.registerSlugs(content, group)
         this.cache[group] = content
@@ -158,6 +164,7 @@ class CMS {
         if (content.subPages) {
           // Page has subPages - an array of slugs that we need to fetch from
           // flamelink collection `detailPages`
+          await this.populateSubPages(content)
           let subPagesSlugs = []
           content.subPages.forEach(subPage => {
             subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
@@ -184,6 +191,28 @@ class CMS {
       } catch (error) {
         reject(error)
       }
+    })
+  }
+
+  /**
+   * Populate passed in content object with any existing subPages content
+   */
+  populateSubPages = async content => {
+    return new Promise(async resolve => {
+      let subPagesSlugs = []
+      content.subPages.forEach(subPage => {
+        subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
+      })
+      // Fetch detailPages
+      const detailPagesData = await this.flamelinkApp.content.get(
+        ContentGroup.DETAIL_PAGES
+      )
+      // Convert result to array
+      const detailPages = this.arrayFromFirebaseData(detailPagesData)
+      // Add relevant pages to content.subContent
+      const subContent = detailPages.filter(detailPage => subPagesSlugs.includes(detailPage.slug))
+      content.subContent = subContent
+      resolve()
     })
   }
 

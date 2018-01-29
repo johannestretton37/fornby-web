@@ -1,0 +1,23 @@
+@import 'styles/_colors.scss';
+
+.linkable {
+  position: relative;
+  transition: color 300ms ease-out;
+  a {
+    display: block;
+    position: absolute;
+    opacity: 0;
+    top: 2px;
+    left: -32px;
+    width: 30px;
+    color: $brand-primary;
+    text-decoration: none;
+    transition: opacity 300ms ease-out;
+  }
+  &:hover {
+    color: $brand-primary;
+    a {
+      opacity: 1;
+    }
+  }
+}

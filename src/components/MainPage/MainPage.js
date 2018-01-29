@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import GalleryPage from '../GalleryPage'
 import Loading from '../Loading'
 import ErrorPage from '../ErrorPage'
-import { Row, Col } from 'reactstrap'
+import { Container, Row, Col } from 'reactstrap'
 import SubMenu from '../SubMenu'
 import cms from '../../cms'
 import './MainPage.css'
@@ -36,17 +36,17 @@ class MainPage extends Component {
       isLoading: false
     })
   }
-  
+
   render() {
     let { isLoading, pages } = this.state
     const page = this.props.match.params.page
     return (
-      <Row>
-        <SubMenu />
-        <Col>
-          {isLoading ? <Loading /> : pages[page] || <ErrorPage />}
-        </Col>
-      </Row>
+      <Container>
+        <Row>
+          <SubMenu />
+          <Col>{isLoading ? <Loading /> : pages[page] || <ErrorPage />}</Col>
+        </Row>
+      </Container>
     )
   }
 }

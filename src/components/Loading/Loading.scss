@@ -1,18 +1,23 @@
 @import 'styles/_colors.scss';
 
-.loading {
+.loading-container {
   display: flex;
-  margin: auto;
-  padding-bottom: 120px;
-  .spinner {
-    display: block;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    border: 3px solid $brand-secondary;
-    border-bottom: 3px solid transparent;
-    border-left: none;
-    animation: spin 1500ms linear infinite;
+  flex-direction: column;
+  height: 100%;
+  .loading {
+    display: flex;
+    margin: auto;
+    padding-bottom: 120px;
+    .spinner {
+      display: block;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid $brand-secondary;
+      border-bottom: 3px solid transparent;
+      border-left: none;
+      animation: spin 1500ms linear infinite;
+    }
   }
 }
 

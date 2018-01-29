@@ -1,18 +1,20 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { object, string } from 'prop-types'
 import { DateHelper } from '../../Helpers'
 import ImagePreLoader from '../ImagePreLoader'
+import DetailPage from '../DetailPage'
 import './DefaultPage.css'
 
 class DefaultPage extends Component {
   static propTypes = {
     content: object,
-    mainImageURL: string
+    mainImageURL: string,
+    location: object
   }
 
   render() {
-    const { content: { name, summary, shortInfo, mainBody, subContent }, mainImageURL } = this.props
+    const { content: { name, summary, shortInfo, mainBody, subContent }, mainImageURL, location } = this.props
     return (
       <div className="default-page">
         <h3 className="summary">{summary}</h3>
@@ -26,17 +28,10 @@ class DefaultPage extends Component {
           className="main-body"
           dangerouslySetInnerHTML={{ __html: mainBody }}
         />
-        {subContent && subContent.map((article, i) => {
-          return (
-            <div key={i}>
-              <h4 id={article.slug}>{article.name}</h4>
-              <p><b>{article.shortInfo}</b></p>
-            </div>
-          )
-        })}
+        <DetailPage content={subContent} url={location.pathname} />
       </div>
     )
   }
 }
 
-export default DefaultPage
+export default withRouter(DefaultPage)
