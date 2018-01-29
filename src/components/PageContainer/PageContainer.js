@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import cms from '../../cms'
 import ImagePreLoader from '../ImagePreLoader'
-import './Page.css'
+import './PageContainer.css'
 import CoursePage from '../CoursePage'
 import ErrorPage from '../ErrorPage'
 import { ContentGroup } from '../../constants'
@@ -10,7 +10,7 @@ import { ContentGroup } from '../../constants'
  * A generic component that will display detailed information about
  * something, e.g. a course
  */
-class Page extends Component {
+class PageContainer extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -55,7 +55,7 @@ class Page extends Component {
   render() {
     return (
       <div>
-        <h1>{this.state.content.name}</h1>
+        <h1 className='page-title' >{this.state.content.name}</h1>
         {this.subPage()}
 
       </div>
@@ -65,4 +65,4 @@ class Page extends Component {
 
 
 
-export default Page
+export default PageContainer

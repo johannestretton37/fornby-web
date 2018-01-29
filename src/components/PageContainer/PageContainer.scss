@@ -1,0 +1,10 @@
+@import 'styles/_colors.scss';
+
+p {
+  color: $default-text-color;
+}
+.page-title{
+  margin-bottom: 1.0em;
+  overflow: hidden;
+  border-bottom: 3px solid $default-text-color;
+}

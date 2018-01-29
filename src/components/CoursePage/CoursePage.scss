@@ -1,0 +1,23 @@
+@import '../../styles/colors';
+
+.btn {
+    border-radius: 0px;
+    margin-top: 2em;
+}
+p{
+    line-height:1.65em;
+    margin-bottom: 0.5em;
+    font-weight: normal;
+    font-size: 22px;
+    max-width: 50em;
+    color: $default-text-color;
+}
+.course-header{
+    margin-left: 2em;
+}
+.course-summary{
+    margin-bottom: 2em;
+}
+.course-date{
+    font-weight: bold;
+}
