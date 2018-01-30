@@ -17,7 +17,8 @@ class BackButton extends Component {
 
   render() {
     return (
-      <a href={this.props.location.pathname} onClick={this.handleClick}>{this.props.prevPage ? `Tillbaka till ${this.props.prevPage}` : 'Tillbaka'}</a>
+      <p>
+      <a href={this.props.location.pathname} onClick={this.handleClick}>{this.props.prevPage ? `Tillbaka till ${this.props.prevPage}` : 'Tillbaka'}</a></p>
     )
   }
 }
