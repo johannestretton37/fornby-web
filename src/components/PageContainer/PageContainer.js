@@ -69,7 +69,7 @@ class PageContainer extends Component {
     return (
       <div>
         <BackButton prevPage={this.props.title} />
-        <h2>{this.state.content.name}</h2>
+        <h1 className='page-title'>{this.state.content.name}</h1>
         {pageType}
       </div>
     )

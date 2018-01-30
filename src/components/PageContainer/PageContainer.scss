@@ -4,7 +4,9 @@ p {
   color: $default-text-color;
 }
 .page-title{
-  margin-bottom: 1.0em;
+  margin-bottom: 2rem;
+  letter-spacing: 1.1px;
   overflow: hidden;
   border-bottom: 3px solid $default-text-color;
+  font-size: 3em;
 }
