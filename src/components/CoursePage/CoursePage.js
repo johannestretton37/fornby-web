@@ -24,16 +24,12 @@ function CoursePage({ content, mainImageURL, onApplyClicked }) {
   return (
     <div>
       <div className='course-header'>
-        <p>
-          <div className='course-summary' dangerouslySetInnerHTML={{ __html: summary }} /></p>
-        <p>
-          <h5 className='course-date' >Startdatum: {DateHelper.formatDate(courseStartDate)}</h5>
-          <h5 className='course-date' >Sista ansökningsdag: {DateHelper.formatDate(applicationDeadline)}</h5>
-        </p>
+        <p className='course-summary' dangerouslySetInnerHTML={{ __html: summary }} />
+        <h5 className='course-date' >Startdatum: {DateHelper.formatDate(courseStartDate)}</h5>
+        <h5 className='course-date' >Sista ansökningsdag: {DateHelper.formatDate(applicationDeadline)}</h5>
         <p>
           <button className='btn default' color="primary" size="lg" onClick={onApplyClicked}>{'Ansök till ' + name}</button>
         </p>
-
       </div>
       {(() => {
         if (mainImage) {
@@ -42,10 +38,9 @@ function CoursePage({ content, mainImageURL, onApplyClicked }) {
           </ImagePreLoader>)
         }
       })()}
-      <p>
-        <div className='course-main-body' dangerouslySetInnerHTML={{ __html: mainBody }} />
-      </p>
+      <p className='course-main-body' dangerouslySetInnerHTML={{ __html: mainBody }} />
     </div>
   )
 }
-export default CoursePage;
+
+export default CoursePage

@@ -1,29 +1,36 @@
 @import '../../styles/colors';
 
-
-p{
+.course {
+  p {
     line-height:1.65em;
     margin-bottom: 1em;
     font-weight: normal;
     max-width: 40em;
     color: $default-text-color;
-}
-.course-header{
-   // margin-left: 2em;
-}
-.course-summary{
-    //margin-bottom: 2em;
-}
-.course-date{
+  }
+  &-header {
+
+  }
+  &-summary {
+
+  }
+  &-date {
     font-weight: bold;
+  }
+  &-main-body {
+    ul {
+      margin-bottom: 1em;
+    }
+    ul, li {
+      margin-left: 1em;
+    }
+  }
 }
+
 .btn{
-    -webkit-transition: background-color 0.2s ease-in-out;
-    -moz-transition: background-color 0.2s ease-in-out;
-    -o-transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out;
     border-radius: 0px;
     display: inline-block;
-    transition: background-color 0.2s ease-in-out;
     background-color: $brand-secondary;
     border: 2px solid transparent;
     border-radius: 0px;
@@ -37,7 +44,7 @@ p{
     text-align: center;
     text-decoration: none;
     text-transform: uppercase;
-    :hover{
+    &:hover{
         color: #5f2222;
     }
 }
