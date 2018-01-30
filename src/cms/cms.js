@@ -15,7 +15,7 @@ class CMS {
   constructor() {
     this.flamelinkApp = flamelink({ firebaseApp })
     this.cache = {}
-    this.getBasicInfo()
+    // this.getBasicInfo()
   }
 
   /**
@@ -41,6 +41,7 @@ class CMS {
       order
     }
   }
+
   /**
    * Main Menu
    */
@@ -71,7 +72,7 @@ class CMS {
         }
       })
       this.cache.mainMenu = mainMenu
-      resolve(mainMenu)
+      return resolve(mainMenu)
     })
   }
 
@@ -100,57 +101,100 @@ class CMS {
     return parent
   }
 
+  getDetailPages = () => {
+    return new Promise(async resolve => {
+      if (this.cache.detailPages) return resolve(this.cache.detailPages)
+      // No cache, fetch detailPages
+      const detailPagesData = await this.flamelinkApp.content.get(
+        ContentGroup.DETAIL_PAGES
+      )
+      // Convert result to array
+      const detailPages = this.arrayFromFirebaseData(detailPagesData)
+      this.cache.detailPages = detailPages
+      return resolve(detailPages)
+    })
+  }
+
   /**
    * Return an array of content objects
    *
-   * @param {string} group - The name of the group to get. Example `ContentGroup.COURSES` ('kurser')
+   * @param {string} groupName - The name of the group to get. Example `ContentGroup.COURSES` ('kurser')
    * @param {object} options - The property fields to get. Example `{ fields: ['id', 'name', 'shortInfo'] }`
    * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
-  getContentGroup = (
-    group,
-    options = {},
-    cacheResponse = true
-  ) => {
+  getContentGroup = (groupName, options, cacheResponse = true) => {
+    console.log('getContentGroup(', groupName, options, cacheResponse, ')')
     // Convert group name from friendly URL to camelCase
-    group = camelCase(group)
+    let group = camelCase(groupName)
     return new Promise(async resolve => {
       // Return cached group if present
       if (this.cache[group]) return resolve(this.cache[group])
       const contentData = await this.flamelinkApp.content.get(group, options)
       let content = this.arrayFromFirebaseData(contentData)
-      let contentWithSubPages = content.filter(item => item.subPages !== undefined)
-      let promises = contentWithSubPages.map(contentItem => {
-        console.log('fetch subPages for', contentItem)
-        return this.populateSubPages(contentItem)
-      })
-      await Promise.all(promises)
+      // Get this group's main menu item
+      let mainMenu = await this.mainMenuItems()
+      let mainMenuItem = mainMenu.find(
+        item => item.url.replace('/', '') === groupName
+      )
+      if (mainMenuItem) {
+        // Check if main menu has submenus
+        if (mainMenuItem.subItems) {
+          // The submenus point to detail pages, get the corresponding detailPages
+          const detailPages = await this.getDetailPages()
+          // Loop through submenus and search for detailPages
+          mainMenuItem.subItems.forEach(subItem => {
+            // Detail pages are nested this deep:
+            if (subItem.subItems) {
+              // Slugs we need to get from detailPages
+              let slugsToGet = subItem.subItems.map(s => {
+                return getSlug(s.title, { lang: 'sv' })
+              })
+              // Extract the titles
+              detailPages.forEach(detailPage => {
+                let contentItemToPopulate = content.find(
+                  c => c.slug === getSlug(subItem.title, { lang: 'sv' })
+                )
+                if (contentItemToPopulate === undefined) {
+                  console.warn("Could not find detailPage for", subItem.title)
+                } else {
+                  if (contentItemToPopulate.subContent === undefined) contentItemToPopulate.subContent = []
+                  if (slugsToGet.includes(detailPage.slug)) {
+                    contentItemToPopulate.subContent.push(detailPage)
+                  }
+                }
+              })
+            }
+          })
+        }
+      }
       if (cacheResponse) {
-        //        this.registerSlugs(content, group)
         this.cache[group] = content
       }
       console.log(`[${group}] CMS Cache\n`, this.cache)
-      resolve(content)
+      return resolve(content)
     })
   }
 
   /**
    * Return a single content object
-   * @param {string} group - A string representing a group, e.g. 'kurser'
+   * @param {string} groupName - A string representing a group, e.g. 'kurser'
    * @param {string} slug - A string representing a slug, e.g. 'konstkurs-VT-18'
    * @returns - A Promise that resolves to a content object
    */
-  getContent = (group, slug) => {
+  getContent = (groupName, slug) => {
+    console.log('getContent(', groupName, slug, ')')
     // Convert group name from friendly URL to camelCase
-    group = camelCase(group)
+    let group = camelCase(groupName)
     return new Promise(async (resolve, reject) => {
+      let contentGroup
+      if (!this.cache[group]) {
+        contentGroup = await this.getContentGroup(groupName)
+      }
       // Return cached group if present
       if (this.cache[group]) {
         let cachedItem = this.cache[group].find(item => item.slug === slug)
-        if (cachedItem) {
-          return resolve(cachedItem)
-        }
+        if (cachedItem) return resolve(cachedItem)
       }
       try {
         let id = this.idFromSlug(group, slug)
@@ -161,35 +205,41 @@ class CMS {
         }
         // Get data from flamelink
         const content = await this.flamelinkApp.content.get(group, id)
-        if (content.subPages) {
-          // Page has subPages - an array of slugs that we need to fetch from
-          // flamelink collection `detailPages`
-          await this.populateSubPages(content)
-          let subPagesSlugs = []
-          content.subPages.forEach(subPage => {
-            subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
-          })
-          // Fetch detailPages
-          const detailPagesData = await this.flamelinkApp.content.get(
-            ContentGroup.DETAIL_PAGES
-          )
-          // Convert result to array
-          const detailPages = this.arrayFromFirebaseData(detailPagesData)
-          // Add relevant pages to content.subContent
-          const subContent = detailPages.filter(detailPage => subPagesSlugs.includes(detailPage.slug))
-          content.subContent = subContent
-        }
-        if (this.cache[group]) {
-          let cachedGroupIndex = this.cache[group].findIndex(page => page.slug === slug)
-          if (cachedGroupIndex !== -1) {
-            this.cache[group][cachedGroupIndex] = content
-          } else {
-            this.cache[group].push(content)
-          }
-        }
-        resolve(content)
+        // if (content.subPages) {
+        //   // Page has subPages - an array of slugs that we need to fetch from
+        //   // flamelink collection `detailPages`
+        //   await this.populateSubPages(content)
+        //   let subPagesSlugs = []
+        //   content.subPages.forEach(subPage => {
+        //     subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
+        //   })
+        //   // Fetch detailPages
+        //   const detailPagesData = await this.flamelinkApp.content.get(
+        //     ContentGroup.DETAIL_PAGES
+        //   )
+        //   // Convert result to array
+        //   const detailPages = this.arrayFromFirebaseData(detailPagesData)
+        //   // Add relevant pages to content.subContent
+        //   const subContent = detailPages.filter(detailPage =>
+        //     subPagesSlugs.includes(detailPage.slug)
+        //   )
+        //   content.subContent = subContent
+        // }
+
+        // Cache
+        // if (this.cache[group]) {
+        //   let cachedGroupIndex = this.cache[group].findIndex(
+        //     page => page.slug === slug
+        //   )
+        //   if (cachedGroupIndex !== -1) {
+        //     this.cache[group][cachedGroupIndex] = content
+        //   } else {
+        //     this.cache[group].push(content)
+        //   }
+        // }
+        return resolve(content)
       } catch (error) {
-        reject(error)
+        return reject(error)
       }
     })
   }
@@ -197,24 +247,26 @@ class CMS {
   /**
    * Populate passed in content object with any existing subPages content
    */
-  populateSubPages = async content => {
-    return new Promise(async resolve => {
-      let subPagesSlugs = []
-      content.subPages.forEach(subPage => {
-        subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
-      })
-      // Fetch detailPages
-      const detailPagesData = await this.flamelinkApp.content.get(
-        ContentGroup.DETAIL_PAGES
-      )
-      // Convert result to array
-      const detailPages = this.arrayFromFirebaseData(detailPagesData)
-      // Add relevant pages to content.subContent
-      const subContent = detailPages.filter(detailPage => subPagesSlugs.includes(detailPage.slug))
-      content.subContent = subContent
-      resolve()
-    })
-  }
+  // populateSubPages = async content => {
+  //   return new Promise(async resolve => {
+  //     let subPagesSlugs = []
+  //     content.subPages.forEach(subPage => {
+  //       subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
+  //     })
+  //     // Fetch detailPages
+  //     const detailPagesData = await this.flamelinkApp.content.get(
+  //       ContentGroup.DETAIL_PAGES
+  //     )
+  //     // Convert result to array
+  //     const detailPages = this.arrayFromFirebaseData(detailPagesData)
+  //     // Add relevant pages to content.subContent
+  //     const subContent = detailPages.filter(detailPage =>
+  //       subPagesSlugs.includes(detailPage.slug)
+  //     )
+  //     content.subContent = subContent
+  //     resolve()
+  //   })
+  // }
 
   getURL = id => {
     return this.flamelinkApp.storage.getURL(id, { size: 'device' })

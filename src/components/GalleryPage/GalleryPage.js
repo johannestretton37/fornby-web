@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Switch, Route, withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { Container, Row, Col } from 'reactstrap'
+import { Container, Row, Col, ButtonGroup, Button } from 'reactstrap'
 import Gallery from '../Gallery'
 import Page from '../Page'
 import cms from '../../cms'
@@ -15,7 +15,8 @@ class GalleryPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      galleryItems: []
+      galleryItems: [],
+      selectedFilial: []
     }
   }
   static propTypes = {
@@ -32,16 +33,40 @@ class GalleryPage extends Component {
     const content = await cms.getContentGroup(contentType)
     this.setState({
       galleryItems: content
-    })
+    }, () => console.log('GalleryPage got content:', this.state.galleryItems))
+  }
+
+  selectFilial = filial => {
+    const index = this.state.selectedFilial.indexOf(filial);
+    if (index < 0) {
+      this.state.selectedFilial.push(filial);
+    } else {
+      this.state.selectedFilial.splice(index, 1);
+    }
+    this.setState({ selectedFilial: [...this.state.selectedFilial] });
   }
 
   render() {
     const { title } = this.props
+    const filials = [
+      {
+        slug: 'borlange',
+        name: 'Borlänge'
+      },
+      {
+        slug: 'ludvika',
+        name: 'Ludvika'
+      },
+      {
+        slug: 'falun',
+        name: 'Falun'
+      }
+    ]
     return (
       <section>
         <Container>
           <Switch>
-            <Route path="/:page/:slug" component={Page} />
+            <Route path="/:page/:slug" render={(props) => <Page title={title} {...props} items={this.state.galleryItems} />} />
             <Route
               render={() => {
                 return (
@@ -49,6 +74,18 @@ class GalleryPage extends Component {
                     <Row>
                       <Col>
                         <h2>{title}</h2>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <p>[Eventuellt en sorteringsfunktion här?]</p>
+                        <p>Visa endast kurser som hålls i</p>
+                        <ButtonGroup style={{ paddingBottom: '20px'}}>
+                          {filials.map(filial => {
+                            return <Button color="primary" key={filial.slug} onClick={
+                              () => this.selectFilial(filial.slug)} active={this.state.selectedFilial.includes(filial.slug)}>{filial.name}</Button>
+                          })}
+                        </ButtonGroup>
                       </Col>
                     </Row>
                     <Row>
