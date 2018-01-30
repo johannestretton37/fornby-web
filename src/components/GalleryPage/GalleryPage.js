@@ -3,7 +3,7 @@ import { Switch, Route, withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Container, Row, Col, ButtonGroup, Button } from 'reactstrap'
 import Gallery from '../Gallery'
-import Page from '../Page'
+import PageContainer from '../PageContainer'
 import cms from '../../cms'
 import './GalleryPage.css'
 
@@ -66,7 +66,7 @@ class GalleryPage extends Component {
       <section>
         <Container>
           <Switch>
-            <Route path="/:page/:slug" render={(props) => <Page title={title} {...props} items={this.state.galleryItems} />} />
+            <Route path="/:page/:slug" render={(props) => <PageContainer title={title} {...props} items={this.state.galleryItems} />} />
             <Route
               render={() => {
                 return (
@@ -103,7 +103,5 @@ class GalleryPage extends Component {
     )
   }
 }
-
-
 
 export default withRouter(GalleryPage)
