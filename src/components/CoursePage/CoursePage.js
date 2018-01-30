@@ -3,7 +3,6 @@ import './CoursePage.css'
 import PropTypes from 'prop-types'
 import DateHelper from '../../Helpers'
 import ImagePreLoader from '../ImagePreLoader'
-import { Button } from 'reactstrap'
 
 CoursePage.propTypes = {
   content: PropTypes.any.isRequired,
@@ -20,16 +19,21 @@ CoursePage.propTypes = {
 function CoursePage({ content, mainImageURL, onApplyClicked }) {
 
   const {
-    courseStartDate, applicationDeadline, summary, mainBody, mainImage, name, colorScheme
+    courseStartDate, applicationDeadline, summary, mainBody, mainImage, name
   } = content;
-  console.log(colorScheme)
   return (
     <div>
       <div className='course-header'>
-        <div className='course-summary' dangerouslySetInnerHTML={{ __html: summary }} />
-        <h4 className='course-date' >Startdatum: {DateHelper.formatDate(courseStartDate)}</h4>
-        <h4 className='course-date' >Sista ansökningsdag: {DateHelper.formatDate(applicationDeadline)}</h4>
-        <Button style={{ 'background-color': colorScheme, 'border-color': colorScheme }} color="primary" size="lg" onClick={onApplyClicked}>{'Ansök till ' + name}</Button>
+        <p>
+          <div className='course-summary' dangerouslySetInnerHTML={{ __html: summary }} /></p>
+        <p>
+          <h5 className='course-date' >Startdatum: {DateHelper.formatDate(courseStartDate)}</h5>
+          <h5 className='course-date' >Sista ansökningsdag: {DateHelper.formatDate(applicationDeadline)}</h5>
+        </p>
+        <p>
+          <button className='btn default' color="primary" size="lg" onClick={onApplyClicked}>{'Ansök till ' + name}</button>
+        </p>
+
       </div>
       {(() => {
         if (mainImage) {
@@ -38,7 +42,9 @@ function CoursePage({ content, mainImageURL, onApplyClicked }) {
           </ImagePreLoader>)
         }
       })()}
-      <div className='course-main-body' dangerouslySetInnerHTML={{ __html: mainBody }} />
+      <p>
+        <div className='course-main-body' dangerouslySetInnerHTML={{ __html: mainBody }} />
+      </p>
     </div>
   )
 }

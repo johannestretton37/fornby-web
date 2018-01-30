@@ -1,23 +1,43 @@
 @import '../../styles/colors';
 
-.btn {
-    border-radius: 0px;
-    margin-top: 2em;
-}
+
 p{
     line-height:1.65em;
-    margin-bottom: 0.5em;
+    margin-bottom: 1em;
     font-weight: normal;
-    font-size: 22px;
-    max-width: 50em;
+    max-width: 40em;
     color: $default-text-color;
 }
 .course-header{
-    margin-left: 2em;
+   // margin-left: 2em;
 }
 .course-summary{
-    margin-bottom: 2em;
+    //margin-bottom: 2em;
 }
 .course-date{
     font-weight: bold;
+}
+.btn{
+    -webkit-transition: background-color 0.2s ease-in-out;
+    -moz-transition: background-color 0.2s ease-in-out;
+    -o-transition: background-color 0.2s ease-in-out;
+    border-radius: 0px;
+    display: inline-block;
+    transition: background-color 0.2s ease-in-out;
+    background-color: $brand-secondary;
+    border: 2px solid transparent;
+    border-radius: 0px;
+    box-sizing: border-box;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 400;
+    letter-spacing: 1.1px;
+    line-height: 1.2;
+    padding: 0.8em 1em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    :hover{
+        color: #5f2222;
+    }
 }
