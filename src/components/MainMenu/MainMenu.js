@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { object } from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import MainMenuItem from '../MainMenuItem'
+import logo from '../../assets/logo.svg'
 import cms from '../../cms'
 import './MainMenu.css'
 
@@ -11,7 +12,8 @@ class MainMenu extends Component {
     mainMenuItems: [],
     activeItem: -1,
     left: '0px',
-    width: '0px'
+    width: '0px',
+    isOpen: false
   }
 
   static propTypes = {
@@ -45,18 +47,51 @@ class MainMenu extends Component {
     }
   }
 
-  moveIndicator = (activeItem, indicatorPosition) => {
+  updateIndicator = () => {
+
+  }
+
+  moveIndicator = (activeItem, indicatorPosition, withOutTransition = false) => {
+    if (!this.activeIndicator) return false
+    let transition = this.activeIndicator.style.transition
+    if (withOutTransition) {
+      this.activeIndicator.style.transition = 'none'
+    }
     this.setState({
       activeItem,
       ...indicatorPosition
+    }, () => {
+      if (withOutTransition) {
+        setTimeout(() => {
+          this.activeIndicator.style.transition = transition
+        }, 10)
+      }
+    })
+  }
+
+  /**
+   * Mobile menu
+   */
+  toggleMenu = e => {
+    e.preventDefault()
+    this.setState(prevState => {
+      return { isOpen: !prevState.isOpen }
     })
   }
 
   render() {
-    const { left, width, mainMenuItems, activeItem } = this.state
+    const { left, width, mainMenuItems, activeItem, isOpen } = this.state
     return (
       <div className="main-menu-container">
-        <nav className="main-menu">
+        <div className="main-menu-header">
+          <div className={`main-menu-toggler${isOpen ? ' open' : ''}`} onClick={this.toggleMenu}>HAMBURGER</div>
+          <div className='main-menu-logo'>
+            <a href="/">
+              <img src={logo} className="logo" alt="logo" />
+            </a>    
+          </div>
+        </div>
+        <nav className="main-menu" style={{ maxHeight: isOpen ? '400px' : '0px' }} >
           {mainMenuItems.map((menuItem, i, items) => {
             return (
               <CSSTransition
@@ -80,6 +115,7 @@ class MainMenu extends Component {
         </nav>
           <div
             id="main-menu-indicator"
+            ref={(activeIndicator) => { this.activeIndicator = activeIndicator }}
             style={{
               left,
               width,

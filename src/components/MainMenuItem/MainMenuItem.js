@@ -18,7 +18,26 @@ class MainMenuItem extends Component {
   }
 
   componentDidMount() {
-    if (this.props.isActive) this.moveIndicator()
+    if (this.props.isActive) {
+      this.moveIndicator()
+      window.addEventListener('resize', this.handleResize)
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.isActive && this.props.isActive) {
+      console.log(this.props.order, 'is no longer active')
+      // This item toggled to inactive, remove listener
+      window.removeEventListener('resize', this.handleResize)
+    } else if (nextProps.isActive && !this.props.isActive) {
+      // This item toggled to active, add listener
+      window.addEventListener('resize', this.handleResize)      
+    }
+  }
+
+  handleResize = e => {
+    console.log(this.props.order)
+    this.moveIndicator(true)
   }
 
   handleClick = e => {
@@ -38,9 +57,9 @@ class MainMenuItem extends Component {
     navigate(url)
   }
 
-  moveIndicator = () => {
+  moveIndicator = (withOutTransition) => {
     const { order } = this.props
-    this.props.moveIndicator(order, this.titleSpanMeasurements())
+    this.props.moveIndicator(order, this.titleSpanMeasurements(), withOutTransition)
   }
 
   render() {

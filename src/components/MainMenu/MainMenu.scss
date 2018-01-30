@@ -1,9 +1,90 @@
 @import 'styles/_colors.scss';
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .main-menu-container {
   position: relative;
+  .main-menu-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    .main-menu-toggler {
+      /* small */
+      flex-grow: 1;
+      cursor: pointer;
+      &.open {
+        color:purple;
+      }
+      @include media-breakpoint-up(md) {
+        /* large */
+        display:none;
+      }
+    }
+    .main-menu-logo {
+      /* small */
+      display: block;
+      flex-grow: 2;
+      @include media-breakpoint-up(md) {
+        /* large */
+        display: none;
+      }
+      img {
+        width: 120px;
+      }
+    }
+  }
+  .main-menu {
+    /* small */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    transition: max-height 500ms ease-out;
+    @include media-breakpoint-up(md) {
+      /* large */
+      flex-direction: row;
+      margin-bottom: 3rem;
+      overflow: visible;
+      max-height: 100% !important;
+    }
+    ul,
+    li {
+      margin: auto;
+    }
+    .nav-item {
+      flex-grow: 1;
+      .nav-link {
+        text-align: center;
+        text-decoration: none;
+        text-transform: uppercase;
+        outline: none;
+        color: #555;
+        transition: color 300ms ease-out;
+        @include media-breakpoint-up(md) {
+          /* large */
+          border-right: 1px solid #eee;
+          &.last {
+            border-right: none;
+          }
+        }
+        &:hover,
+        &:active {
+          color: #500;
+        }
+        &.active {
+          color: $brand-primary;
+        }
+      }
+    }
+  }
   #main-menu-indicator {
-    display: block;
+    /* small */
+    display:none;
+    @include media-breakpoint-up(md) {
+      /* large */
+      display: block;
+    }
     position: absolute;
     height: 3px;
     width: 80px;
