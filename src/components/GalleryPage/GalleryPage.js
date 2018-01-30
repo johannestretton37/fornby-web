@@ -33,7 +33,7 @@ class GalleryPage extends Component {
     const content = await cms.getContentGroup(contentType)
     this.setState({
       galleryItems: content
-    }, () => console.log('GalleryPage got content:', this.state.galleryItems))
+    })
   }
 
   selectFilial = filial => {

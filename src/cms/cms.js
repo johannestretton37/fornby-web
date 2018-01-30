@@ -124,7 +124,6 @@ class CMS {
    * @returns - A Promise that resolves to an array of objects
    */
   getContentGroup = (groupName, options, cacheResponse = true) => {
-    console.log('getContentGroup(', groupName, options, cacheResponse, ')')
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
     return new Promise(async resolve => {
@@ -183,13 +182,11 @@ class CMS {
    * @returns - A Promise that resolves to a content object
    */
   getContent = (groupName, slug) => {
-    console.log('getContent(', groupName, slug, ')')
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
     return new Promise(async (resolve, reject) => {
-      let contentGroup
       if (!this.cache[group]) {
-        contentGroup = await this.getContentGroup(groupName)
+        await this.getContentGroup(groupName)
       }
       // Return cached group if present
       if (this.cache[group]) {
@@ -205,38 +202,6 @@ class CMS {
         }
         // Get data from flamelink
         const content = await this.flamelinkApp.content.get(group, id)
-        // if (content.subPages) {
-        //   // Page has subPages - an array of slugs that we need to fetch from
-        //   // flamelink collection `detailPages`
-        //   await this.populateSubPages(content)
-        //   let subPagesSlugs = []
-        //   content.subPages.forEach(subPage => {
-        //     subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
-        //   })
-        //   // Fetch detailPages
-        //   const detailPagesData = await this.flamelinkApp.content.get(
-        //     ContentGroup.DETAIL_PAGES
-        //   )
-        //   // Convert result to array
-        //   const detailPages = this.arrayFromFirebaseData(detailPagesData)
-        //   // Add relevant pages to content.subContent
-        //   const subContent = detailPages.filter(detailPage =>
-        //     subPagesSlugs.includes(detailPage.slug)
-        //   )
-        //   content.subContent = subContent
-        // }
-
-        // Cache
-        // if (this.cache[group]) {
-        //   let cachedGroupIndex = this.cache[group].findIndex(
-        //     page => page.slug === slug
-        //   )
-        //   if (cachedGroupIndex !== -1) {
-        //     this.cache[group][cachedGroupIndex] = content
-        //   } else {
-        //     this.cache[group].push(content)
-        //   }
-        // }
         return resolve(content)
       } catch (error) {
         return reject(error)
