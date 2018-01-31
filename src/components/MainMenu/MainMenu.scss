@@ -9,7 +9,13 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    .main-menu-toggler {
+    /* small */
+    padding: 20px 0;
+    @include media-breakpoint-up(md) {
+      /* large */
+      padding: 0;
+    }
+  .main-menu-toggler {
       /* small */
       flex-grow: 1;
       cursor: pointer;
@@ -86,7 +92,7 @@
       display: block;
     }
     position: absolute;
-    height: 3px;
+    height: 2px;
     width: 80px;
     bottom: 0;
     opacity: 0;

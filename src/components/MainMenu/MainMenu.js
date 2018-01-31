@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { object } from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import MainMenuItem from '../MainMenuItem'
-import logo from '../../assets/logo.svg'
+import logo from '../../assets/fornby-logo.svg'
 import cms from '../../cms'
 import './MainMenu.css'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import MainMenu from '../MainMenu'
-import logo from '../../assets/logo.svg'
+import logo from '../../assets/fornby-logo.svg'
 import './Header.css'
 
 const Header = () => {

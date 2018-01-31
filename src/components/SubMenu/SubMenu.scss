@@ -5,9 +5,11 @@
   margin-bottom: 3rem;
   padding: 1.5rem 1rem;
   overflow-y: auto;
+  cursor: pointer;
   ul.nav {
     padding-left: 1rem;
-    li {
+    li a {
+      display: block;
       padding: 0.15em 0;
     }
   }
@@ -32,7 +34,7 @@
         font-size: 1em;
         color: $default-text-color;
         &:hover {
-          color: lighten($default-text-color, 15%);
+          color: lighten($default-text-color, 30%);
           text-decoration: none;
         }
      }
