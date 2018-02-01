@@ -59,16 +59,17 @@ class CMS {
           // This is a root link, e.g. '/kurser'
           mainMenu.push(this.createMainMenuItem(item))
         } else {
+          /* Get this from MainPages instead */
           // This is a sub link, e.g. '/kurser/mer-info'
           // Find parent and add child to parent's subItems array
           // We can assume that the parent is already added to mainMenu,
           // search from end of array
-          const array = mainMenu
-          let parent = this.findParentFor(item, array)
-          if (parent) {
-            if (!parent.subItems) parent.subItems = []
-            parent.subItems.push(this.createMainMenuItem(item, parent))
-          }
+          // const array = mainMenu
+          // let parent = this.findParentFor(item, array)
+          // if (parent) {
+          //   if (!parent.subItems) parent.subItems = []
+          //   parent.subItems.push(this.createMainMenuItem(item, parent))
+          // }
         }
       })
       this.cache.mainMenu = mainMenu
@@ -212,10 +213,15 @@ class CMS {
   /**
    * Fetch Main Pages from CMS
    * 
-   * @returns {array} - Returns an array of Main Page objects
+   * Use this method to get an array of main page objects. Each object
+   * will correspond to a collection item fetched from flamelink.
+   * https://app.flamelink.io/edit/collection/mainPages
+   * 
+   * @returns {Promise} - Returns Promise that resolves to an array of Main Page objects
    */
   getMainPages = () => {
     return new Promise(async (resolve, reject) => {
+      // If mainPages is cached, return cache
       if (this.cache.mainPages) return resolve(this.cache.mainPages)
       try {
         let mainPagesData = await this.flamelinkApp.content.get('mainPages')
@@ -228,39 +234,61 @@ class CMS {
       }
     })
   }
-
+  
+  /**
+   * Fetch content from CMS
+   * 
+   * Use this method to get an array of objects corresponding to
+   * a collection in flamelink
+   * @param {string} pageName - The name of the pages to fetch. Can be camelCased or kebab-cased.
+   * @returns {Promise} - A Promise that resolves to an array of objects on success
+   */
   getPageContent = (pageName) => {
     // Convert page name from friendly URL to camelCase
     let page = camelCase(pageName)
     return new Promise(async (resolve, reject) => {
+      // If page is cached, return cache
       if (this.cache[page]) return resolve(this.cache[page])
-      let content = {}
-      let mainPages = await this.getMainPages()
-      let mainPage = mainPages.find(mainPage => {
-        return mainPage.slug === pageName
-      })
-      // Extract props we don't need to return
-      if (mainPage) {
-        let { __meta__, subPages, ...neededProps } = mainPage
-        content = { ...neededProps }
-        if (mainPage.subPages) {
-          // Fetch subPages
-          let subPages = await this.flamelinkApp.content.get('subPages', {
-            fields: [
-              'id', 'name', 'detailPages'
-            ],
-            populate: [
-              {
-                field: 'detailPages',
-                subFields: ['detailPage']
-              }
-            ]
-          })
-          content.subPages = this.arrayFromFirebaseData(subPages)
+      try {
+        let content = {}
+        // Get array of main pages
+        let mainPages = await this.getMainPages()
+        // Find the page we're looking for
+        let mainPage = mainPages.find(mainPage => {
+          return mainPage.slug === pageName
+        })
+        // Check if any main page matched
+        if (mainPage) {
+          // Extract props we don't need to return
+          let { __meta__, subPages, ...neededProps } = mainPage
+          // Add the rest to our content object
+          content = { ...neededProps }
+          // If the mainPage has subPages
+          if (mainPage.subPages) {
+            // Fetch subPages
+            // NOTE: - We need to specify every field we want to get!
+            let subPages = await this.flamelinkApp.content.get('subPages', {
+              fields: [
+                'id', 'name', 'detailPages'
+              ],
+              populate: [
+                {
+                  field: 'detailPages',
+                  subFields: ['detailPage']
+                }
+              ]
+            })
+            // Add subPages to content object
+            content.subPages = this.arrayFromFirebaseData(subPages)
+          }
         }
+        // Cache content
+        this.cache[page] = content
+        // Return content
+        return resolve(content)
+      } catch(error) {
+        return reject(error)
       }
-      this.cache[page] = content
-      return resolve(content)
     })
   }
 

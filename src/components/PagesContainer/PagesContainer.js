@@ -32,8 +32,7 @@ class PagesContainer extends Component {
     const { content: { name, shortInfo, body }, subPages } = this.state
     const subPage = this.props.match.params.subpage
     return (
-      <div style={{ border: '3px double green', padding: '3px' }}>
-      <p style={{ color: 'green' }}>PagesContainer</p>
+      <div>
         <h3>{name}</h3>
         <p>{shortInfo}</p>
         <p dangerouslySetInnerHTML={{ __html: body }} />

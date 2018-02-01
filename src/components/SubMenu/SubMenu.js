@@ -20,13 +20,42 @@ class SubMenu extends Component {
 
   getSubMenu = (page) => {
     return new Promise(async resolve => {
-      const mainMenuItems = await cms.mainMenuItems()
-      const pageMenuItems = mainMenuItems.find(mainItem => mainItem.url === '/' + page)
-      const menuItems = pageMenuItems.subItems || []
+      const pageContent = await cms.getPageContent(page)
+      let menuItems = []
+      if (pageContent.subPages) {
+        const page = '/' + this.props.match.params.page
+        pageContent.subPages.forEach(subPage => {
+          let menuItem = {
+            title: subPage.name,
+            url: page + '/' + subPage.slug
+          }
+          if (subPage.detailPages) {
+            subPage.detailPages.forEach(detailPage => {
+              let { name, slug } = detailPage.detailPage[0]
+              if (!menuItem.subItems) menuItem.subItems = []
+              menuItem.subItems.push({
+                title: name,
+                url: page + '/' + subPage.slug + '#' + slug
+              })
+            })
+          }
+          menuItems.push(menuItem)
+        })
+      }
       this.setState({ menuItems })
       resolve()
     })
   }
+
+  // getSubMenu = (page) => {
+  //   return new Promise(async resolve => {
+  //     const mainMenuItems = await cms.mainMenuItems()
+  //     const pageMenuItems = mainMenuItems.find(mainItem => mainItem.url === '/' + page)
+  //     const menuItems = pageMenuItems.subItems || []
+  //     this.setState({ menuItems })
+  //     resolve()
+  //   })
+  // }
 
   menuItem = (item, i) => {
     return (

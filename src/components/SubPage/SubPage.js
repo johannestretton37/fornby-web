@@ -6,8 +6,7 @@ import './SubPage.css'
 const SubPage = ({ content = {}, url }) => {
   let { name, detailPages } = content
   return (
-    <div style={{ border: '3px double blue', padding: '3px' }}>
-    <p style={{ color: 'blue' }}>SubPage</p>
+    <div>
       <h2>{name}</h2>
       {detailPages &&
         detailPages.map(detailPageContent => {

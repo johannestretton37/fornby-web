@@ -6,8 +6,7 @@ const DetailPage = ({ content = {}, url }) => {
   console.log('DetailPage:', content)
   let { slug, name, shortInfo, body } = content
   return (
-    <div style={{ border: '3px double red', padding: '3px' }}>
-      <p style={{ color: 'red' }}>DetailPage</p>
+    <div>
       <Linkable id={slug} tag="h4" title={name} url={`${url}#${slug}`} />
       {shortInfo && (
         <p>
