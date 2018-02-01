@@ -240,22 +240,24 @@ class CMS {
         return mainPage.slug === pageName
       })
       // Extract props we don't need to return
-      let { __meta__, subPages, ...neededProps } = mainPage
-      content = { ...neededProps }
-      if (mainPage.subPages) {
-        // Fetch subPages
-        let subPages = await this.flamelinkApp.content.get('subPages', {
-          fields: [
-            'id', 'name', 'detailPages'
-          ],
-          populate: [
-            {
-              field: 'detailPages',
-              subFields: ['detailPage']
-            }
-          ]
-        })
-        content.subPages = this.arrayFromFirebaseData(subPages)
+      if (mainPage) {
+        let { __meta__, subPages, ...neededProps } = mainPage
+        content = { ...neededProps }
+        if (mainPage.subPages) {
+          // Fetch subPages
+          let subPages = await this.flamelinkApp.content.get('subPages', {
+            fields: [
+              'id', 'name', 'detailPages'
+            ],
+            populate: [
+              {
+                field: 'detailPages',
+                subFields: ['detailPage']
+              }
+            ]
+          })
+          content.subPages = this.arrayFromFirebaseData(subPages)
+        }
       }
       this.cache[page] = content
       return resolve(content)
