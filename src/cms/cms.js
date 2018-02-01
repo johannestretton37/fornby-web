@@ -210,6 +210,59 @@ class CMS {
   }
 
   /**
+   * Fetch Main Pages from CMS
+   * 
+   * @returns {array} - Returns an array of Main Page objects
+   */
+  getMainPages = () => {
+    return new Promise(async (resolve, reject) => {
+      if (this.cache.mainPages) return resolve(this.cache.mainPages)
+      try {
+        let mainPagesData = await this.flamelinkApp.content.get('mainPages')
+        let mainPages = this.arrayFromFirebaseData(mainPagesData)
+        // Cache main pages
+        this.cache.mainPages = mainPages
+        return resolve(mainPages)
+      } catch(error) {
+        return reject(error)
+      }
+    })
+  }
+
+  getPageContent = (pageName) => {
+    // Convert page name from friendly URL to camelCase
+    let page = camelCase(pageName)
+    return new Promise(async (resolve, reject) => {
+      if (this.cache[page]) return resolve(this.cache[page])
+      let content = {}
+      let mainPages = await this.getMainPages()
+      let mainPage = mainPages.find(mainPage => {
+        return mainPage.slug === pageName
+      })
+      // Extract props we don't need to return
+      let { __meta__, subPages, ...neededProps } = mainPage
+      content = { ...neededProps }
+      if (mainPage.subPages) {
+        // Fetch subPages
+        let subPages = await this.flamelinkApp.content.get('subPages', {
+          fields: [
+            'id', 'name', 'detailPages'
+          ],
+          populate: [
+            {
+              field: 'detailPages',
+              subFields: ['detailPage']
+            }
+          ]
+        })
+        content.subPages = this.arrayFromFirebaseData(subPages)
+      }
+      this.cache[page] = content
+      return resolve(content)
+    })
+  }
+
+  /**
    * Populate passed in content object with any existing subPages content
    */
   // populateSubPages = async content => {

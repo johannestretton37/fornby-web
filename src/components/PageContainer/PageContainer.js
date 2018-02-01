@@ -8,6 +8,7 @@ import './PageContainer.css'
 import ErrorPage from '../ErrorPage'
 import { pageTypes } from '../../constants'
 import { camelCase } from '../../Helpers'
+
 /**
  * A generic component that will display detailed information about
  * something, e.g. a course
@@ -38,8 +39,12 @@ class PageContainer extends Component {
     }
   }
 
+  componentDidMount() {
+    this.getContent(this.props.match.params.page, this.props.match.params.category)
+  }
+
   getContent = async (group, id) => {
-      try {
+    try {
         let content = await cms.getContent(group, id)
         this.setState({ content })
         if (content.mainImage) {
@@ -47,8 +52,9 @@ class PageContainer extends Component {
           this.setState({ mainImageURL })
         }
       } catch (error) {
-        const parentPath = this.props.location.pathname.replace(`/${id}`, '')
-        this.props.history.push(parentPath)
+        console.error(error)
+        // const parentPath = this.props.location.pathname.replace(`/${id}`, '')
+        // this.props.history.push(parentPath)
       }
   }
 

@@ -1,17 +1,26 @@
 import React, { Component } from 'react'
+import { Switch, Route } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import GalleryPage from '../GalleryPage'
 import Loading from '../Loading'
 import ErrorPage from '../ErrorPage'
+import ApplyPage from '../ApplyPage'
+import DefaultPage from '../DefaultPage'
+import DefaultPageContainer from '../DefaultPageContainer'
+import PagesContainer from '../PagesContainer'
 import { Container, Row, Col } from 'reactstrap'
 import SubMenu from '../SubMenu'
 import cms from '../../cms'
 import './MainPage.css'
+import PageContainer from '../PageContainer/PageContainer'
 
+/**
+ * MainPage
+ */
 class MainPage extends Component {
   state = {
     isLoading: true,
-    pages: {}
+    title: ''
   }
 
   static propTypes = {
@@ -19,32 +28,32 @@ class MainPage extends Component {
   }
 
   componentDidMount() {
-    this.loadPages()
+    this.loadTitle()
   }
 
-  loadPages = async () => {
+  loadTitle = async () => {
     let mainMenuItems = await cms.mainMenuItems()
-    let pages = {}
-    mainMenuItems.forEach(item => {
-      const contentGroupName = item.url.replace('/', '')
-      pages[contentGroupName] = (
-        <GalleryPage contentType={contentGroupName} title={item.title} />
-      )
-    })
+    let activeItem = mainMenuItems.find(item => item.url === this.props.match.url)
     this.setState({
-      pages,
+      title: activeItem.title,
       isLoading: false
     })
   }
 
   render() {
-    let { isLoading, pages } = this.state
-    const page = this.props.match.params.page
+    const { isLoading, title } = this.state
     return (
       <Container>
         <Row>
           <SubMenu />
-          <Col>{isLoading ? <Loading /> : pages[page] || <ErrorPage />}</Col>
+          <Col>{isLoading ? <Loading /> : 
+            <Switch>
+              <Route path='/kurser' render={props => <GalleryPage {...props} title={title} />} />
+              <Route path='/:page/:subpage?' component={PagesContainer} />
+              <Route path='/:page' component={PageContainer} />
+            </Switch>}
+          
+          </Col>
         </Row>
       </Container>
     )

@@ -1,5 +1,6 @@
 import CoursePage from './components/CoursePage'
 import DefaultPage from './components/DefaultPage'
+import ApplyPage from './components/ApplyPage'
 
 /**
  * Map react components to content groups
@@ -13,6 +14,7 @@ import DefaultPage from './components/DefaultPage'
 export const pageTypes = {
   kurser: CoursePage,
   praktiskInfo: DefaultPage,
+  ansok: ApplyPage,
 }
 
 export const ContentGroup = {

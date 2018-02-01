@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Switch, Route, withRouter } from 'react-router-dom'
-import PropTypes from 'prop-types'
+import { string, object } from 'prop-types'
 import { Container, Row, Col, ButtonGroup, Button } from 'reactstrap'
 import Gallery from '../Gallery'
 import PageContainer from '../PageContainer'
@@ -12,20 +12,18 @@ import './GalleryPage.css'
  * It renders a `Gallery` component which then displays the content
  */
 class GalleryPage extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      galleryItems: [],
-      selectedFilial: []
-    }
+  state = {
+    galleryItems: [],
+    selectedFilial: []
   }
+
   static propTypes = {
-    title: PropTypes.string.isRequired,
-    contentType: PropTypes.string.isRequired
+    title: string.isRequired,
+    match: object.isRequired
   }
 
   componentDidMount() {
-    this.getContent(this.props.contentType)
+    this.getContent(this.props.match.path.replace('/', ''))
   }
 
   getContent = async contentType => {
@@ -37,13 +35,13 @@ class GalleryPage extends Component {
   }
 
   selectFilial = filial => {
-    const index = this.state.selectedFilial.indexOf(filial);
+    const index = this.state.selectedFilial.indexOf(filial)
     if (index < 0) {
-      this.state.selectedFilial.push(filial);
+      this.state.selectedFilial.push(filial)
     } else {
-      this.state.selectedFilial.splice(index, 1);
+      this.state.selectedFilial.splice(index, 1)
     }
-    this.setState({ selectedFilial: [...this.state.selectedFilial] });
+    this.setState({ selectedFilial: [...this.state.selectedFilial] })
   }
 
   render() {
@@ -66,7 +64,16 @@ class GalleryPage extends Component {
       <section>
         <Container>
           <Switch>
-            <Route path="/:page/:slug" render={(props) => <PageContainer title={title} {...props} items={this.state.galleryItems} />} />
+            <Route
+              path="/:page/:slug"
+              render={props => (
+                <PageContainer
+                  title={title}
+                  {...props}
+                  items={this.state.galleryItems}
+                />
+              )}
+            />
             <Route
               render={() => {
                 return (
@@ -80,10 +87,20 @@ class GalleryPage extends Component {
                       <Col>
                         <p>[Eventuellt en sorteringsfunktion här?]</p>
                         <p>Visa endast kurser som hålls i</p>
-                        <ButtonGroup style={{ paddingBottom: '20px'}}>
+                        <ButtonGroup style={{ paddingBottom: '20px' }}>
                           {filials.map(filial => {
-                            return <Button color="primary" key={filial.slug} onClick={
-                              () => this.selectFilial(filial.slug)} active={this.state.selectedFilial.includes(filial.slug)}>{filial.name}</Button>
+                            return (
+                              <Button
+                                color="primary"
+                                key={filial.slug}
+                                onClick={() => this.selectFilial(filial.slug)}
+                                active={this.state.selectedFilial.includes(
+                                  filial.slug
+                                )}
+                              >
+                                {filial.name}
+                              </Button>
+                            )
                           })}
                         </ButtonGroup>
                       </Col>
