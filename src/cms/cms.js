@@ -123,7 +123,7 @@ class CMS {
    * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
-  getContentGroup = (groupName, options, cacheResponse = true) => {
+  getContentGroup = (groupName, options = { populate: ['category']}, cacheResponse = true) => {
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
     return new Promise(async resolve => {
