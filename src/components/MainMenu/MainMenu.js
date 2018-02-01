@@ -30,10 +30,10 @@ class MainMenu extends Component {
     const { location } = this.props
     const mainPath = location.pathname.split('/')[1]
     let activeItem = 0
-    let activeMenuItem = mainMenuItems.find(
+    let activeMenuItem = mainMenuItems.findIndex(
       item => item.url === '/' + mainPath
     )
-    if (activeMenuItem) activeItem = activeMenuItem.order
+    if (activeMenuItem) activeItem = activeMenuItem
     this.setState({
       mainMenuItems,
       activeItem
@@ -47,26 +47,33 @@ class MainMenu extends Component {
     }
   }
 
-  updateIndicator = () => {
+  updateIndicator = () => {}
 
-  }
-
-  moveIndicator = (activeItem, indicatorPosition, withOutTransition = false) => {
-    if (!this.activeIndicator) return false
-    let transition = this.activeIndicator.style.transition
-    if (withOutTransition) {
+  moveIndicator = (
+    activeItem,
+    indicatorPosition,
+    withOutTransition = false
+  ) => {
+    let transition
+    if (this.activeIndicator && withOutTransition) {
+      transition = this.activeIndicator.style.transition
       this.activeIndicator.style.transition = 'none'
     }
-    this.setState({
-      activeItem,
-      ...indicatorPosition
-    }, () => {
-      if (withOutTransition) {
-        setTimeout(() => {
-          this.activeIndicator.style.transition = transition
-        }, 10)
+    this.setState(
+      {
+        activeItem,
+        ...indicatorPosition
+      },
+      () => {
+        if (withOutTransition) {
+          setTimeout(() => {
+            if (transition) {
+              this.activeIndicator.style.transition = transition
+            }
+          }, 10)
+        }
       }
-    })
+    )
   }
 
   /**
@@ -84,14 +91,22 @@ class MainMenu extends Component {
     return (
       <div className="main-menu-container">
         <div className="main-menu-header">
-          <div className={`main-menu-toggler${isOpen ? ' open' : ''}`} onClick={this.toggleMenu}>HAMBURGER</div>
-          <div className='main-menu-logo'>
+          <div
+            className={`main-menu-toggler${isOpen ? ' open' : ''}`}
+            onClick={this.toggleMenu}
+          >
+            HAMBURGER
+          </div>
+          <div className="main-menu-logo">
             <a href="/">
               <img src={logo} className="logo" alt="logo" />
-            </a>    
+            </a>
           </div>
         </div>
-        <nav className="main-menu" style={{ maxHeight: isOpen ? '400px' : '0px' }} >
+        <nav
+          className="main-menu"
+          style={{ maxHeight: isOpen ? '400px' : '0px' }}
+        >
           {mainMenuItems.map((menuItem, i, items) => {
             return (
               <CSSTransition
@@ -113,17 +128,19 @@ class MainMenu extends Component {
             )
           })}
         </nav>
-          <div
-            id="main-menu-indicator"
-            ref={(activeIndicator) => { this.activeIndicator = activeIndicator }}
-            style={{
-              left,
-              width,
-              opacity: mainMenuItems.length > 0 ? 1 : 0
-            }}
-          >
-            &nbsp;
-          </div>
+        <div
+          id="main-menu-indicator"
+          ref={activeIndicator => {
+            this.activeIndicator = activeIndicator
+          }}
+          style={{
+            left,
+            width,
+            opacity: mainMenuItems.length > 0 ? 1 : 0
+          }}
+        >
+          &nbsp;
+        </div>
       </div>
     )
   }

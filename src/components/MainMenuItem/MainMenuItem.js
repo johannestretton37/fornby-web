@@ -19,7 +19,7 @@ class MainMenuItem extends Component {
 
   componentDidMount() {
     if (this.props.isActive) {
-      this.moveIndicator()
+      this.moveIndicator(true)
       window.addEventListener('resize', this.handleResize)
     }
   }
