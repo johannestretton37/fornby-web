@@ -7,7 +7,7 @@ admin.initializeApp(functions.config().firebase)
 const updateSlug = (id, eventSnapshot) => {
   const addedItem = eventSnapshot.val()
   const slug = getSlug(addedItem.name, { lang: 'sv' })
-  return eventSnapshot.ref.child('slug').update(slug)
+  return eventSnapshot.ref.child('slug').set(slug)
 }
 
 // Add slug when new courses are added
