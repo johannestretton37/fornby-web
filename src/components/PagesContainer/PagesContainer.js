@@ -16,12 +16,8 @@ class PagesContainer extends Component {
 
   componentDidMount() {
     const pageName = this.props.match.params.page
-    const subPageName = this.props.match.params.subpage
-    console.log('Get page content for', pageName)
     cms.getPageContent(pageName)
     .then(content => {
-      console.log('Got content for', pageName)
-      console.log(content)
       let subPages = {}
       if (content.subPages) {
         content.subPages.map(subPageContent => {
