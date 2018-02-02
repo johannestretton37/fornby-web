@@ -36,8 +36,8 @@ class PagesContainer extends Component {
     const { page, subpage: subPage } = this.props.match.params
     return (
       <div>
-        <h3>{name}</h3>
-        <p>{shortInfo}</p>
+        <h2>{name}</h2>
+        <p className='short-info'>{shortInfo}</p>
         <p dangerouslySetInnerHTML={{ __html: body }} />
         {page === PageSlug.ANSOK ? <ApplyForm /> : null}
         {subPage && subPages[subPage] }

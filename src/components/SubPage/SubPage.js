@@ -7,7 +7,7 @@ const SubPage = ({ content = {}, url }) => {
   let { name, detailPages } = content
   return (
     <div>
-      <h2>{name}</h2>
+      <h3>{name}</h3>
       {detailPages &&
         detailPages.map(detailPageContent => {
           let detailPage = detailPageContent.detailPage[0]
