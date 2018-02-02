@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import {  Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Container, Row, Col } from 'reactstrap'
 import StartPageCarousel from '../StartPageCarousel'
 import BannerBox from '../BannerBox'
@@ -68,7 +68,7 @@ class StartPage extends Component {
             {cities.map((city, i) => {
               return (
                 <Col key={i}>
-                  <Link className={i == cities.length - 1 ? 'last' : ''} to={city.url}>{city.title}</Link>
+                  <Link className={i === cities.length - 1 ? 'last' : ''} to={city.url}>{city.title}</Link>
                 </Col>
               )
             })}

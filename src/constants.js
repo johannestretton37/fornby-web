@@ -17,9 +17,24 @@ export const pageTypes = {
   ansok: ApplyPage,
 }
 
+/**
+ * Map constants to Flamelink collection names
+ */
 export const ContentGroup = {
-  COURSES: 'kurser',
-  PRAKTISK_INFO: 'praktiskInfo',
+  MAIN_PAGES: 'mainPages',
+  SUB_PAGES: 'subPages',
+  DETAIL_PAGES: 'detailPages',
   START_PAGE_SLIDES: 'startPageSlides',
-  DETAIL_PAGES: 'detailPages'
+  COURSES: 'kurser',
+}
+
+/**
+ * Map slugs
+ */
+export const PageSlug = {
+  COURSES: 'kurser',
+  PRAKTISK_INFO: 'praktisk-info',
+  ANSOK: 'ansok',
+  KONFERENS: 'konferens',
+  OM_FORNBY: 'om-fornby',
 }

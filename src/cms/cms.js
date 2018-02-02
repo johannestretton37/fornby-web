@@ -224,7 +224,7 @@ class CMS {
       // If mainPages is cached, return cache
       if (this.cache.mainPages) return resolve(this.cache.mainPages)
       try {
-        let mainPagesData = await this.flamelinkApp.content.get('mainPages')
+        let mainPagesData = await this.flamelinkApp.content.get(ContentGroup.MAIN_PAGES)
         let mainPages = this.arrayFromFirebaseData(mainPagesData)
         // Cache main pages
         this.cache.mainPages = mainPages
@@ -267,13 +267,13 @@ class CMS {
           if (mainPage.subPages) {
             // Fetch subPages
             // NOTE: - We need to specify every field we want to get!
-            let subPages = await this.flamelinkApp.content.get('subPages', {
+            let subPages = await this.flamelinkApp.content.get(ContentGroup.SUB_PAGES, {
               fields: [
-                'id', 'name', 'detailPages'
+                'id', 'name', ContentGroup.DETAIL_PAGES
               ],
               populate: [
                 {
-                  field: 'detailPages',
+                  field: ContentGroup.DETAIL_PAGES,
                   subFields: ['detailPage']
                 }
               ]

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { object, string } from 'prop-types'
-import { DateHelper } from '../../Helpers'
+// import { DateHelper } from '../../Helpers'
 import ImagePreLoader from '../ImagePreLoader'
 import DetailPage from '../DetailPage'
 import './DefaultPage.css'
