@@ -25,7 +25,7 @@ class ApplyForm extends Component {
     return (
       <Row>
         <Col>
-          <div className='iframe-container' style={{ backgroundColor: isLoaded ? 'rgba(255,255,255,0)' : '#eee' }}>
+          <div className='iframe-container'>
             <iframe id='schoolsoft' style={{ opacity: isLoaded ? 1 : 0 }} onLoad={this.handleLoad} title='Ansökan SchoolSoft' src={iframeSrc}></iframe>
           </div>
         </Col>
