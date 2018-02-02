@@ -68,7 +68,7 @@ class StartPage extends Component {
             {cities.map((city, i) => {
               return (
                 <Col key={i}>
-                  <Link className={i === cities.length - 1 ? 'last' : ''} to={city.url}>{city.title}</Link>
+                  <Link className={`city${i === cities.length - 1 ? ' last' : ''}`} to={city.url}>{city.title}</Link>
                 </Col>
               )
             })}

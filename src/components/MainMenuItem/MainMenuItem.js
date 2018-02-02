@@ -6,19 +6,25 @@ class MainMenuItem extends Component {
   static propTypes = {
     item: object.isRequired,
     navigate: func.isRequired,
+    updateIsVertical: func.isRequired,
     moveIndicator: func.isRequired,
     order: number.isRequired,
     isActive: bool,
-    isLast: bool
+    isFirst: bool,
+    isLast: bool,
+    isVertical: bool
   }
 
   static defaultProps = {
     isActive: false,
-    isLast: false
+    isFirst: false,
+    isLast: false,
+    isVertical: false
   }
 
   componentDidMount() {
     if (this.props.isActive) {
+      this.updateIsVertical(window.innerWidth < 768)
       this.moveIndicator(true)
       window.addEventListener('resize', this.handleResize)
     }
@@ -26,7 +32,6 @@ class MainMenuItem extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.isActive && this.props.isActive) {
-      console.log(this.props.order, 'is no longer active')
       // This item toggled to inactive, remove listener
       window.removeEventListener('resize', this.handleResize)
     } else if (nextProps.isActive && !this.props.isActive) {
@@ -36,7 +41,8 @@ class MainMenuItem extends Component {
   }
 
   handleResize = e => {
-    console.log(this.props.order)
+    // TODO: Throttle this!
+    this.updateIsVertical(e.target.innerWidth < 768)
     this.moveIndicator(true)
   }
 
@@ -48,8 +54,10 @@ class MainMenuItem extends Component {
   
   titleSpanMeasurements = () => {
     const left = this.titleSpan.offsetLeft + 'px'
+    const top = this.titleSpan.offsetTop + 'px'
     const width = this.titleSpan.offsetWidth + 'px'
-    return {left, width}
+    const height = this.titleSpan.offsetHeight + 'px'
+    return {left, top, width, height}
   }
   
   navigate = () => {
@@ -57,18 +65,21 @@ class MainMenuItem extends Component {
     navigate(url)
   }
 
+  updateIsVertical = (isVertical) => {
+    this.props.updateIsVertical(isVertical)
+  }
   moveIndicator = (withOutTransition) => {
     const { order } = this.props
     this.props.moveIndicator(order, this.titleSpanMeasurements(), withOutTransition)
   }
 
   render() {
-    const { item, isActive, isLast } = this.props
+    const { item, isActive, isFirst, isLast } = this.props
     return (
       <div className="nav-item">
         <a
           onClick={this.handleClick}
-          className={`nav-link${isLast ? ' last' : ''}${isActive ? ' active' : ''}`}
+          className={`nav-link${isFirst ? ' first' : ''}${isLast ? ' last' : ''}${isActive ? ' active' : ''}`}
           href={item.url}
         >
           <span ref={(titleSpan) => { this.titleSpan = titleSpan }}>{item.title}</span>

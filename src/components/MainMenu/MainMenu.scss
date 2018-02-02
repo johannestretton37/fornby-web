@@ -9,6 +9,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: stretch;
     /* small */
     padding: 20px 0;
     @include media-breakpoint-up(md) {
@@ -46,7 +47,20 @@
     flex-direction: column;
     overflow: hidden;
     height: 100%;
-    transition: max-height 500ms ease-out;
+    &.closed {
+      @include media-breakpoint-down(sm) {
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+      }
+    }
+    &.open {
+      @include media-breakpoint-down(sm) {
+        /* small only */
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+      }
+    }
+    transition: max-height 500ms ease-in-out, border 500ms ease-in-out;
     @include media-breakpoint-up(md) {
       /* large */
       flex-direction: row;
@@ -61,14 +75,24 @@
     .nav-item {
       flex-grow: 1;
       .nav-link {
-        text-align: center;
+        text-align: left;
         text-decoration: none;
         text-transform: uppercase;
         outline: none;
         color: #555;
         transition: color 300ms ease-out;
+        @include media-breakpoint-down(sm) {
+          /* small only */
+          &.first {
+            margin-top: 1rem;
+          }
+          &.last {
+            margin-bottom: 1rem;
+          }
+        }  
         @include media-breakpoint-up(md) {
           /* large */
+          text-align: center;
           border-right: 1px solid #eee;
           &.last {
             border-right: none;
@@ -86,17 +110,19 @@
   }
   #main-menu-indicator {
     /* small */
-    display:none;
+    display:block;
+    position: absolute;
+    height: 2em;
+    width: 2px;
+    left: 0;
     @include media-breakpoint-up(md) {
       /* large */
-      display: block;
+      width: 80px;
+      height: 2px;
+      bottom: 0;
     }
-    position: absolute;
-    height: 2px;
-    width: 80px;
-    bottom: 0;
     opacity: 0;
     background-color: $brand-primary;
-    transition: left 250ms ease-out, width 250ms ease-out, opacity 500ms 250ms ease-out;
+    transition: left 250ms ease-out, top 250ms ease-out, width 250ms ease-out, height 250ms ease-out, opacity 500ms 250ms ease-out;
   }
 }
