@@ -28,6 +28,12 @@ class PagesContainer extends Component {
           )
         })
       }
+      if (Object.keys(content).length === 0) {
+        content = {
+          name: '404',
+          shortInfo: 'Här finns ingenting.'
+        }
+      }
       this.setState({ content, subPages })
     })
   }
