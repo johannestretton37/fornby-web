@@ -32,13 +32,13 @@ class MainPage extends Component {
     let mainMenuItems = await cms.mainMenuItems()
     let activeItem = mainMenuItems.find(item => item.url === this.props.match.url)
     this.setState({
-      title: activeItem.title,
+      title: activeItem && activeItem.title || 'No Title!',
       isLoading: false
     })
   }
 
   render() {
-    const { category} = this.props.match.params
+
     const { isLoading, title } = this.state
     return (
       <Container>
@@ -47,7 +47,7 @@ class MainPage extends Component {
           <Col>
             {isLoading ? <Loading /> :
               <Switch>
-                <Route path='/kurser/:category?/:slug?' component={CoursesPage}/*render={props => <CoursesPage {...props} title={title} }/> */ />
+                <Route path='/kurser/:category?/:slug?' component={CoursesPage} />
                 <Route path='/:page/:subpage?' component={PagesContainer} />
                 <Route path='/:page' component={PageContainer} />
               </Switch>}
