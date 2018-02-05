@@ -7,42 +7,74 @@ import ContentGroup from '../../constants'
 import './CoursesPage.css'
 import { string, object } from 'prop-types'
 import PageContainer from '../PageContainer'
+import CoursePage from '../CoursePage';
 
 class CoursesPage extends Component {
+
+  static propTypes = {
+    match: object.isRequired,
+    title: string.isRequired
+  }
+
   state = {
     categories: []
   }
-  static propTypes = {
-    title: string.isRequired,
-    match: object.isRequired
-  }
+
   componentDidMount() {
+    const pageName = this.props.match.params.page;
     this.getContent();
+    if (this.props.match.params.category) {
+      console.log(this.props.match.params.category);
+    } else if (this.props.match.params.slug) {
+      console.log(this.props.match.params.slug);
+    } else {
+      console.log(this.props.match.params);
+    }
+
   }
 
   getContent = async () => {
     const categories = await cms.getCourses();
-    debugger;
+    let category = {};
+    console.log(categories);
+    if (categories.category) {
+      categories.category.forEach(cat => {
+        category[cat.slug] = (
+          <Gallery items={this.state.categories} />
+        )
+      })
+    }
     this.setState({
       categories
     })
   }
+  findCategory(categories, slug) {
+    const category = categories.find(category => category.slug == slug);
+    return category || null;
+  }
   render() {
+    const { categories } = this.state
+    const { category, slug } = this.props.match.params
+
+    let content = null;
+    if (slug) {
+      const items = this.findCategory(categories, category)
+      if (items && items.category) {
+        let course = this.findCategory(items.category, slug);
+        if (course) {
+          content = <CoursePage content={course} onApplyChanged={() => { }} />
+        }
+      }
+    } else if (category) {
+      const items = this.findCategory(categories, category)
+      content = items && <Gallery items={items.category} />
+    } else {
+      content = <Gallery items={categories} />
+    }
+
     return (
       <div>
         <Container>
-          <Switch>
-            <Route
-              path="/:page/:slug"
-              render={props => (
-                <PageContainer
-                  title={this.state.title}
-                  {...props}
-                  items={this.state.galleryItems}
-                />
-              )}
-            />
-          </Switch>
           <Row>
             <Col>
               <div style={{ textAlign: 'center' }}>
@@ -52,12 +84,10 @@ class CoursesPage extends Component {
           </Row>
           <Row>
             <Col>
-              <Gallery items={this.state.categories} />
+              {content}
             </Col>
           </Row>
         </Container>
-
-        {this.state.categories.length}
       </div>
     )
   }
