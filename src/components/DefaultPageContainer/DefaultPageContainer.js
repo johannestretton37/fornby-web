@@ -18,7 +18,6 @@ class DefaultPageContainer extends Component {
   getContent = async () => {
     const page = this.props.match.params.page
     const content = await cms.getContentGroup(page)
-    debugger
     this.setState({
       content
     })
