@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import GalleryPage from '../GalleryPage'
+import CoursesPage from '../CoursesPage'
 import Loading from '../Loading'
 import PagesContainer from '../PagesContainer'
 import { Container, Row, Col } from 'reactstrap'
@@ -37,18 +38,19 @@ class MainPage extends Component {
   }
 
   render() {
+    const { category} = this.props.match.params
     const { isLoading, title } = this.state
     return (
       <Container>
         <Row>
           <SubMenu />
-            <Col>
-            {isLoading ? <Loading /> : 
-            <Switch>
-              <Route path='/kurser' render={props => <GalleryPage {...props} title={title} />} />
-              <Route path='/:page/:subpage?' component={PagesContainer} />
-              <Route path='/:page' component={PageContainer} />
-            </Switch>}
+          <Col>
+            {isLoading ? <Loading /> :
+              <Switch>
+                <Route path='/kurser/:category?/:slug?' component={CoursesPage}/*render={props => <CoursesPage {...props} title={title} }/> */ />
+                <Route path='/:page/:subpage?' component={PagesContainer} />
+                <Route path='/:page' component={PageContainer} />
+              </Switch>}
           </Col>
         </Row>
       </Container>
