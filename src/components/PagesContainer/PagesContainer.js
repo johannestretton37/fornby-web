@@ -43,11 +43,11 @@ class PagesContainer extends Component {
     // NOTE: - We're renaming subpage to subPage while destructuring
     const { page, subpage: subPage } = this.props.match.params
     return (
-      <CSSTransition
-        in={Object.keys(content).length > 0}
-        classNames="fade"
-        appear={true}
-        timeout={400}>
+      // <CSSTransition
+      //   in={Object.keys(content).length > 0}
+      //   classNames="fade"
+      //   appear={true}
+      //   timeout={400}>
         <div>
           <h2>{name}</h2>
           <p className="short-info">{shortInfo}</p>
@@ -55,7 +55,7 @@ class PagesContainer extends Component {
           {page === PageSlug.ANSOK ? <ApplyForm /> : null}
           {subPage && subPages[subPage]}
         </div>
-      </CSSTransition>
+      // </CSSTransition>
     )
   }
 }
