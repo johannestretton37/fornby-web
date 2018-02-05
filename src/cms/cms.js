@@ -24,7 +24,7 @@ class CMS {
    * Get basic info, such as navigation, page headlines and such
    */
   getBasicInfo = () => {
-    return Promise.all([this.mainMenuItems(), this.getSlides()])
+    return Promise.all([this.mainMenuItems(), this.getSlides(), this.getCourses()])
   }
 
   createMainMenuItem = (item, parent) => {
@@ -117,7 +117,15 @@ class CMS {
       return resolve(detailPages)
     })
   }
-
+  getCourses = () => {
+    return new Promise(async resolve => {
+      if (this.cache.courses) return resolve(this.cache.courses)
+      let options = { populate: ['category'] };
+      const categoriesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options);
+      const categories = this.arrayFromFirebaseData(categoriesData)
+      return resolve(categories);
+    })
+  }
   /**
    * Return an array of content objects
    *
@@ -126,7 +134,8 @@ class CMS {
    * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
-  getContentGroup = (groupName, options = { populate: ['category']}, cacheResponse = true) => {
+  getContentGroup = (groupName, options = { populate: ['category'] }, cacheResponse = true) => {
+    console.log('getContentGroup ' + groupName);
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
     return new Promise(async resolve => {
@@ -173,6 +182,8 @@ class CMS {
       if (cacheResponse) {
         this.cache[group] = content
       }
+      console.log('Got content');
+      console.log(content);
       console.log(`[${group}] CMS Cache\n`, this.cache)
       return resolve(content)
     })
@@ -185,6 +196,7 @@ class CMS {
    * @returns - A Promise that resolves to a content object
    */
   getContent = (groupName, slug) => {
+    console.log('WOW!!! hämtar ' + groupName);
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
     return new Promise(async (resolve, reject) => {
@@ -205,6 +217,7 @@ class CMS {
         }
         // Get data from flamelink
         const content = await this.flamelinkApp.content.get(group, id)
+
         return resolve(content)
       } catch (error) {
         return reject(error)
@@ -232,7 +245,7 @@ class CMS {
         this.cache.mainPages = mainPages
         console.log('getMainPages()', this.cache)
         return resolve(mainPages)
-      } catch(error) {
+      } catch (error) {
         return reject(error)
       }
     })
@@ -342,7 +355,7 @@ class CMS {
         // Return content
         console.log('getPageContent(' + pageName + ')', this.cache)
         return resolve(content)
-      } catch(error) {
+      } catch (error) {
         return reject(error)
       }
     })

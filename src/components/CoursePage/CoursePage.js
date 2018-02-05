@@ -21,12 +21,13 @@ function CoursePage({ content, mainImageURL, onApplyClicked }) {
   const {
     courseStartDate, applicationDeadline, summary, mainBody, mainImage, name
   } = content;
+
   return (
     <div>
       <div className='course-header'>
         <p className='course-summary' dangerouslySetInnerHTML={{ __html: summary }} />
-        <h5 className='course-date' >Startdatum: {DateHelper.formatDate(courseStartDate)}</h5>
-        <h5 className='course-date' >Sista ansökningsdag: {DateHelper.formatDate(applicationDeadline)}</h5>
+        {courseStartDate && <h5 className='course-date' >Startdatum: {DateHelper.formatDate(courseStartDate)}</h5>}
+        {applicationDeadline && <h5 className='course-date' >Sista ansökningsdag: {DateHelper.formatDate(applicationDeadline)}</h5>}
         <p>
           <button className='btn default' color="primary" size="lg" onClick={onApplyClicked}>{'Ansök till ' + name}</button>
         </p>
@@ -43,4 +44,4 @@ function CoursePage({ content, mainImageURL, onApplyClicked }) {
   )
 }
 
-export default CoursePage
+export default CoursePage;
