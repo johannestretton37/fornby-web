@@ -3,7 +3,6 @@ import Linkable from '../Linkable'
 import './DetailPage.css'
 
 const DetailPage = ({ content = {}, url }) => {
-  console.log('DetailPage:', content)
   let { slug, name, shortInfo, body } = content
   return (
     <div>

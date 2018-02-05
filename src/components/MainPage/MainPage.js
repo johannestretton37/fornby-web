@@ -43,15 +43,13 @@ class MainPage extends Component {
         <Row>
           <SubMenu />
             <Col>
-              <Route path='/:page/:subpage?' component={PagesContainer} />
-            </Col>
-          {/* <Col>{isLoading ? <Loading /> : 
+            {isLoading ? <Loading /> : 
             <Switch>
               <Route path='/kurser' render={props => <GalleryPage {...props} title={title} />} />
+              <Route path='/:page/:subpage?' component={PagesContainer} />
               <Route path='/:page' component={PageContainer} />
             </Switch>}
-          
-          </Col> */}
+          </Col>
         </Row>
       </Container>
     )

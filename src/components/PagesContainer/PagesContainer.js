@@ -30,7 +30,7 @@ class PagesContainer extends Component {
       }
       if (Object.keys(content).length === 0) {
         content = {
-          name: '404',
+          name: '404 ' + pageName,
           shortInfo: 'Här finns ingenting.'
         }
       }

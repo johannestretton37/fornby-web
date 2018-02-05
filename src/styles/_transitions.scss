@@ -20,3 +20,32 @@
   }
 }
 
+/* Transitioning between pages */
+.page-fade- {
+  &enter, &appear {
+    opacity: 0;
+    &.page-fade-enter-active,
+    &.page-fade-appear-active {
+      opacity: 1;
+      transition: all 300ms ease-out;
+    }
+  }
+  &exit, &disappear {
+    opacity: 1;
+    &.page-fade-exit-active,
+    &.page-fade-disappear-active {
+      opacity: 0;
+      transition: all 300ms ease-in;
+    }
+  }
+}
+/* Container must be absolute positioned during the transition */
+.main-container {
+  &.page-fade- {
+    &enter, &appear {
+      &-active {
+        position: absolute;
+      }      
+    }
+  }
+}
