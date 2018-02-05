@@ -20,6 +20,7 @@ export const ContentGroup = {
   MAIN_PAGES: 'mainPages',
   SUB_PAGES: 'subPages',
   DETAIL_PAGES: 'detailPages',
+  STAFF: 'staff',
   START_PAGE_SLIDES: 'startPageSlides',
   COURSES: 'kurser',
 }

@@ -14,7 +14,9 @@ import { camelCase } from '../Helpers'
 class CMS {
   constructor() {
     this.flamelinkApp = flamelink({ firebaseApp })
-    this.cache = {}
+    this.cache = {
+      imageUrls: {}
+    }
     // this.getBasicInfo()
   }
 
@@ -228,7 +230,37 @@ class CMS {
         let mainPages = this.arrayFromFirebaseData(mainPagesData)
         // Cache main pages
         this.cache.mainPages = mainPages
+        console.log('getMainPages()', this.cache)
         return resolve(mainPages)
+      } catch(error) {
+        return reject(error)
+      }
+    })
+  }
+
+  /**
+   * Fetch Staff info from CMS
+   * 
+   * Use this method to get an object of staff page objects. Each object
+   * will correspond to a collection item fetched from flamelink.
+   * https://app.flamelink.io/edit/collection/staff
+   * 
+   * @returns {Promise} - Returns Promise that resolves to an object of Staff objects
+   */
+
+  getStaffPages = () => {
+    return new Promise(async (resolve, reject) => {
+      // If staffPages is cached, return cache
+      if (this.cache.staffPages) return resolve(this.cache.staffPages)
+      try {
+        const staffPages = await this.flamelinkApp.content.get(ContentGroup.STAFF, {
+          // fields: ['name', 'phone', 'email', 'portrait', 'role', 'slug'],
+          populate: ['portrait']
+        })
+        // Cache staffPages
+        this.cache.staffPages = staffPages
+        console.log('getStaffPages()', this.cache)
+        return resolve(staffPages)
       } catch(error) {
         return reject(error)
       }
@@ -265,26 +297,50 @@ class CMS {
           content = { ...neededProps }
           // If the mainPage has subPages
           if (mainPage.subPages) {
-            // Fetch subPages
-            // NOTE: - We need to specify every field we want to get!
-            let subPages = await this.flamelinkApp.content.get(ContentGroup.SUB_PAGES, {
-              fields: [
-                'id', 'name', ContentGroup.DETAIL_PAGES
-              ],
-              populate: [
-                {
-                  field: ContentGroup.DETAIL_PAGES,
-                  subFields: ['detailPage']
+            /** 
+             * Since flamelink doesn't allow us to query which subPages we want,
+             * we need to fetch all subPages and cache them
+             * 
+             * NOTE: - We need to specify every field we want to get!
+             */
+            const subPageIds = mainPage.subPages.map(item => item.subPage)
+            if (this.cache.subPages) {
+              content.subPages = this.cache.subPages.filter(subPage => subPageIds.includes(subPage.id))
+            } else {
+              let subPages = await this.flamelinkApp.content.get(ContentGroup.SUB_PAGES, {
+                fields: [
+                  'id', 'name', ContentGroup.DETAIL_PAGES, ContentGroup.STAFF
+                ],
+                populate: [
+                  {
+                    field: ContentGroup.DETAIL_PAGES,
+                    subFields: ['detailPage']
+                  }
+                ]
+              })
+              // Check for staffPages
+              let staffPages = await this.getStaffPages()
+              // Convert subPages to array
+              const allSubPages = this.arrayFromFirebaseData(subPages)
+              // Populate subPages with staff
+              allSubPages.forEach(subPage => {
+                if (subPage.staff) {
+                  subPage.staff = subPage.staff.map(staffObject => {
+                    return staffPages[staffObject.staffPerson]
+                  })
                 }
-              ]
-            })
-            // Add subPages to content object
-            content.subPages = this.arrayFromFirebaseData(subPages)
+              })
+              // Cache subPages
+              this.cache.subPages = allSubPages
+              // Add page's subPages to content object
+              content.subPages = allSubPages.filter(subPage => subPageIds.includes(subPage.id))
+            }
           }
         }
         // Cache content
         this.cache[page] = content
         // Return content
+        console.log('getPageContent(' + pageName + ')', this.cache)
         return resolve(content)
       } catch(error) {
         return reject(error)
@@ -316,8 +372,13 @@ class CMS {
   //   })
   // }
 
-  getURL = id => {
-    return this.flamelinkApp.storage.getURL(id, { size: 'device' })
+  getURL = (id, size) => {
+    return new Promise(async resolve => {
+      if (this.cache.imageUrls[id]) return resolve(this.cache.imageUrls[id])
+      const url = await this.flamelinkApp.storage.getURL(id, { size: size || 'device' })
+      this.cache.imageUrls[id] = url
+      return resolve(url)
+    })
   }
 
   /**
