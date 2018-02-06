@@ -322,7 +322,7 @@ class CMS {
             } else {
               let subPages = await this.flamelinkApp.content.get(ContentGroup.SUB_PAGES, {
                 fields: [
-                  'id', 'name', ContentGroup.DETAIL_PAGES, ContentGroup.STAFF
+                  'id', 'name', 'showByDefault', ContentGroup.DETAIL_PAGES, ContentGroup.STAFF
                 ],
                 populate: [
                   {

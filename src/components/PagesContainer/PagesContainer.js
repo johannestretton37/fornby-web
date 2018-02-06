@@ -7,6 +7,13 @@ import SubPage from '../SubPage'
 import ApplyForm from '../ApplyForm'
 import './PagesContainer.css'
 
+/**
+ * PagesContainer
+ * 
+ * PagesContainer renders a `MainPage`, which in turn renders
+ * a list of `SubPage`s (if available). `SubPage` will render
+ * a list of `DetailPage`s (if available).
+ */
 class PagesContainer extends Component {
   static propTypes = {
     match: object.isRequired
@@ -14,15 +21,22 @@ class PagesContainer extends Component {
 
   state = {
     content: {},
-    subPages: {}
+    subPages: {},
+    subPageSlug: this.props.match.params.subpage
   }
 
   componentDidMount() {
     const pageName = this.props.match.params.page
     cms.getPageContent(pageName).then(content => {
       let subPages = {}
+      let subPageSlug
       if (content.subPages) {
         content.subPages.forEach(subPageContent => {
+          if (subPageContent.showByDefault) {
+            // Sanity check
+            if (subPageSlug) console.error(`Multiple SubPages are set to showByDefault. '${subPageSlug}', '${subPageContent.slug}' found`)
+            subPageSlug = subPageContent.slug
+          }
           subPages[subPageContent.slug] = (
             <SubPage content={subPageContent} url={this.props.match.url} />
           )
@@ -34,14 +48,14 @@ class PagesContainer extends Component {
           shortInfo: 'Här finns ingenting.'
         }
       }
-      this.setState({ content, subPages })
+      if (!subPageSlug) subPageSlug = this.props.match.params.subpage
+      this.setState({ content, subPageSlug, subPages })
     })
   }
 
   render() {
-    const { content, content: { name, shortInfo, body }, subPages } = this.state
-    // NOTE: - We're renaming subpage to subPage while destructuring
-    const { page, subpage: subPage } = this.props.match.params
+    const { content, content: { name, shortInfo, body }, subPageSlug, subPages } = this.state
+    let { page } = this.props.match.params
     return (
       // <CSSTransition
       //   in={Object.keys(content).length > 0}
@@ -53,7 +67,7 @@ class PagesContainer extends Component {
           <p className="short-info">{shortInfo}</p>
           <p dangerouslySetInnerHTML={{ __html: body }} />
           {page === PageSlug.ANSOK ? <ApplyForm /> : null}
-          {subPage && subPages[subPage]}
+          {subPageSlug && subPages[subPageSlug]}
         </div>
       // </CSSTransition>
     )

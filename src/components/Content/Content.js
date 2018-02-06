@@ -11,6 +11,12 @@ class Content extends Component {
   static propTypes = {
     location: PropTypes.object
   }
+
+  onEnter = (node, isAppearing) => {
+    console.log(node, isAppearing)
+    // Check if footer needs to be animated down or up
+  }
+
   render() {
     let { location } = this.props
     return (
@@ -18,6 +24,7 @@ class Content extends Component {
         <CSSTransition
           key={location.key}
           timeout={300}
+          onEnter={this.onEnter}
           classNames='page-fade'
           appear={true}>
           <section className='main-container'>

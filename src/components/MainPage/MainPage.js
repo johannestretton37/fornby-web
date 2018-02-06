@@ -38,7 +38,7 @@ class MainPage extends Component {
   }
 
   render() {
-
+    console.log('MainPage', this.props)
     const { isLoading, title } = this.state
     return (
       <Container>
