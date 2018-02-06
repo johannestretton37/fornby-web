@@ -123,6 +123,7 @@ class CMS {
       let options = { populate: ['category'] };
       const categoriesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options);
       const categories = this.arrayFromFirebaseData(categoriesData)
+      this.cache.courses = categories
       return resolve(categories);
     })
   }
