@@ -5,7 +5,7 @@ import { Container, Row, Col } from 'reactstrap'
 import Gallery from '../Gallery'
 import ContentGroup from '../../constants'
 import './CoursesPage.css'
-import { string, object } from 'prop-types'
+import { string, array, object } from 'prop-types'
 import PageContainer from '../PageContainer'
 import CoursePage from '../CoursePage';
 
@@ -13,7 +13,8 @@ class CoursesPage extends Component {
 
   static propTypes = {
     match: object.isRequired,
-    title: string.isRequired
+    title: string.isRequired,
+    content: array.isRequired
   }
 
   state = {
@@ -21,20 +22,7 @@ class CoursesPage extends Component {
   }
 
   componentDidMount() {
-    const pageName = this.props.match.params.page;
-    this.getContent();
-    if (this.props.match.params.category) {
-      console.log(this.props.match.params.category);
-    } else if (this.props.match.params.slug) {
-      console.log(this.props.match.params.slug);
-    } else {
-      console.log(this.props.match.params);
-    }
-
-  }
-
-  getContent = async () => {
-    const categories = await cms.getCourses();
+    const categories = this.props.content
     let category = {};
     console.log(categories);
     if (categories.category) {
@@ -47,7 +35,38 @@ class CoursesPage extends Component {
     this.setState({
       categories
     })
+  // const pageName = this.props.match.params.page;
+  //   this.getContent();
+    if (this.props.match.params.category) {
+      console.log(this.props.match.params.category);
+    } else if (this.props.match.params.slug) {
+      console.log(this.props.match.params.slug);
+    } else {
+      console.log(this.props.match.params);
+    }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.match.params.category !== this.props.match.params.category) {
+      // URL changed
+    }
+  }
+
+  // getContent = async () => {
+  //   const categories = await cms.getCourses();
+  //   let category = {};
+  //   console.log(categories);
+  //   if (categories.category) {
+  //     categories.category.forEach(cat => {
+  //       category[cat.slug] = (
+  //         <Gallery items={this.state.categories} />
+  //       )
+  //     })
+  //   }
+  //   this.setState({
+  //     categories
+  //   })
+  // }
   findCategory(categories, slug) {
     const category = categories.find(category => category.slug == slug);
     return category || null;
