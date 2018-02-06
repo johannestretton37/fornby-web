@@ -1,6 +1,7 @@
 import React from 'react'
 import { string } from 'prop-types'
 import { Link } from 'react-router-dom'
+import SearchBar from '../SearchBar'
 import './ErrorPage.css'
 
 ErrorPage.propTypes = {
@@ -15,7 +16,9 @@ function ErrorPage({ heading, message, buttonText, buttonHref }) {
     <div>
       <h2>404</h2>
       <p><b>{heading || 'Ooops, här finns ingenting att se.'}</b></p>
-      <p>{message || 'Tryck på knappen för att komma tillbaka till tryggheten.'}</p>
+      <p>Du kan söka här:</p>
+      <SearchBar />
+      <p>{message || 'Eller klicka nedan för att komma tillbaka till tryggheten.'}</p>
       <Link to={buttonHref || '/'}>{buttonText || 'Till startsidan'}</Link>
     </div>
   )

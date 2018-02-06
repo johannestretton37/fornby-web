@@ -58,9 +58,8 @@ class MainPage extends Component {
       const pageContent = await cms.getPageContent(page)
       if (Object.keys(pageContent).length === 0) {
         this.setState({
-          title: 'Här var det tomt',
           pageContent: {
-            shortInfo: 'Error 404'
+            error: true
           },
           isLoading: false
         })

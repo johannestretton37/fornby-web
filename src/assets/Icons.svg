@@ -21,4 +21,9 @@
     <line class="b" x1="244.01" y1="244.01" x2="779.99" y2="779.99"/>
   </symbol>
 
+  <symbol id="icon-search" viewBox="0 0 1024 1024">
+    <circle class="b" cx="567.75" cy="432.38" r="244.25"/>
+    <line class="b" x1="402.13" y1="612.74" x2="201.74" y2="813.13"/>
+  </symbol>
+
 </svg>

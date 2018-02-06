@@ -1,10 +1,37 @@
 /* Font colors */
 /* Brand colors */
-header .brand-header .logo {
-  display: none; }
+header .header-top-container {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center; }
+  header .header-top-container > * {
+    flex: 1 0;
+    /* small */ }
+    @media (min-width: 768px) {
+      header .header-top-container > * {
+        /* large */ } }
   @media (min-width: 768px) {
-    header .brand-header .logo {
+    header .header-top-container .main-menu-toggler {
       /* large */
-      display: block;
-      margin: 3rem auto;
-      width: 12rem; } }
+      visibility: hidden; } }
+  header .header-top-container .main-menu-toggler .icon-container {
+    padding-left: 8px; }
+  header .header-top-container .brand-header {
+    padding: 0.5rem 1rem; }
+    header .header-top-container .brand-header h1 {
+      text-align: center; }
+      header .header-top-container .brand-header h1 .logo {
+        width: 8rem; }
+        @media (min-width: 768px) {
+          header .header-top-container .brand-header h1 .logo {
+            /* large */
+            margin: 2rem auto;
+            width: 12rem; } }
+  header .header-top-container .searchbar-toggler .icon-container {
+    /* small */ }
+    @media (min-width: 768px) {
+      header .header-top-container .searchbar-toggler .icon-container {
+        /* large */
+        padding-right: 35px; } }

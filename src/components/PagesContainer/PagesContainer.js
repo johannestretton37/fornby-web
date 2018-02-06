@@ -4,6 +4,7 @@ import cms from '../../cms'
 import { PageSlug } from '../../constants'
 import { CSSTransition } from 'react-transition-group'
 import SubPage from '../SubPage'
+import ErrorPage from '../ErrorPage'
 import ApplyForm from '../ApplyForm'
 import './PagesContainer.css'
 
@@ -68,12 +69,15 @@ class PagesContainer extends Component {
 
   render() {
     const {
-      content: { name, shortInfo, body },
+      content: { name, shortInfo, body, error },
       subPageSlug,
       subPages
     } = this.state
     let { page } = this.props.match.params
     return (
+      error ?
+      <ErrorPage />
+      :
       <div>
         <h2>{name}</h2>
         <p className="short-info">{shortInfo}</p>

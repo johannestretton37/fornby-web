@@ -36,7 +36,9 @@ class MainMenuItem extends Component {
       window.removeEventListener('resize', this.handleResize)
     } else if (nextProps.isActive && !this.props.isActive) {
       // This item toggled to active, add listener
-      window.addEventListener('resize', this.handleResize)      
+      window.addEventListener('resize', this.handleResize)
+      this.moveIndicator()
+      this.updateIsVertical(window.innerWidth < 768)
     }
   }
 

@@ -1,0 +1,13 @@
+.searchbar-container {
+  transition: max-height 600ms ease-out, opacity 600ms ease-out;
+  height: 100%;
+  overflow: hidden;
+  &.open {
+    max-height: 200px;
+    opacity: 1;
+  }
+  &.closed {
+    max-height: 0;
+    opacity: 0;
+  }
+}

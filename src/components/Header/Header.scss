@@ -4,14 +4,52 @@
 @import 'bootstrap/scss/mixins/_breakpoints';
 
 header {
-  .brand-header {
-    .logo {
-      display: none;
+  .header-top-container {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    & > * {
+      flex: 1 0;
+      /* small */
       @include media-breakpoint-up(md) {
         /* large */
-        display: block;
-        margin: 3rem auto;
-        width: 12rem;
+        // flex: 0 100%;
+      }    
+    }
+    .main-menu-toggler {
+      @include media-breakpoint-up(md) {
+        /* large */
+        visibility: hidden;
+      }
+      .icon-container {
+        padding-left: 8px;
+      }
+    }
+    .brand-header {
+      padding: 0.5rem 1rem;
+      h1 {
+        text-align: center;
+        .logo {
+          width: 8rem;
+          // display: none;
+          @include media-breakpoint-up(md) {
+            /* large */
+            // display: block;
+            margin: 2rem auto;
+            width: 12rem;
+          }
+        }
+      }
+    }
+    .searchbar-toggler {
+      .icon-container {
+        /* small */
+        @include media-breakpoint-up(md) {
+          /* large */
+          padding-right: 35px;
+        }
       }
     }
   }

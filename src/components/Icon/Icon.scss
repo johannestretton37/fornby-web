@@ -4,6 +4,12 @@
   display: flex;
   height: 100%;
   flex-grow: 1;
+  &.left {
+    justify-content: flex-start;
+  }
+  &.right {
+    justify-content: flex-end;
+  }
   .icon {
     margin: auto 0;
     fill: none;

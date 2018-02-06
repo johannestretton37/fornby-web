@@ -1,45 +1,54 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { object } from 'prop-types'
+import { object, array, bool } from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import MainMenuItem from '../MainMenuItem'
 import logo from '../../assets/fornby-logo.svg'
-import cms from '../../cms'
 import './MainMenu.css'
-import Icon from '../Icon'
+
 
 class MainMenu extends Component {
   state = {
-    mainMenuItems: [],
+    items: [],
     activeItem: -1,
     left: '0px',
     top: '0px',
     width: '0px',
     height: '0px',
-    isOpen: false,
     isVertical: false
   }
 
   static propTypes = {
+    items: array.isRequired,
+    isOpen: bool,
     location: object,
     history: object
   }
 
   componentDidMount() {
-    this.getMainMenuItems()
+    this.findActiveItem()
   }
 
-  getMainMenuItems = async () => {
-    const mainMenuItems = await cms.mainMenuItems()
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.items.length !== this.props.items.length) {
+      this.setState({
+        items: nextProps.items
+      }, () => {
+        this.findActiveItem()
+      })
+    }
+  }
+
+  findActiveItem = () => {
     const { location } = this.props
+    const { items } = this.state
     const mainPath = location.pathname.split('/')[1]
-    let activeItem = 0
-    let activeMenuItem = mainMenuItems.findIndex(
+    let activeItem = -1
+    let activeMenuItem = items.findIndex(
       item => item.url === '/' + mainPath
     )
     if (activeMenuItem) activeItem = activeMenuItem
     this.setState({
-      mainMenuItems,
       activeItem
     })
   }
@@ -77,30 +86,19 @@ class MainMenu extends Component {
     })
   }
 
-  /**
-   * Mobile menu
-   */
-  toggleMenu = e => {
-    e.preventDefault()
-    this.setState(prevState => {
-      return { isOpen: !prevState.isOpen }
-    })
-  }
-
   render() {
     const {
       left,
       top,
       width,
       height,
-      mainMenuItems,
       activeItem,
-      isOpen,
       isVertical
     } = this.state
+    const { items, isOpen } = this.props
     // isVertical is true when mobile menu is visible
     let indicatorStyle = {
-      opacity: mainMenuItems.length > 0 ? 1 : 0
+      opacity: items.length > 0 ? 1 : 0
     }
     if (isVertical) {
       indicatorStyle.top = top
@@ -114,22 +112,10 @@ class MainMenu extends Component {
     }
     return (
       <div className="main-menu-container">
-        <div className="main-menu-header">
-          <div
-            className={`main-menu-toggler${isOpen ? ' open' : ''}`}
-            onClick={this.toggleMenu}>
-            <Icon name={isOpen ? 'close' : 'menu'} size={40} />
-          </div>
-          <div className="main-menu-logo">
-            <a href="/">
-              <img src={logo} className="logo" alt="logo" />
-            </a>
-          </div>
-        </div>
         <nav
           className={`main-menu${isOpen ? ' open' : ' closed'}`}
           style={{ maxHeight: isOpen ? '400px' : '0px' }}>
-          {mainMenuItems.map((menuItem, i, items) => {
+          {items.map((menuItem, i, items) => {
             return (
               <CSSTransition
                 key={i}
