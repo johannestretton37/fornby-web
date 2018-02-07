@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Row, Col } from 'reactstrap'
 import { withRouter } from 'react-router-dom'
 import cms from '../../cms'
 import MainMenu from '../MainMenu'

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import GalleryPage from '../GalleryPage'
 import CoursesPage from '../CoursesPage'
 import Loading from '../Loading'
 import PagesContainer from '../PagesContainer'

@@ -1,8 +1,64 @@
+/* Font colors */
+/* Brand colors */
+/* Footer */
 footer {
   width: 100%;
-  height: 60px;
-  background: #500; }
-  footer p {
-    margin: 0;
-    line-height: 60px;
-    color: #ddd; }
+  padding-top: 2em;
+  font-size: 1.1em;
+  background: #4d1229;
+  /* small */
+  text-align: center; }
+  @media (min-width: 576px) {
+    footer {
+      /* large */
+      text-align: left; } }
+  footer h5 {
+    font-size: 1.1em;
+    color: #fff;
+    margin-bottom: 1em; }
+  footer p, footer a {
+    font-size: 0.9em;
+    color: #b4b8c0; }
+  footer a {
+    font-weight: bold;
+    text-decoration: none;
+    color: #c4ccdb;
+    transition: color 300ms ease-out; }
+    footer a:hover {
+      color: #fff;
+      text-decoration: none; }
+  footer ul, footer li {
+    list-style: none; }
+  footer .social li {
+    display: inline-block;
+    margin-right: 12px; }
+    footer .social li a.facebook, footer .social li a.twitter {
+      display: block;
+      padding: 10px;
+      width: 38px;
+      height: 38px;
+      background-size: 30px;
+      background-repeat: no-repeat;
+      text-indent: -9999px;
+      opacity: 0.85;
+      transition: opacity 300ms ease-out; }
+      footer .social li a.facebook:hover, footer .social li a.twitter:hover {
+        opacity: 1; }
+    footer .social li a.facebook {
+      background-image: url(../../assets/facebook-white.svg); }
+    footer .social li a.twitter {
+      background-image: url(../../assets/twitter-white.svg);
+      background-position: -6px -6px;
+      background-size: 42px; }
+  footer .footer-bottom {
+    display: flex;
+    flex-direction: row;
+    margin-top: 2em;
+    width: 100%;
+    height: 88px;
+    background-color: #280915; }
+    footer .footer-bottom .logo {
+      margin: auto;
+      padding: 1em 2em; }
+      footer .footer-bottom .logo img {
+        width: 105px; }

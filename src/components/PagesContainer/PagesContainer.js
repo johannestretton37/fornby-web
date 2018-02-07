@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { object } from 'prop-types'
-import cms from '../../cms'
 import { PageSlug } from '../../constants'
-import { CSSTransition } from 'react-transition-group'
 import SubPage from '../SubPage'
 import ErrorPage from '../ErrorPage'
 import ApplyForm from '../ApplyForm'
