@@ -53,8 +53,16 @@ class CoursesPage extends Component {
   }
 
   findCategory(categories, slug) {
-    const category = categories.find(category => category.slug == slug);
-    return category || null;
+    return categories.find(category => category.slug == slug);
+  }
+
+  RenderPage(galleryItems, field) {
+    const { body } = field ;
+    return (
+      <div>
+        {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
+        <Gallery items={galleryItems} />
+      </div>);
   }
   render() {
     const { categories } = this.state;
@@ -63,17 +71,17 @@ class CoursesPage extends Component {
     let content = null;
     if (slug) {
       const items = this.findCategory(categories, category)
-      if (items && items.category) {
-        let course = this.findCategory(items.category, slug);
+      if (items && items.courses) {
+        let course = this.findCategory(items.courses, slug);
         if (course) {
           content = <CoursePage content={course} onApplyChanged={() => { }} />
         }
       }
     } else if (category) {
       const items = this.findCategory(categories, category)
-      content = items && <Gallery items={items.category} />
+      content = items && this.RenderPage(items.courses,items);
     } else {
-      content = <Gallery items={categories} />
+      content = this.RenderPage(categories, this.props.content);
     }
 
     return (
@@ -81,7 +89,7 @@ class CoursesPage extends Component {
         <Container>
           <Row>
             <Col>
-              <div style={{ textAlign: 'center' }}>
+              <div style={{ textAlign: 'left', borderBottom: "2px solid" }}>
                 <h1>{this.props.title}</h1>
               </div>
             </Col>
