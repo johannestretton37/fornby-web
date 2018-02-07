@@ -1,13 +1,95 @@
+@import 'styles/_colors.scss';
+
 .searchbar-container {
-  transition: max-height 600ms ease-out, opacity 600ms ease-out;
-  height: 100%;
-  overflow: hidden;
-  &.open {
-    max-height: 200px;
-    opacity: 1;
+  display: flex;
+  justify-content: flex-end;
+  form {
+    transition: width 500ms ease-out, opacity 500ms ease-out;
+    margin-left: 1em;
+    input[type=search] {
+      border-radius: 8px;
+      &.form-control, &.form-control:active, &.form-control:focus {
+        outline: none;
+        box-shadow: none;
+        border-color: lighten($brand-secondary, 40%);
+      }
+    }
+    .searchResults {
+      position: absolute;
+      background-color: #eee;
+      z-index: 99;
+      &, .list-group-item {
+        border-radius: 8px;
+        font-size: 0.9em;
+        line-height: 1.4em;
+      }
+      .list-group-item {
+        transition: background-color 300ms ease-out;
+        a {
+          display:block;
+          text-decoration: none;
+          h5, p {
+            transition: color 300ms ease-out;
+          }
+          h5 {
+            color: $brand-secondary;
+          }
+          p {
+            color: $default-text-color;
+          }
+        }
+        &:hover {
+          background-color: $brand-secondary;
+          a {
+            h5, p {
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
   }
-  &.closed {
-    max-height: 0;
-    opacity: 0;
+  /**
+   * Horizontal search bar (expands horizontally) will only
+   * be shown on larger screens
+   */
+  &.horizontal {
+    &.open {
+      form {
+        width: 100%;
+        opacity: 1;
+      }
+    }
+    &.closed {
+      form {
+        width: 0px;
+        opacity: 0;
+      }
+    }
+  }
+  /**
+   * Vertical search bar (expands vertically) will only
+   * be shown on smaller screens
+   */
+   &.vertical {
+    transition: max-height 600ms ease-out, opacity 600ms ease-out;
+    height: 100%;
+    overflow: hidden;
+    form {
+      position: relative;
+      width: 100%;
+      input {
+        margin: auto;
+      }
+    }
+    &.open {
+      max-height: 200px;
+      opacity: 1;
+      overflow: visible;
+    }
+    &.closed {
+      max-height: 0;
+      opacity: 0;
+    }
   }
 }

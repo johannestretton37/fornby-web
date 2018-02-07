@@ -43,13 +43,38 @@ header {
         }
       }
     }
-    .searchbar-toggler {
-      .icon-container {
+    #searchbar-toggler {
+      &-small-screens {
         /* small */
         @include media-breakpoint-up(md) {
           /* large */
-          padding-right: 35px;
+          display:none;
         }
+      }
+      &-large-screens {
+        @include media-breakpoint-down(sm) {
+          /* small only */
+          display:none;
+        }
+      }
+    }
+  }
+  .searchbar-container {
+    &.horizontal {
+      /* small */
+      display:none;
+      @include media-breakpoint-up(md) {
+        /* large */
+        display: flex;
+      }
+    }
+    &.vertical {
+      /* small */
+      display:flex;
+      margin-bottom: 1em;
+      @include media-breakpoint-up(md) {
+        /* large */
+        display: none;
       }
     }
   }

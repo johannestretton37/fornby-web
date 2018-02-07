@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { bool } from 'prop-types'
+import { bool, func, array } from 'prop-types'
+import Toggler from '../Toggler'
 import {
   Form,
   Input,
@@ -11,54 +12,83 @@ import {
 import './SearchBar.css'
 
 class SearchBar extends Component {
-  state = {
+  static propTypes = {
+    results: array.isRequired,
+    isOpen: bool,
+    expandHorizontal: bool,
+    toggleSearchBar: func.isRequired,
+    performSearch: func.isRequired,
+  }
+
+  static defaultProps = {
     results: []
   }
 
-  static propTypes = {
-    isOpen: bool
+  handleClick = e => {
+    e.preventDefault()
+    this.performSearch()
+    if (this.props.isOpen) {
+      // Close
+      // Clear form
+      this.search.value = ''
+      this.search.blur()
+    } else {
+      // Open
+      this.search.focus()
+    }
+    this.props.toggleSearchBar()
   }
 
   handleChange = e => {
     e.preventDefault()
-    this.setState({
-      results: [
-        {
-          heading: '[MOCK SEARCH RESULT] Musikkurser',
-          body:
-            'Här hittar du alla våra musikkurser. Men du, detta är bara ett exempel, sökfunktionen är inte implementerad ännu.'
-        }
-      ]
-    })
+    this.performSearch()
+  }
+
+  performSearch = () => {
+    let searchText = this.search.value
+    if (searchText) {
+      this.props.performSearch(searchText)
+    }
+  }
+
+  handleSubmit = e => {
+    e.preventDefault()
+    this.performSearch()
   }
 
   render() {
-    const { results } = this.state
-    const { isOpen } = this.props
-    const debug = true
+    const { expandHorizontal, isOpen, results } = this.props
     return (
-      debug && (
-        <div className={`searchbar-container${isOpen ? ' open' : ' closed'}`}>
-          <Form>
+        <div className={`searchbar-container${expandHorizontal ? ' horizontal' : ' vertical' }${isOpen ? ' open' : ' closed'}`}>
+          {expandHorizontal && <Toggler
+            id='searchbar-toggler-large-screens'
+            className='searchbar-toggler'
+            onClick={this.handleClick}
+            iconOpen='search'
+            iconClosed='search'
+            align='right'
+            />}
+          <Form onSubmit={this.handleSubmit}>
             <Input
               type="search"
               name="search"
+              innerRef={search => this.search = search}
               onChange={this.handleChange}
-              id="exampleSearch"
               placeholder="search will be implemented soon..."
             />
-            <ListGroup>
+            <ListGroup className='searchResults'>
               {results.map((result, i) => (
                 <ListGroupItem key={i} active={false}>
-                  <ListGroupItemHeading>{result.heading}</ListGroupItemHeading>
-                  <ListGroupItemText>{result.body}</ListGroupItemText>
+                  <a href={result.url}>
+                    <ListGroupItemHeading>{result.heading}</ListGroupItemHeading>
+                    <ListGroupItemText>{result.body}</ListGroupItemText>
+                  </a>
                 </ListGroupItem>
               ))}
             </ListGroup>
           </Form>
         </div>
       )
-    )
   }
 }
 

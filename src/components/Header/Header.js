@@ -17,7 +17,8 @@ class Header extends Component {
     height: '0px',
     isMainMenuOpen: false,
     isSearchBarOpen: false,
-    isVertical: false
+    isVertical: false,
+    results: []
   }
 
   componentDidMount() {
@@ -52,21 +53,45 @@ class Header extends Component {
   /**
    * Search bar
    */
-  handleSearchBarToggle = e => {
-    e.preventDefault()
+  handleSearchBarToggle = () => {
+    this.toggleSearchBar()
+  }
+  
+  toggleSearchBar = () => {
     this.setState(prevState => {
       return { isSearchBarOpen: !prevState.isSearchBarOpen }
     })
   }
 
+  performSearch = (searchText) => {
+    console.log('PERFORMING SEARCH FOR', searchText)
+    let results = [
+      {
+        heading: 'Musikkurser',
+        url: '/kurser/musikkurser',
+        body:
+          'Här hittar du alla våra musikkurser. Men du, detta är bara ett exempel, sökfunktionen är inte implementerad ännu.'
+        }
+      ]
+    if (searchText.length > 3) results.push({
+      heading: 'Konstkurser',
+      url: '/kurser/konstkurser',
+      body:
+        'Om konst är din melodi kan du...'
+    })
+    this.setState({
+      results
+    })
+  }
+
   render() {
-    const { mainMenuItems, isMainMenuOpen, isSearchBarOpen } = this.state
+    const { mainMenuItems, isMainMenuOpen, isSearchBarOpen, results } = this.state
     return (
       <header className="container">
         <div className="header-top-container">
           <Toggler
             className='main-menu-toggler'
-            onToggle={this.handleMainMenuToggle}
+            onClick={this.handleMainMenuToggle}
             isOpen={isMainMenuOpen}
             iconOpen='menu'
             iconClosed='close'
@@ -80,16 +105,28 @@ class Header extends Component {
             </h1>
           </div>
           <Toggler
+            id='searchbar-toggler-small-screens'
             className='searchbar-toggler'
-            onToggle={this.handleSearchBarToggle}
+            onClick={this.handleSearchBarToggle}
             isOpen={isSearchBarOpen}
             iconOpen='search'
             iconClosed='search'
             align='right'
             />
+          <SearchBar
+            isOpen={isSearchBarOpen}
+            expandHorizontal={true}
+            toggleSearchBar={this.toggleSearchBar}
+            performSearch={this.performSearch}
+            results={results} />
         </div>
         <MainMenu items={mainMenuItems} isOpen={isMainMenuOpen} />
-        <SearchBar isOpen={isSearchBarOpen}  />
+        <SearchBar
+          isOpen={isSearchBarOpen}
+          expandHorizontal={false}
+          toggleSearchBar={this.toggleSearchBar}
+          performSearch={this.performSearch}
+          results={results} />
       </header>
     )
   }

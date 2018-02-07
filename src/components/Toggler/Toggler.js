@@ -5,20 +5,26 @@ import './Toggler.css'
   
 class Toggler extends Component {
   static propTypes = {
-    onToggle: func.isRequired,
-    isOpen: bool.isRequired,
+    id: string,
+    onClick: func.isRequired,
+    isOpen: bool,
     className: string.isRequired,
     iconOpen: string.isRequired,
     iconClosed: string.isRequired,
     align: string,
   }
 
+  static defaultProps = {
+    isOpen: true
+  }
+
   render() {
-    const { isOpen, className, iconClosed, iconOpen, align } = this.props
+    const { id, isOpen, className, iconClosed, iconOpen, align } = this.props
     return (
       <div
+        id={id}
         className={`${className} toggler${isOpen ? ' open' : ''}`}
-        onClick={this.props.onToggle}>
+        onClick={this.props.onClick}>
         <Icon name={isOpen ? iconClosed : iconOpen } align={align} size={40} />
       </div>
     )

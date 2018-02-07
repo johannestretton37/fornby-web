@@ -4,7 +4,7 @@ import './Icon.css'
   
 const Icon = ({name, color, size, align}) => {
   return (
-    <div className={`icon-container${align && ' ' + align}`}>
+    <div className={`icon-container${align !== undefined ? ' ' + align : ''}`}>
       <svg className={`icon icon-${name}`} fill={color} width={size} height={size}>
         <use xlinkHref={`${Icons}#icon-${name}`} />
       </svg>
