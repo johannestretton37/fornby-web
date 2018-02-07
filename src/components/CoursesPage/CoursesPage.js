@@ -1,12 +1,8 @@
 import React, { Component } from 'react'
-import cms from '../../cms'
-import { Switch, Route, withRouter } from 'react-router-dom'
 import { Container, Row, Col } from 'reactstrap'
 import Gallery from '../Gallery'
-import ContentGroup from '../../constants'
 import './CoursesPage.css'
-import { string, array, object } from 'prop-types'
-import PageContainer from '../PageContainer'
+import { string, object } from 'prop-types'
 import CoursePage from '../CoursePage';
 
 class CoursesPage extends Component {
@@ -53,11 +49,11 @@ class CoursesPage extends Component {
   }
 
   findCategory(categories, slug) {
-    return categories.find(category => category.slug == slug);
+    return categories.find(category => category.slug === slug);
   }
 
   RenderPage(galleryItems, field) {
-    const { body } = field ;
+    const { body } = field;
     return (
       <div>
         {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
@@ -80,7 +76,7 @@ class CoursesPage extends Component {
       }
     } else if (category) {
       const items = this.findCategory(categories, category)
-      content = items && this.RenderPage(items.courses,items);
+      content = items && this.RenderPage(items.courses, items);
     } else {
       content = this.RenderPage(categories, this.props.content);
     }
