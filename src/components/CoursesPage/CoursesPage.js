@@ -14,7 +14,7 @@ class CoursesPage extends Component {
   static propTypes = {
     match: object.isRequired,
     title: string.isRequired,
-    content: array.isRequired
+    content: object.isRequired
   }
 
   state = {
@@ -22,7 +22,7 @@ class CoursesPage extends Component {
   }
 
   componentDidMount() {
-    const categories = this.props.content
+    const categories = this.props.content.courseCategory;
     let category = {};
     console.log(categories);
     if (categories.category) {
@@ -35,8 +35,8 @@ class CoursesPage extends Component {
     this.setState({
       categories
     })
-  // const pageName = this.props.match.params.page;
-  //   this.getContent();
+    // const pageName = this.props.match.params.page;
+    //   this.getContent();
     if (this.props.match.params.category) {
       console.log(this.props.match.params.category);
     } else if (this.props.match.params.slug) {
@@ -53,27 +53,36 @@ class CoursesPage extends Component {
   }
 
   findCategory(categories, slug) {
-    return categories.find(category => category.slug == slug)
+    return categories.find(category => category.slug == slug);
+  }
+
+  RenderPage(galleryItems, field) {
+    const { body } = field ;
+    return (
+      <div>
+        {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
+        <Gallery items={galleryItems} />
+      </div>);
   }
 
   render() {
-    const { categories } = this.state
+    const { categories } = this.state;
     const { category, slug } = this.props.match.params
 
     let content = null;
     if (slug) {
       const items = this.findCategory(categories, category)
-      if (items && items.category) {
-        let course = this.findCategory(items.category, slug);
+      if (items && items.courses) {
+        let course = this.findCategory(items.courses, slug);
         if (course) {
           content = <CoursePage content={course} onApplyChanged={() => { }} />
         }
       }
     } else if (category) {
       const items = this.findCategory(categories, category)
-      content = items && <Gallery items={items.category} />
+      content = items && this.RenderPage(items.courses,items);
     } else {
-      content = <Gallery items={categories} />
+      content = this.RenderPage(categories, this.props.content);
     }
 
     return (
@@ -81,7 +90,7 @@ class CoursesPage extends Component {
         <Container>
           <Row>
             <Col>
-              <div style={{ textAlign: 'center' }}>
+              <div style={{ textAlign: 'left', borderBottom: "2px solid" }}>
                 <h1>{this.props.title}</h1>
               </div>
             </Col>
