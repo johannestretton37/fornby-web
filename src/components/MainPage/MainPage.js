@@ -47,7 +47,8 @@ class MainPage extends Component {
       const pageContent = await cms.getCourses()
       this.setState({
         pageContent,
-        isLoading: false
+        isLoading: false,
+        title: pageContent.name
       })
       resolve()
     })

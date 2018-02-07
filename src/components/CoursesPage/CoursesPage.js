@@ -14,7 +14,7 @@ class CoursesPage extends Component {
   static propTypes = {
     match: object.isRequired,
     title: string.isRequired,
-    content: array.isRequired
+    content: object.isRequired
   }
 
   state = {
@@ -22,7 +22,7 @@ class CoursesPage extends Component {
   }
 
   componentDidMount() {
-    const categories = this.props.content
+    const categories = this.props.content.courseCategory;
     let category = {};
     console.log(categories);
     if (categories.category) {
@@ -35,8 +35,8 @@ class CoursesPage extends Component {
     this.setState({
       categories
     })
-  // const pageName = this.props.match.params.page;
-  //   this.getContent();
+    // const pageName = this.props.match.params.page;
+    //   this.getContent();
     if (this.props.match.params.category) {
       console.log(this.props.match.params.category);
     } else if (this.props.match.params.slug) {
@@ -52,27 +52,12 @@ class CoursesPage extends Component {
     }
   }
 
-  // getContent = async () => {
-  //   const categories = await cms.getCourses();
-  //   let category = {};
-  //   console.log(categories);
-  //   if (categories.category) {
-  //     categories.category.forEach(cat => {
-  //       category[cat.slug] = (
-  //         <Gallery items={this.state.categories} />
-  //       )
-  //     })
-  //   }
-  //   this.setState({
-  //     categories
-  //   })
-  // }
   findCategory(categories, slug) {
     const category = categories.find(category => category.slug == slug);
     return category || null;
   }
   render() {
-    const { categories } = this.state
+    const { categories } = this.state;
     const { category, slug } = this.props.match.params
 
     let content = null;

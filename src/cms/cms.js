@@ -119,12 +119,20 @@ class CMS {
   }
   getCourses = () => {
     return new Promise(async resolve => {
-      if (this.cache.courses) return resolve(this.cache.courses)
-      let options = { populate: ['category'] };
-      const categoriesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options);
-      const categories = this.arrayFromFirebaseData(categoriesData)
-      this.cache.courses = categories
-      return resolve(categories);
+      if (this.cache.courseMainPage) return resolve(this.cache.courseMainPage)
+      const coursePageContent = await this.flamelinkApp.content.get(ContentGroup.COURSES_MAIN_PAGE, 1518008977981);
+      if (!coursePageContent) return resolve(null);
+      const options = { populate: ['courses'] };
+      const courseCategories = this.arrayFromFirebaseData(await this.flamelinkApp.content.get(ContentGroup.COURSES_CATEGORIES, options));
+
+      for (let i = 0; i < coursePageContent.courseCategory.length; i++) {
+        let courseCategory = courseCategories.find(c => c.id === coursePageContent.courseCategory[i]);
+        if (courseCategory) {
+          coursePageContent.courseCategory[i] = courseCategory;
+        }
+      }
+      this.cache.courseMainPage = coursePageContent;
+      return resolve(coursePageContent);
     })
   }
   /**
@@ -135,7 +143,7 @@ class CMS {
    * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
-  getContentGroup = (groupName, options = { populate: ['category'] }, cacheResponse = true) => {
+  getContentGroup = (groupName, options = {}, cacheResponse = true) => {
     console.log('getContentGroup ' + groupName);
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
@@ -275,12 +283,12 @@ class CMS {
         this.cache.staffPages = staffPages
         console.log('getStaffPages()', this.cache)
         return resolve(staffPages)
-      } catch(error) {
+      } catch (error) {
         return reject(error)
       }
     })
   }
-  
+
   /**
    * Fetch content from CMS
    * 

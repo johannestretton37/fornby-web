@@ -22,6 +22,8 @@ export const ContentGroup = {
   DETAIL_PAGES: 'detailPages',
   STAFF: 'staff',
   START_PAGE_SLIDES: 'startPageSlides',
+  COURSES_MAIN_PAGE:'coursesMainPage',
+  COURSES_CATEGORIES: 'kurser',
   COURSES: 'kurser',
 }
 
