@@ -52,25 +52,10 @@ class CoursesPage extends Component {
     }
   }
 
-  // getContent = async () => {
-  //   const categories = await cms.getCourses();
-  //   let category = {};
-  //   console.log(categories);
-  //   if (categories.category) {
-  //     categories.category.forEach(cat => {
-  //       category[cat.slug] = (
-  //         <Gallery items={this.state.categories} />
-  //       )
-  //     })
-  //   }
-  //   this.setState({
-  //     categories
-  //   })
-  // }
   findCategory(categories, slug) {
-    const category = categories.find(category => category.slug == slug);
-    return category || null;
+    return categories.find(category => category.slug == slug)
   }
+
   render() {
     const { categories } = this.state
     const { category, slug } = this.props.match.params
