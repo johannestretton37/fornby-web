@@ -1,14 +1,13 @@
 import getSlug from 'speakingurl'
 import firebaseApp from '../Fire'
 import flamelink from 'flamelink'
+import CustomError from '../models/CustomError'
 import { ContentGroup } from '../constants'
 import { camelCase } from '../Helpers'
 
 /**
  * CMS
- *
- * This is an API for the Content Managing System. It is meant as a middleware for accessing
- * content while we decide what technical solution we're gonna use.
+ * This is an API for easy access to the Flamelink Content Managing System.
  */
 
 class CMS {
@@ -48,34 +47,40 @@ class CMS {
    * Main Menu
    */
   mainMenuItems = () => {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
       // Return cached main menu if present
       if (this.cache.mainMenu) return resolve(this.cache.mainMenu)
-      const mainNavigation = await this.flamelinkApp.nav.get('mainNavigation', {
-        fields: ['items']
-      })
-      // Structure menu
-      let mainMenu = []
-      mainNavigation.items.forEach(item => {
-        if (item.parentIndex === 0) {
-          // This is a root link, e.g. '/kurser'
-          mainMenu.push(this.createMainMenuItem(item))
-        } else {
-          /* Get this from MainPages instead */
-          // This is a sub link, e.g. '/kurser/mer-info'
-          // Find parent and add child to parent's subItems array
-          // We can assume that the parent is already added to mainMenu,
-          // search from end of array
-          // const array = mainMenu
-          // let parent = this.findParentFor(item, array)
-          // if (parent) {
-          //   if (!parent.subItems) parent.subItems = []
-          //   parent.subItems.push(this.createMainMenuItem(item, parent))
-          // }
-        }
-      })
-      this.cache.mainMenu = mainMenu
-      return resolve(mainMenu)
+      try {
+        const mainNavigation = await this.flamelinkApp.nav.get('mainNavigation', {
+          fields: ['items']
+        })
+        if (!mainNavigation) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Navigation')
+        if (!mainNavigation.items) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Navigation items')
+        // Structure menu
+        let mainMenu = []
+        mainNavigation.items.forEach(item => {
+          if (item.parentIndex === 0) {
+            // This is a root link, e.g. '/kurser'
+            mainMenu.push(this.createMainMenuItem(item))
+          } else {
+            /* Get this from MainPages instead */
+            // This is a sub link, e.g. '/kurser/mer-info'
+            // Find parent and add child to parent's subItems array
+            // We can assume that the parent is already added to mainMenu,
+            // search from end of array
+            // const array = mainMenu
+            // let parent = this.findParentFor(item, array)
+            // if (parent) {
+            //   if (!parent.subItems) parent.subItems = []
+            //   parent.subItems.push(this.createMainMenuItem(item, parent))
+            // }
+          }
+        })
+        this.cache.mainMenu = mainMenu
+        return resolve(mainMenu)
+      } catch (error) {
+        return reject(error)
+      }
     })
   }
 
@@ -89,7 +94,7 @@ class CMS {
    *
    * @returns - An `object` that is the child's parent, or `undefined` if search fails
    */
-  findParentFor = (item, array) => {
+  DEPRECATED_findParentFor = (item, array) => {
     let parent
     let i = array.length - 1
     while (parent === undefined && i >= 0) {
@@ -104,19 +109,25 @@ class CMS {
     return parent
   }
 
-  getDetailPages = () => {
-    return new Promise(async resolve => {
+  DEPRECATED_getDetailPages = () => {
+    return new Promise(async (resolve, reject) => {
+      // Return cached data if it exists
       if (this.cache.detailPages) return resolve(this.cache.detailPages)
       // No cache, fetch detailPages
-      const detailPagesData = await this.flamelinkApp.content.get(
-        ContentGroup.DETAIL_PAGES
-      )
-      // Convert result to array
-      const detailPages = this.arrayFromFirebaseData(detailPagesData)
-      this.cache.detailPages = detailPages
-      return resolve(detailPages)
+      try {
+        const detailPagesData = await this.flamelinkApp.content.get(
+          ContentGroup.DETAIL_PAGES + 'xxx'
+        )
+        // Convert result to array
+        const detailPages = this.arrayFromFirebaseData(detailPagesData)
+        this.cache.detailPages = detailPages
+        return resolve(detailPages)
+      } catch (error) {
+        return reject(error)
+      }
     })
   }
+
   getCourses = () => {
     return new Promise(async resolve => {
       if (this.cache.courseMainPage) return resolve(this.cache.courseMainPage)
@@ -135,6 +146,7 @@ class CMS {
       return resolve(coursePageContent);
     })
   }
+
   /**
    * Return an array of content objects
    *
@@ -143,7 +155,7 @@ class CMS {
    * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
-  getContentGroup = (groupName, options = {}, cacheResponse = true) => {
+  DEPRECATED_getContentGroup = (groupName, options = {}, cacheResponse = true) => {
     console.log('getContentGroup ' + groupName);
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
@@ -204,7 +216,7 @@ class CMS {
    * @param {string} slug - A string representing a slug, e.g. 'konstkurs-VT-18'
    * @returns - A Promise that resolves to a content object
    */
-  getContent = (groupName, slug) => {
+  DEPRECATED_getContent = (groupName, slug) => {
     console.log('WOW!!! hämtar ' + groupName);
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
@@ -249,10 +261,11 @@ class CMS {
       if (this.cache.mainPages) return resolve(this.cache.mainPages)
       try {
         let mainPagesData = await this.flamelinkApp.content.get(ContentGroup.MAIN_PAGES)
+        if (!mainPagesData) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Pages')
         let mainPages = this.arrayFromFirebaseData(mainPagesData)
         // Cache main pages
         this.cache.mainPages = mainPages
-        console.log('getMainPages()', this.cache)
+        console.log('getMainPages() cached:', this.cache)
         return resolve(mainPages)
       } catch (error) {
         return reject(error)
@@ -269,7 +282,6 @@ class CMS {
    * 
    * @returns {Promise} - Returns Promise that resolves to an object of Staff objects
    */
-
   getStaffPages = () => {
     return new Promise(async (resolve, reject) => {
       // If staffPages is cached, return cache
@@ -279,9 +291,10 @@ class CMS {
           // fields: ['name', 'phone', 'email', 'portrait', 'role', 'slug'],
           populate: ['portrait']
         })
+        if (!staffPages) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Staff Pages')
         // Cache staffPages
         this.cache.staffPages = staffPages
-        console.log('getStaffPages()', this.cache)
+        console.log('getStaffPages() cached:', this.cache)
         return resolve(staffPages)
       } catch (error) {
         return reject(error)
@@ -307,6 +320,7 @@ class CMS {
         let content = {}
         // Get array of main pages
         let mainPages = await this.getMainPages()
+        if (!mainPages) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Pages found (in cms.getPageContent())')
         // Find the page we're looking for
         let mainPage = mainPages.find(mainPage => {
           return mainPage.slug === pageName
@@ -340,29 +354,33 @@ class CMS {
                   }
                 ]
               })
-              // Check for staffPages
-              let staffPages = await this.getStaffPages()
-              // Convert subPages to array
-              const allSubPages = this.arrayFromFirebaseData(subPages)
-              // Populate subPages with staff
-              allSubPages.forEach(subPage => {
-                if (subPage.staff) {
-                  subPage.staff = subPage.staff.map(staffObject => {
-                    return staffPages[staffObject.staffPerson]
+              if (subPages) {
+                // Convert subPages to array
+                const allSubPages = this.arrayFromFirebaseData(subPages)
+                // Check for staffPages
+                let staffPages = await this.getStaffPages()
+                if (staffPages) {
+                  // Populate subPages with staff
+                  allSubPages.forEach(subPage => {
+                    if (subPage.staff) {
+                      subPage.staff = subPage.staff.map(staffObject => {
+                        return staffPages[staffObject.staffPerson]
+                      })
+                    }
                   })
                 }
-              })
-              // Cache subPages
-              this.cache.subPages = allSubPages
-              // Add page's subPages to content object
-              content.subPages = allSubPages.filter(subPage => subPageIds.includes(subPage.id))
+                // Cache subPages
+                this.cache.subPages = allSubPages
+                // Add page's subPages to content object
+                content.subPages = allSubPages.filter(subPage => subPageIds.includes(subPage.id))
+              }
             }
           }
         }
         // Cache content
         this.cache[page] = content
         // Return content
-        console.log('getPageContent(' + pageName + ')', this.cache)
+        console.log('getPageContent(' + pageName + '), cached:', this.cache)
         return resolve(content)
       } catch (error) {
         return reject(error)
@@ -395,11 +413,16 @@ class CMS {
   // }
 
   getURL = (id, size) => {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
       if (this.cache.imageUrls[id]) return resolve(this.cache.imageUrls[id])
-      const url = await this.flamelinkApp.storage.getURL(id, { size: size || 'device' })
-      this.cache.imageUrls[id] = url
-      return resolve(url)
+      try {
+        const url = await this.flamelinkApp.storage.getURL(id, { size: size || 'device' })
+        if (!url) throw new CustomError('Ett fel uppstod', `No URL found for ${id}`)
+        this.cache.imageUrls[id] = url
+        return resolve(url)
+      } catch (error) {
+        return reject(`No URL found for ${id}`)
+      }
     })
   }
 
@@ -424,6 +447,7 @@ class CMS {
             populate: ['image']
           }
         )
+        if (!slides) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta slides')
         resolve(slides)
       } catch (error) {
         reject(error)

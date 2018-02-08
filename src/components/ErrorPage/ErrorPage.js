@@ -1,25 +1,26 @@
 import React from 'react'
-import { string } from 'prop-types'
+import { instanceOf } from 'prop-types'
 import { Link } from 'react-router-dom'
+import CustomError from '../../models/CustomError'
 import SearchBar from '../SearchBar'
 import './ErrorPage.css'
 
 ErrorPage.propTypes = {
-  heading: string,
-  message: string,
-  buttonText: string,
-  buttonHref: string
+  error: instanceOf(CustomError).isRequired,
 }
 
-function ErrorPage({ heading, message, buttonText, buttonHref }) {
+function ErrorPage({ error: {title, message, rescueLink, rescueText, showSearch} }) {
   return (
     <div>
-      <h2>404</h2>
-      <p><b>{heading || 'Ooops, här finns ingenting att se.'}</b></p>
-      <p>Du kan söka här:</p>
-      <SearchBar />
-      <p>{message || 'Eller klicka nedan för att komma tillbaka till tryggheten.'}</p>
-      <Link to={buttonHref || '/'}>{buttonText || 'Till startsidan'}</Link>
+      <h2>{title}</h2>
+      <p>{message}</p>
+      {rescueLink && <Link to={rescueLink}>{rescueText || 'Klicka här'}</Link>}
+      {showSearch && <div>
+        <p>Du kan söka efter det du letar efter här</p>
+        <SearchBar />
+        <p>{'Eller klicka nedan för att komma tillbaka till tryggheten.'}</p>
+        <Link to='/'>Till startsidan</Link>
+      </div>}
     </div>
   )
 }

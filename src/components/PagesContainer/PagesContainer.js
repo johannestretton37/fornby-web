@@ -74,7 +74,7 @@ class PagesContainer extends Component {
     let { page } = this.props.match.params
     return (
       error ?
-      <ErrorPage />
+      <ErrorPage error={error} />
       :
       <div>
         <h2>{name}</h2>

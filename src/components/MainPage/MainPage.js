@@ -7,6 +7,7 @@ import PagesContainer from '../PagesContainer'
 import { Container, Row, Col } from 'reactstrap'
 import { ContentGroup } from '../../constants'
 import SubMenu from '../SubMenu'
+import ErrorPage from '../ErrorPage'
 import cms from '../../cms'
 import './MainPage.css'
 import PageContainer from '../PageContainer/PageContainer'
@@ -22,7 +23,8 @@ class MainPage extends Component {
   state = {
     isLoading: true,
     pageContent: {},
-    title: ''
+    title: '',
+    error: null
   }
 
   static propTypes = {
@@ -30,7 +32,7 @@ class MainPage extends Component {
   }
 
   componentDidMount() {
-    const page = this.props.match.params.page
+    const { page } = this.props.match.params
     if (page === ContentGroup.COURSES) {
       this.getCourses()
     } else {
@@ -53,29 +55,26 @@ class MainPage extends Component {
     })
   }
 
+  /**
+   * If URL does NOT match /kurser, get requested content
+   */
   getPageContent = (page) => {
-    return new Promise(async resolve => {
-      const pageContent = await cms.getPageContent(page)
-      if (Object.keys(pageContent).length === 0) {
-        this.setState({
-          pageContent: {
-            error: true
-          },
-          isLoading: false
-        })
-      } else {
+    cms.getPageContent(page)
+      .then(pageContent => {
+        if (Object.keys(pageContent).length === 0) throw new Error('No content found')
         this.setState({
           title: pageContent.name,
           pageContent,
           isLoading: false
         })
-      }
-      resolve()
-    })
+      })
+      .catch(error => {
+        this.setState({ error: error })
+      })
   }
 
   render() {
-    const { isLoading, title, pageContent } = this.state
+    const { isLoading, title, pageContent, error } = this.state
     return (
       <Container>
       {isLoading ?
@@ -84,11 +83,15 @@ class MainPage extends Component {
         <Row>
           <SubMenu />
           <Col>
-              <Switch>
-                <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} title={title} />} />
-                <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent}/>} />
-                <Route path='/:page' component={PageContainer} />
-              </Switch>
+          {error ?
+            <ErrorPage error={error} />
+            :
+            <Switch>
+              <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} title={title} />} />
+              <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent}/>} />
+              <Route path='/:page' component={PageContainer} />
+            </Switch>
+          }
           </Col>
         </Row>
       }
