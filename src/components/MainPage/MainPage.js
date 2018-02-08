@@ -5,7 +5,7 @@ import CoursesPage from '../CoursesPage'
 import Loading from '../Loading'
 import PagesContainer from '../PagesContainer'
 import { Container, Row, Col } from 'reactstrap'
-import { ContentGroup } from '../../constants'
+import { ContentGroup } from '../../constants'
 import SubMenu from '../SubMenu'
 import cms from '../../cms'
 import './MainPage.css'
@@ -37,7 +37,7 @@ class MainPage extends Component {
       this.getPageContent(page)
     }
   }
-  
+
   /**
    * If URL matches /kurser, get courses content
    */
@@ -75,23 +75,23 @@ class MainPage extends Component {
   }
 
   render() {
-    const { isLoading, title, pageContent } = this.state
+    const { isLoading, pageContent } = this.state
     return (
       <Container>
-      {isLoading ?
-        <Loading />
-        :
-        <Row>
-          <SubMenu />
-          <Col>
+        {isLoading ?
+          <Loading />
+          :
+          <Row>
+            <SubMenu />
+            <Col>
               <Switch>
-                <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} title={title} />} />
-                <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent}/>} />
+                <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} />} />
+                <Route path='/:page/:subpage?' render={props => <PagesContainer {...props} content={pageContent} />} />
                 <Route path='/:page' component={PageContainer} />
               </Switch>
-          </Col>
-        </Row>
-      }
+            </Col>
+          </Row>
+        }
       </Container>
     )
   }

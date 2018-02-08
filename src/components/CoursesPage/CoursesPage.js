@@ -2,19 +2,19 @@ import React, { Component } from 'react'
 import { Container, Row, Col } from 'reactstrap'
 import Gallery from '../Gallery'
 import './CoursesPage.css'
-import { string, object } from 'prop-types'
+import { object } from 'prop-types'
 import CoursePage from '../CoursePage';
 
 class CoursesPage extends Component {
 
   static propTypes = {
     match: object.isRequired,
-    title: string.isRequired,
     content: object.isRequired
   }
 
   state = {
-    categories: []
+    categories: [],
+    title: ''
   }
 
   componentDidMount() {
@@ -28,17 +28,9 @@ class CoursesPage extends Component {
       })
     }
     this.setState({
-      categories
+      categories,
+      title: this.props.content.name
     })
-    // const pageName = this.props.match.params.page;
-    //   this.getContent();
-    /*if (this.props.match.params.category) {
-      console.log(this.props.match.params.category);
-    } else if (this.props.match.params.slug) {
-      console.log(this.props.match.params.slug);
-    } else {
-      console.log(this.props.match.params);
-    }*/
   }
 
   componentWillReceiveProps(nextProps) {
@@ -59,10 +51,10 @@ class CoursesPage extends Component {
         <Gallery items={galleryItems} />
       </div>);
   }
-
   render() {
     const { categories } = this.state;
     const { category, slug } = this.props.match.params
+    let title = this.state.title;
 
     let content = null;
     if (slug) {
@@ -70,12 +62,16 @@ class CoursesPage extends Component {
       if (items && items.courses) {
         let course = this.findCategory(items.courses, slug);
         if (course) {
+          title = course.name;
           content = <CoursePage content={course} onApplyChanged={() => { }} />
         }
       }
     } else if (category) {
       const items = this.findCategory(categories, category)
-      content = items && this.RenderPage(items.courses, items);
+      if (items && items.courses) {
+        title = items.name;
+        content = this.RenderPage(items.courses, items);
+      }
     } else {
       content = this.RenderPage(categories, this.props.content);
     }
@@ -86,7 +82,7 @@ class CoursesPage extends Component {
           <Row>
             <Col>
               <div style={{ textAlign: 'left', borderBottom: "2px solid" }}>
-                <h1>{this.props.title}</h1>
+                <h1>{title}</h1>
               </div>
             </Col>
           </Row>
