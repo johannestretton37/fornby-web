@@ -32,7 +32,7 @@ class Content extends Component {
               <Route
                 location={location}
                 key={location.key}
-                path="/:page"
+                path="/:page/:subpage?"
                 component={MainPage}
               />
               <Route path="/" component={StartPage} />
