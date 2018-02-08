@@ -11,7 +11,6 @@ class Content extends Component {
   static propTypes = {
     location: PropTypes.object
   }
-
   onEnter = (node, isAppearing) => {
     console.log(node, isAppearing)
     // Check if footer needs to be animated down or up
@@ -32,7 +31,7 @@ class Content extends Component {
               <Route
                 location={location}
                 key={location.key}
-                path="/:page/:subpage?"
+                path="/:page/:subpage?/:detailPage?"
                 component={MainPage}
               />
               <Route path="/" component={StartPage} />

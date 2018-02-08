@@ -17,7 +17,7 @@ function ErrorPage({ error: {title, message, rescueLink, rescueText, showSearch}
       {rescueLink && <Link to={rescueLink}>{rescueText || 'Klicka här'}</Link>}
       {showSearch && <div>
         <p>Du kan söka efter det du letar efter här</p>
-        <SearchBar />
+        <SearchBar isOpen={true} expandHorizontal={false} />
         <p>{'Eller klicka nedan för att komma tillbaka till tryggheten.'}</p>
         <Link to='/'>Till startsidan</Link>
       </div>}

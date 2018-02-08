@@ -5,9 +5,10 @@ import CoursesPage from '../CoursesPage'
 import Loading from '../Loading'
 import PagesContainer from '../PagesContainer'
 import { Container, Row, Col } from 'reactstrap'
-import { ContentGroup } from '../../constants'
+import { ContentGroup } from '../../constants'
 import SubMenu from '../SubMenu'
 import ErrorPage from '../ErrorPage'
+import CustomError from '../../models/CustomError'
 import cms from '../../cms'
 import './MainPage.css'
 import PageContainer from '../PageContainer/PageContainer'
@@ -39,7 +40,7 @@ class MainPage extends Component {
       this.getPageContent(page)
     }
   }
-  
+
   /**
    * If URL matches /kurser, get courses content
    */
@@ -61,7 +62,11 @@ class MainPage extends Component {
   getPageContent = (page) => {
     cms.getPageContent(page)
       .then(pageContent => {
-        if (Object.keys(pageContent).length === 0) throw new Error('No content found')
+        if (Object.keys(pageContent).length === 0) throw new CustomError(
+          'Oj, här var det tomt',
+          'Vi kunde inte hitta något här.',
+          true
+        )
         this.setState({
           title: pageContent.name,
           pageContent,
@@ -69,12 +74,15 @@ class MainPage extends Component {
         })
       })
       .catch(error => {
-        this.setState({ error: error })
+        this.setState({
+          error: error,
+          isLoading: false
+        })
       })
   }
 
   render() {
-    const { isLoading, title, pageContent, error } = this.state
+    const { isLoading, pageContent, error } = this.state
     return (
       <Container>
       {isLoading ?
@@ -87,7 +95,7 @@ class MainPage extends Component {
             <ErrorPage error={error} />
             :
             <Switch>
-              <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} title={title} />} />
+              <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} />} />
               <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent}/>} />
               <Route path='/:page' component={PageContainer} />
             </Switch>
