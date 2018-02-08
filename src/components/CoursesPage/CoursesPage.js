@@ -20,7 +20,6 @@ class CoursesPage extends Component {
   componentDidMount() {
     const categories = this.props.content.courseCategory;
     let category = {};
-    console.log(categories);
     if (categories.category) {
       categories.category.forEach(cat => {
         category[cat.slug] = (
@@ -33,13 +32,13 @@ class CoursesPage extends Component {
     })
     // const pageName = this.props.match.params.page;
     //   this.getContent();
-    if (this.props.match.params.category) {
+    /*if (this.props.match.params.category) {
       console.log(this.props.match.params.category);
     } else if (this.props.match.params.slug) {
       console.log(this.props.match.params.slug);
     } else {
       console.log(this.props.match.params);
-    }
+    }*/
   }
 
   componentWillReceiveProps(nextProps) {
