@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import PropTypes from 'prop-types'
+import { object, bool } from 'prop-types'
 import CoursesPage from '../CoursesPage'
 import Loading from '../Loading'
 import PagesContainer from '../PagesContainer'
@@ -29,15 +29,23 @@ class MainPage extends Component {
   }
 
   static propTypes = {
-    match: PropTypes.object.isRequired
+    match: object.isRequired,
+    subMenu: bool
+  }
+
+  static defaultProps = {
+    subMenu: true
   }
 
   componentDidMount() {
     const { page } = this.props.match.params
-    if (page === ContentGroup.COURSES) {
-      this.getCourses()
-    } else {
-      this.getPageContent(page)
+    switch (page) {
+      case ContentGroup.COURSES:
+        this.getCourses()
+      break
+      default:
+        this.getPageContent(page)
+      break;
     }
   }
 
@@ -82,6 +90,7 @@ class MainPage extends Component {
   }
 
   render() {
+    const { subMenu } = this.props
     const { isLoading, pageContent, error } = this.state
     return (
       <Container>
@@ -89,14 +98,14 @@ class MainPage extends Component {
         <Loading />
         :
         <Row>
-          <SubMenu />
+          {subMenu && <SubMenu />}
           <Col>
           {error ?
             <ErrorPage error={error} />
             :
             <Switch>
               <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} />} />
-              <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent}/>} />
+              <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent} />} />
               <Route path='/:page' component={PageContainer} />
             </Switch>
           }

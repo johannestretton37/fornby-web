@@ -23,7 +23,7 @@
   opacity: 1; }
   .page-fade-exit.page-fade-exit-active, .page-fade-exit.page-fade-disappear-active, .page-fade-disappear.page-fade-exit-active, .page-fade-disappear.page-fade-disappear-active {
     opacity: 0;
-    transition: all 300ms ease-in; }
+    transition: all 300ms ease-out; }
 
 /* Container must be absolute positioned during the transition */
 .main-container.page-fade-enter-active, .main-container.page-fade-appear-active {

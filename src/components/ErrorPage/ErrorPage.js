@@ -11,7 +11,7 @@ ErrorPage.propTypes = {
 
 function ErrorPage({ error: {title, message, rescueLink, rescueText, showSearch} }) {
   return (
-    <div>
+    <div className='error-page'>
       <h2>{title}</h2>
       <p>{message}</p>
       {rescueLink && <Link to={rescueLink}>{rescueText || 'Klicka här'}</Link>}

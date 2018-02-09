@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { string } from 'prop-types'
-import { Link } from 'react-router-dom'
+import { Link, Route } from 'react-router-dom'
 import { Container, Row, Col } from 'reactstrap'
 import CustomError from '../../models/CustomError'
 import { ContentGroup } from '../../constants'
 import heroImg from '../../assets/heroImg.jpg'
 import Image from '../Image'
+import MainPage from '../MainPage'
 import BannerBox from '../BannerBox'
 import cms from '../../cms'
 import './StartPage.css'
@@ -25,6 +26,7 @@ class StartPage extends Component {
     switch (page) {
       case 'ludvika':
       case 'falun':
+      this.setState({ left: '10px' })
         this.getPageContent(page)
       break
       default:
@@ -76,39 +78,18 @@ class StartPage extends Component {
       })
   }
 
+  handleClick = e => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    this.setState({
+      left: `${rect.left + (rect.width * 0.5)}px`
+    })
+  }
+
   render() {
-    const { banners } = this.state
-    const cities = [
-      {
-        title: 'FALUN',
-        url: '/falun'
-      },
-      {
-        title: 'BORLÄNGE',
-        url: '/'
-      },
-      {
-        title: 'LUDVIKA',
-        url: '/ludvika'
-      },
-    ]
+    const { banners, pageContent } = this.state
     return (
-      <div>
-        <Image className='full-width' src={heroImg} height={400} />
-        {/* <StartPageCarousel /> */}
-        <div className='city-links full-width'>
-          <Container>
-            <Row>             
-            {cities.map((city, i) => {
-              return (
-                <Col xs='12' md='4' key={i}>
-                  <Link className={`city${i === cities.length - 1 ? ' last' : ''}`} to={city.url}>{city.title}</Link>
-                </Col>
-              )
-            })}
-            </Row>
-          </Container>
-          </div>
+      <div style={{ position: 'relative' }}>
+        {pageContent && <Route path='/:page/:subpage?/:slug?' render={props => <MainPage {...props} content={pageContent} subMenu={false} />} />}
         {banners.length > 0 &&
         <div className='banner-boxes-container full-width'>
           <Container className='banner-boxes'>

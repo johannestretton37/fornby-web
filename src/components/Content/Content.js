@@ -28,8 +28,6 @@ class Content extends Component {
           appear={true}>
           <section className='main-container'>
             <Switch location={location}>
-              <Route path="/ludvika" render={props => <StartPage {...props} page='ludvika' />} />
-              <Route path="/falun" render={props => <StartPage {...props} page='falun' />} />
               <Route
                 location={location}
                 key={location.key}

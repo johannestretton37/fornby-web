@@ -4,7 +4,8 @@ const config = {
   dev: {
     apiKey: "AIzaSyAmKV3SJDTgGKSaHjy5KAoFXl82etzvxec",
     authDomain: "fornby-web-staging.firebaseapp.com",
-    databaseURL: "https://fornby-web-staging.firebaseio.com",
+    databaseURL: "https://fornby-web.firebaseio.com",
+    // databaseURL: "https://fornby-web-staging.firebaseio.com",
     projectId: "fornby-web-staging",
     storageBucket: "fornby-web.appspot.com",
     // storageBucket: "fornby-web-staging.appspot.com",
@@ -20,6 +21,6 @@ const config = {
   }
 }
 
-const firebaseApp = firebase.initializeApp(process.env.NODE_ENV === 'production' ? config.prod : config.dev)
+const firebaseApp = firebase.initializeApp(process.env.REACT_APP_DATABASE === 'production' ? config.prod : config.dev)
 
 export default firebaseApp

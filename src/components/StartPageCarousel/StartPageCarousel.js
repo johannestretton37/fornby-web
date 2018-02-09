@@ -1,142 +1,118 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import {
-  Row,
-  Col,
-  Carousel,
-  CarouselItem,
-  CarouselControl,
-  CarouselIndicators,
-  CarouselCaption
-} from 'reactstrap'
+import {object} from 'prop-types'
+import {Link} from 'react-router-dom'
+import {Transition} from 'react-transition-group'
+import { Container, Row, Col } from 'reactstrap'
+import heroImg from '../../assets/heroImg.jpg'
+import Image from '../Image'
 import cms from '../../cms'
 import './StartPageCarousel.css'
 
 class StartPageCarousel extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      items: [],
-      activeIndex: 0,
-      show: false
-    }
+  state = {
+    isVisible: false,
+    left: '50%'
   }
+
   static propTypes = {
-    height: PropTypes.number
-  }
-  static defaultProps = {
-    height: 400
+    match: object
   }
 
   componentDidMount() {
-    this.getSlides()
+    this.update()
   }
 
-  getSlides = async () => {
-    const slides = await cms.getSlides()
-    // Wait until browser has loaded the first image,
-    // then show carousel
-    let firstImg = new Image()
-    firstImg.onload = () => {
-      this.setState({ show: true })
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.match.params.city !== this.props.match.params.city) {
+      let cityParam = nextProps.match.params.city || '/'
+      this.update(cityParam)
     }
-    firstImg.src = slides[0].image[0].url
-    // Load all slides
+  }
+  
+  update = (cityParam) => {
+    const city = cityParam || this.props.match.params.city
+    switch (city) {
+      case 'ludvika':
+      case 'falun':
+        this.getPageContent(city)
+        this.setState({ isVisible: true })
+      break
+      case '/': 
+      case undefined:
+        this.setState({
+          left: '50%',
+          isVisible: true
+        })
+      break
+      default: 
+        this.setState({ isVisible: false })
+      break
+    }
+  }
+
+  getPageContent = (page) => {
+    cms.getPageContent(page)
+      .then(pageContent => {
+        this.setState({ pageContent })
+      })
+      .catch(error => {
+        console.error(error)
+      })
+  }
+
+  handleClick = e => {
+    const rect = e.currentTarget.getBoundingClientRect()
     this.setState({
-      items: slides
+      left: `${rect.left + (rect.width * 0.5)}px`
     })
-  }
-
-  onExiting = () => {
-    this.animating = true
-  }
-
-  onExited = () => {
-    this.animating = false
-  }
-
-  next = () => {
-    if (this.animating) return
-    const nextIndex =
-      this.state.activeIndex === this.state.items.length - 1
-        ? 0
-        : this.state.activeIndex + 1
-    this.setState({ activeIndex: nextIndex })
-  }
-
-  previous = () => {
-    if (this.animating) return
-    const nextIndex =
-      this.state.activeIndex === 0
-        ? this.state.items.length - 1
-        : this.state.activeIndex - 1
-    this.setState({ activeIndex: nextIndex })
-  }
-
-  goToIndex = newIndex => {
-    if (this.animating) return
-    this.setState({ activeIndex: newIndex })
   }
 
   render() {
-    const { activeIndex } = this.state
-    const slides = this.state.items.map((item, i) => {
-      return (
-        <CarouselItem
-          onExiting={this.onExiting}
-          onExited={this.onExited}
-          key={i}
-          src={item.image[0].url}
-          alt={item.alt}
-        >
-          <CarouselCaption
-            captionText={item.subtitle}
-            captionHeader={item.title}
-          />
-        </CarouselItem>
-      )
-    })
-
+    // if (!this.state.isVisible) return null
+    const cities = [
+      {
+        title: 'FALUN',
+        url: '/falun'
+      },
+      {
+        title: 'BORLÄNGE',
+        url: '/'
+      },
+      {
+        title: 'LUDVIKA',
+        url: '/ludvika'
+      },
+    ]
     return (
-      <Row>
-        <Col>
-          <div
-            style={{
-              opacity: this.state.show ? 1 : 0,
-              filter: this.state.show ? 'blur(0px)' : 'blur(4px)',
-              overflow: 'hidden',
-              maxHeight: this.state.show ? this.props.height + 'px' : '0px',
-              transition:
-                'max-height 300ms ease-in-out, opacity 1000ms ease-out, filter 1000ms ease-out'
+      <Transition in={this.state.isVisible} timeout={300}>
+        {state => {
+          return (
+            <div className='carousel-container' style={{
+              opacity: state === 'exiting' || state === 'entering' ? 0 : 1,
+              display: state === 'exited' ? 'none' : 'block',
+              maxHeight: state === 'exiting' ? '0px' : '600px',
             }} >
-            <Carousel
-              activeIndex={activeIndex}
-              next={this.next}
-              previous={this.previous}
-            >
-              <CarouselIndicators
-                items={this.state.items}
-                activeIndex={activeIndex}
-                onClickHandler={this.goToIndex}
-              />
-              {slides}
-              <CarouselControl
-                direction="prev"
-                directionText="Previous"
-                onClickHandler={this.previous}
-              />
-              <CarouselControl
-                direction="next"
-                directionText="Next"
-                onClickHandler={this.next} />
-            </Carousel>
-          </div>
-        </Col>
-      </Row>
+              <Image className='full-width' src={heroImg} height={400} />
+              <div className='city-links full-width'>
+                <Container>
+                  <Row>             
+                  {cities.map((city, i) => {
+                    return (
+                      <Col xs='12' md='4' key={i}>
+                        <Link onClick={this.handleClick} className={`city${i === cities.length - 1 ? ' last' : ''}`} to={city.url}>{city.title}</Link>
+                      </Col>
+                    )
+                  })}
+                  </Row>
+                  <div id='city-indicator' style={{ left: this.state.left }} ></div>
+                </Container>
+              </div>
+            </div>
+          )
+        }}
+        </Transition>
     )
   }
 }
-
-
 
 export default StartPageCarousel

@@ -4,6 +4,7 @@
 @import 'bootstrap/scss/mixins/_breakpoints';
 
 .city-links {
+  position: relative;
   &.full-width {
     background-color: $brand-primary;
   }
@@ -55,5 +56,17 @@
     &:active {
       color: #fff;
     }
+  }
+  #city-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    font-size: 12px;
+    width: 2em;
+    height: 2em;
+    margin-left: -1em;
+    border: 1em solid transparent;
+    border-bottom: 1em solid white;
+    transition: left 400ms ease-in-out;
   }
 }

@@ -12,6 +12,7 @@ import { camelCase } from '../Helpers'
 
 class CMS {
   constructor() {
+    this.isProd = process.env.REACT_APP_DATABASE === 'production'
     this.flamelinkApp = flamelink({ firebaseApp })
     this.cache = {
       imageUrls: {}
@@ -130,6 +131,7 @@ class CMS {
 
   getCourses = () => {
     return new Promise(async resolve => {
+
       if (this.cache.courseMainPage) return resolve(this.cache.courseMainPage)
       const coursePageContent = await this.flamelinkApp.content.get(ContentGroup.COURSES_MAIN_PAGE, 1518008977981);
       if (!coursePageContent) return resolve(null);
@@ -430,8 +432,26 @@ class CMS {
     let array = []
     if (!data) return array
     Object.values(data).forEach(value => {
+      if (this.isProd && !value.isPublished) {
+        // Don't show unpublished content
+        return;
+      }
+
       let result = {}
-      Object.entries(value).forEach(([field, val]) => {
+      // Check if data is in edit mode
+      let dataObject = value
+      if (value.isEditing) {
+        // If this is prod, show stored values
+        if (this.isProd) {
+          // Show stored values
+          dataObject = value._prodContent
+          if (!dataObject) {
+            debugger
+          }
+        }
+      }
+
+      Object.entries(dataObject).forEach(([field, val]) => {
         result[field] = val
       })
       if (result.slug === undefined && result.name !== undefined) {

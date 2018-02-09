@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start-js": "react-scripts start",
-    "start": "PORT=1337 npm-run-all -p watch-css start-js",
+    "start": "PORT=1337 REACT_APP_DATABASE=staging npm-run-all -p watch-css start-js",
     "build-js": "react-scripts build",
     "build": "npm-run-all build-css build-js",
     "test": "react-scripts test --env=jsdom",
@@ -29,8 +29,8 @@
     "eject": "react-scripts eject",
     "deploy:dev": "firebase deploy -P staging",
     "deploy:prod": "firebase deploy -P default",
-    "release:dev": "NODE_ENV=development && yarn build && yarn deploy:dev",
-    "release:prod": "NODE_ENV=production && yarn build && yarn deploy:prod"
+    "release:dev": "NODE_ENV=development REACT_APP_DATABASE=staging yarn build && yarn deploy:dev",
+    "release:prod": "NODE_ENV=production REACT_APP_DATABASE=production yarn build && yarn deploy:prod"
   },
   "eslintConfig": {
     "extends": [

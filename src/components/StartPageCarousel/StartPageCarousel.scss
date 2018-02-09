@@ -1,49 +1,6 @@
 @import 'styles/_mixins.scss';
 
-$solid-bright: rgba(255, 255, 255, 1);
-$transparent-bright: rgba(255, 255, 255, 0);
-$solid-dark: rgba(0, 0, 0, 0.4);
-$transparent-dark: rgba(0, 0, 0, 0);
 
-.carousel {
-  margin: 20px auto 60px;
-  @include gradient-darker(rgb(141, 199, 209));
-  &-caption {
-    right: 0;
-    bottom: 0;
-    left: 0;
-    @include gradient(to bottom, $transparent-dark, 20%, $solid-dark, 90%);
-    h3,
-    p {
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      color: #fff;
-    }
-  }
-  &-inner {
-    img {
-      margin: auto;
-    }
-  }
-  .carousel-control {
-    &-prev { left: 0; }
-    &-next { right: 0; }
-  }
-  // &:after {
-  //   display: block;
-  //   content: '';
-  //   position: absolute;
-  //   width: 100%;
-  //   height: 100%;
-  //   top: 0;
-  //   left: 0;
-  //   background: linear-gradient(
-  //     left,
-  //     $solid-bright 10%,
-  //     $transparent-bright 20%,
-  //     $transparent-bright 80%,
-  //     $solid-bright 90%
-  //   );
-  // }
+.carousel-container {
+  transition: all 300ms ease-in-out;
 }
