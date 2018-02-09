@@ -1,5 +1,5 @@
 import getSlug from 'speakingurl'
-import firebaseApp from '../Fire'
+import firebaseApp from '../config/firebase.app'
 import flamelink from 'flamelink'
 import CustomError from '../models/CustomError'
 import { ContentGroup } from '../constants'

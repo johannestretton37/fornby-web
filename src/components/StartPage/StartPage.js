@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import { string } from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Container, Row, Col } from 'reactstrap'
-import StartPageCarousel from '../StartPageCarousel'
 import CustomError from '../../models/CustomError'
 import { ContentGroup } from '../../constants'
 import heroImg from '../../assets/heroImg.jpg'
@@ -17,8 +16,31 @@ class StartPage extends Component {
     banners: []
   }
 
+  static propTypes = {
+    page: string
+  }
+
   componentDidMount() {
-    this.getBanners()
+    const { page } = this.props
+    switch (page) {
+      case 'ludvika':
+      case 'falun':
+        this.getPageContent(page)
+      break
+      default:
+        this.getBanners()
+      break
+    }
+  }
+
+  getPageContent = (page) => {
+    cms.getPageContent(page)
+      .then(pageContent => {
+        this.setState({ pageContent })
+      })
+      .catch(error => {
+        console.error(error)
+      })
   }
 
   getBanners = () => {
