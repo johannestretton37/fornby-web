@@ -152,61 +152,27 @@ class CMS {
    *
    * @param {string} groupName - The name of the group to get. Example `ContentGroup.COURSES` ('kurser')
    * @param {object} options - The property fields to get. Example `{ fields: ['id', 'name', 'shortInfo'] }`
-   * @param {boolean} cacheResponse - If set to true (or omitted) the response will be cached into `this.cache`
    * @returns - A Promise that resolves to an array of objects
    */
-  DEPRECATED_getContentGroup = (groupName, options = {}, cacheResponse = true) => {
+  getContentGroup = (groupName, options = {}) => {
     console.log('getContentGroup ' + groupName);
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
-    return new Promise(async resolve => {
-      // Return cached group if present
+    // Return cached group if present
+    return new Promise(async (resolve, reject) => {
       if (this.cache[group]) return resolve(this.cache[group])
-      const contentData = await this.flamelinkApp.content.get(group, options)
-      let content = this.arrayFromFirebaseData(contentData)
-      // Get this group's main menu item
-      let mainMenu = await this.mainMenuItems()
-      let mainMenuItem = mainMenu.find(
-        item => item.url.replace('/', '') === groupName
-      )
-      if (mainMenuItem) {
-        // Check if main menu has submenus
-        if (mainMenuItem.subItems) {
-          // The submenus point to detail pages, get the corresponding detailPages
-          const detailPages = await this.getDetailPages()
-          // Loop through submenus and search for detailPages
-          mainMenuItem.subItems.forEach(subItem => {
-            // Detail pages are nested this deep:
-            if (subItem.subItems) {
-              // Slugs we need to get from detailPages
-              let slugsToGet = subItem.subItems.map(s => {
-                return getSlug(s.title, { lang: 'sv' })
-              })
-              // Extract the titles
-              detailPages.forEach(detailPage => {
-                let contentItemToPopulate = content.find(
-                  c => c.slug === getSlug(subItem.title, { lang: 'sv' })
-                )
-                if (contentItemToPopulate === undefined) {
-                  console.warn("Could not find detailPage for", subItem.title)
-                } else {
-                  if (contentItemToPopulate.subContent === undefined) contentItemToPopulate.subContent = []
-                  if (slugsToGet.includes(detailPage.slug)) {
-                    contentItemToPopulate.subContent.push(detailPage)
-                  }
-                }
-              })
-            }
-          })
-        }
-      }
-      if (cacheResponse) {
+      try {
+        const contentData = await this.flamelinkApp.content.get(group, options)
+        if (!contentData) throw new Error(`Could not find content group: ${groupName}`)
+        let content = this.arrayFromFirebaseData(contentData)
+        console.log('Got content');
+        console.log(content);
         this.cache[group] = content
+        console.log(`[${group}] CMS Cache\n`, this.cache)
+        return resolve(content)
+      } catch (error) {
+        return reject(error)
       }
-      console.log('Got content');
-      console.log(content);
-      console.log(`[${group}] CMS Cache\n`, this.cache)
-      return resolve(content)
     })
   }
 

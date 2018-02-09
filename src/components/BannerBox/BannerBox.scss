@@ -1,8 +1,65 @@
-.banner-box {
-  text-align: center;
-  img {
-    width: 140px;
-    height: 140px;
-    background: #eee;
+@import 'styles/_colors.scss';
+@import 'styles/_mixins.scss';
+
+.banner-boxes-container {
+  background-color: $brand-fourth;
+  @include gradient-darker($brand-fourth);
+  padding: 0;
+  .banner-boxes {
+    margin-top: 3em;
+    padding: 2em 0;
+    .banner-box {
+      a {
+        display: block;
+        text-decoration: none;
+        .banner {
+          background: #fff;
+          border-radius: 5px;
+          overflow: hidden;
+          transition: transform 300ms ease-out, box-shadow 300ms ease-out;
+          box-shadow: 0 0 30px rgba(0, 0, 0, 0);
+          &:hover {
+            transform: scale(1.025);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+          }
+          .hero-image-container {
+            margin: 0;
+            height: 160px;
+            .hero-image {
+              display: flex;
+              width: 100%;
+              height: 100%;
+              background-position: center center;
+              background-size: cover;
+              background-color: $brand-secondary;
+              h3 {
+                margin: auto auto 0.3em 20px;
+                color: #fff;
+              }
+            }
+          }
+          .banner-body {
+            padding: 20px;
+            .read-more {
+              display: flex;
+              flex-direction: column;
+              span {
+                display: block;
+                margin: auto;
+                text-align: center;
+                padding: 0.5em 2.2em;
+                border: 1px solid $brand-secondary;
+                color: $brand-secondary;
+                transition: all 300ms ease-out;
+                &:hover {
+                  background-color: $brand-secondary;
+                  color: #fff;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

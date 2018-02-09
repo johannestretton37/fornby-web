@@ -4,6 +4,7 @@ import Gallery from '../Gallery'
 import './CoursesPage.css'
 import { object } from 'prop-types'
 import CoursePage from '../CoursePage';
+import BackButton from '../BackButton/BackButton';
 
 class CoursesPage extends Component {
 

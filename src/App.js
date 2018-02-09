@@ -29,7 +29,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <div id="app">
-          <div className="container-fluid wrapper main-content">
+          <div className="full-width wrapper main-content">
             <Header />
             <Route component={Content} />
           </div>

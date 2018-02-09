@@ -16,12 +16,14 @@ class SearchBar extends Component {
     results: array.isRequired,
     isOpen: bool,
     expandHorizontal: bool,
-    toggleSearchBar: func.isRequired,
-    performSearch: func.isRequired,
+    toggleSearchBar: func,
+    performSearch: func,
   }
 
   static defaultProps = {
-    results: []
+    results: [],
+    toggleSearchBar: () => {console.warn('this.props.toggleSearchBar() is undefined')},
+    performSearch: () => {console.warn('this.props.performSearch() is undefined')}
   }
 
   handleClick = e => {

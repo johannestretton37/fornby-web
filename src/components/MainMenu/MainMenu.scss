@@ -23,14 +23,14 @@
         /* small only */
         border-top: 1px solid #eee;
         border-bottom: 1px solid #eee;
-        margin-bottom: 30px;
+        // margin-bottom: 30px;
       }
     }
     transition: max-height 500ms ease-in-out, margin 500ms ease-in-out, border 500ms ease-in-out;
     @include media-breakpoint-up(md) {
       /* large */
       flex-direction: row;
-      margin-bottom: 3rem;
+      margin-bottom: 2rem;
       overflow: visible;
       max-height: 100% !important;
     }

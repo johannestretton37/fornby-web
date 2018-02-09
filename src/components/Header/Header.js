@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Route } from 'react-router-dom'
 import cms from '../../cms'
 import MainMenu from '../MainMenu'
 import Toggler from '../Toggler'
@@ -120,7 +120,7 @@ class Header extends Component {
             performSearch={this.performSearch}
             results={results} />
         </div>
-        <MainMenu items={mainMenuItems} isOpen={isMainMenuOpen} />
+        <Route path='/:page?' render={props => <MainMenu {...props} items={mainMenuItems} isOpen={isMainMenuOpen} />} />
         <SearchBar
           isOpen={isSearchBarOpen}
           expandHorizontal={false}

@@ -51,8 +51,9 @@ header .searchbar-container.horizontal {
 
 header .searchbar-container.vertical {
   /* small */
-  display: flex;
-  margin-bottom: 1em; }
+  display: flex; }
+  header .searchbar-container.vertical.open {
+    margin-bottom: 1em; }
   @media (min-width: 768px) {
     header .searchbar-container.vertical {
       /* large */

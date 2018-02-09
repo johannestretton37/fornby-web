@@ -1,38 +1,59 @@
 @import 'styles/_colors.scss';
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .city-links {
+  &.full-width {
+    background-color: $brand-primary;
+  }
   .row {
     margin-bottom: 3rem;
     .col {
       padding: 0;
-      .city {
-        display: block;
-        padding: 0 0.3em;
-        color: #ddd;
-        text-decoration: none;
-        text-align: center;
-        background-color: $brand-primary;
-        font-size: 1.5em;
-        line-height: 3em;
-        transition: background-color 600ms ease-out;
-        &:after {
-          display: block;
-          position: absolute;
-          top: 25%;
-          right: 0;
-          height: 50%;
-          border-right: 1px solid rgba(255,255,255,0.5);
-          content: '';
-        }
-        &.last:after {
-          display: none;
-        }
-        &:hover,
-        &:active {
-          color: #fff;
-          background-color: $brand-secondary;
-        }
+    }
+  }
+  .city {
+    display: block;
+    padding: 0 0.3em;
+    color: #ddd;
+    text-decoration: none;
+    text-align: center;
+    background-color: $brand-primary;
+    font-size: 1.15em;
+    line-height: 3em;
+    @include media-breakpoint-up(md) {
+      /* large */
+      font-size: 1.4em;
+    }
+    transition: background-color 600ms ease-out;
+    &:after {
+      display: block;
+      position: absolute;
+      content: '';
+      border-color: rgba(255,255,255,0.5);
+      border-width: 1px;
+      @include media-breakpoint-down(sm) {
+        /* small only */
+        bottom: 0;
+        left: 10%;
+        width: 80%;
+        border-bottom-style: solid;
       }
+      @include media-breakpoint-up(md) {
+        /* large */
+        top: 25%;
+        right: 0;
+        height: 50%;
+        border-right-style: solid;
+      }
+    }
+    &.last:after {
+      display: none;
+    }
+    &:hover,
+    &:active {
+      color: #fff;
     }
   }
 }

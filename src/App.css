@@ -61,3 +61,6 @@ ul, li {
     display: flex;
     flex: 1 0 auto;
     flex-direction: column; }
+
+.full-width {
+  padding: 0; }

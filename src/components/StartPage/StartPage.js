@@ -3,39 +3,59 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Container, Row, Col } from 'reactstrap'
 import StartPageCarousel from '../StartPageCarousel'
+import CustomError from '../../models/CustomError'
+import { ContentGroup } from '../../constants'
+import heroImg from '../../assets/heroImg.jpg'
+import Image from '../Image'
 import BannerBox from '../BannerBox'
+import cms from '../../cms'
 import './StartPage.css'
 
 class StartPage extends Component {
-
-
-  static propTypes = {
-    content: PropTypes.object
+  state = {
+    error: null,
+    banners: []
   }
 
-  static defaultProps = {
-    content: {
-      boxes: [
+  componentDidMount() {
+    this.getBanners()
+  }
+
+  getBanners = () => {
+    // Get content from cms.js
+    const options = {
+      fields: ['title', 'shortInfo', 'isVisible', 'action', 'actionSubPage', 'actionDetailPage', 'image'],
+      populate: [
         {
-          heading: 'Heading 1',
-          body: 'Body 1',
-          btnText: 'Ansök nu'
+          field: 'action'
         },
         {
-          heading: 'Heading 2',
-          body: 'Body 2',
-          btnText: 'Ansök nu'
+          field: 'actionSubPage'
         },
         {
-          heading: 'Heading 3',
-          body: 'Body 3',
-          btnText: 'Ansök nu'
+          field: 'actionDetailPage'
+        },
+        {
+          field: 'image'
         }
       ]
     }
+    cms.getContentGroup(ContentGroup.START_PAGE_BANNERS, options)
+      .then(banners => {
+        this.setState({ banners })
+      })
+      .catch(error => {
+        if (error.constructor.name === 'CustomError') {
+          // error är vårat CustomError
+          this.setState({ error })
+        } else {
+          console.error(error.message)
+        }
+      })
   }
 
   render() {
+    const { banners } = this.state
     const cities = [
       {
         title: 'FALUN',
@@ -52,35 +72,31 @@ class StartPage extends Component {
     ]
     return (
       <div>
-        <Container>
-          <Row>
-            <Col>
-              <div style={{ textAlign: 'center' }}>
-                <h1>Välkommen!</h1>
-                <p>Detta är startsidan</p>
-              </div>
-            </Col>
-          </Row>
-        </Container>
-        <StartPageCarousel />
-        <Container className='city-links'>
-          <Row>
+        <Image className='full-width' src={heroImg} height={400} />
+        {/* <StartPageCarousel /> */}
+        <div className='city-links full-width'>
+          <Container>
+            <Row>             
             {cities.map((city, i) => {
               return (
-                <Col key={i}>
+                <Col xs='12' md='4' key={i}>
                   <Link className={`city${i === cities.length - 1 ? ' last' : ''}`} to={city.url}>{city.title}</Link>
                 </Col>
               )
             })}
-          </Row>
-        </Container>
-        <Container>
-          <Row>
-            {this.props.content.boxes.map((contentBox, i) => {
-              return <BannerBox key={i} content={contentBox} />
-            })}
-          </Row>
-        </Container>
+            </Row>
+          </Container>
+          </div>
+        {banners.length > 0 &&
+        <div className='banner-boxes-container full-width'>
+          <Container className='banner-boxes'>
+            <Row>
+              {banners.map((banner, i) => {
+                return <BannerBox key={i} content={banner} />
+              })}
+            </Row>
+          </Container>
+        </div>}
       </div>
     )
   }

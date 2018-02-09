@@ -71,7 +71,9 @@ header {
     &.vertical {
       /* small */
       display:flex;
-      margin-bottom: 1em;
+      &.open {
+        margin-bottom: 1em;
+      }
       @include media-breakpoint-up(md) {
         /* large */
         display: none;

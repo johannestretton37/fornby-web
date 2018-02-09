@@ -34,7 +34,8 @@ class MainMenuItem extends Component {
     if (!nextProps.isActive && this.props.isActive) {
       // This item toggled to inactive, remove listener
       window.removeEventListener('resize', this.handleResize)
-    } else if (nextProps.isActive && !this.props.isActive) {
+    }
+    if (nextProps.isActive && !this.props.isActive) {
       // This item toggled to active, add listener
       window.addEventListener('resize', this.handleResize)
       this.moveIndicator()

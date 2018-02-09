@@ -21,7 +21,8 @@ class MainMenu extends Component {
     items: array.isRequired,
     isOpen: bool,
     location: object,
-    history: object
+    history: object,
+    match: object
   }
 
   componentDidMount() {
@@ -36,17 +37,22 @@ class MainMenu extends Component {
         this.findActiveItem()
       })
     }
+    if (nextProps.match.params.page !== this.props.match.params.page) {
+      // Default to start page '/' if `page` is undefined
+      const pageSlug = nextProps.match.params.page || '/'
+      this.findActiveItem(pageSlug)
+    }
   }
 
-  findActiveItem = () => {
+  findActiveItem = (pageSlug) => {
     const { location } = this.props
     const { items } = this.state
-    const mainPath = location.pathname.split('/')[1]
-    let activeItem = -1
-    let activeMenuItem = items.findIndex(
+    const mainPath = pageSlug || location.pathname.split('/')[1]
+    let activeItem = items.findIndex(
       item => item.url === '/' + mainPath
     )
-    if (activeMenuItem) activeItem = activeMenuItem
+    // Default to start page if no match is found
+    if (activeItem === -1 || activeItem === undefined) activeItem = 0
     this.setState({
       activeItem
     })
@@ -150,4 +156,4 @@ class MainMenu extends Component {
   }
 }
 
-export default withRouter(MainMenu)
+export default MainMenu
