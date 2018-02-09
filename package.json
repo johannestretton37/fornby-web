@@ -27,9 +27,10 @@
     "build-css": "node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/",
     "watch-css": "yarn build-css && node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive",
     "eject": "react-scripts eject",
-    "deploy": "firebase deploy",
-    "release:prod": "NODE_ENV=production && yarn build && yarn deploy",
-    "release:dev": "NODE_ENV=development && yarn build && yarn deploy"
+    "deploy:dev": "firebase deploy -P staging",
+    "deploy:prod": "firebase deploy -P default",
+    "release:dev": "NODE_ENV=development && yarn build && yarn deploy:dev",
+    "release:prod": "NODE_ENV=production && yarn build && yarn deploy:prod"
   },
   "eslintConfig": {
     "extends": [

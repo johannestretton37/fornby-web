@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "fornby-web"
+    "default": "fornby-web",
+    "staging": "fornby-web-staging"
   }
 }
