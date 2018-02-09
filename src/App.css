@@ -1,3 +1,4 @@
+/* Site colors */
 /* Font colors */
 /* Brand colors */
 /* Footer */
@@ -32,6 +33,10 @@
 .main-container.page-fade-enter-active, .main-container.page-fade-appear-active {
   position: absolute; }
 
+/* Site colors */
+/* Font colors */
+/* Brand colors */
+/* Footer */
 html, body, #app, #root {
   height: 100%; }
 
@@ -40,6 +45,9 @@ body {
   padding: 0;
   font-family: 'Nunito', sans-serif;
   font-size: 1.2em; }
+
+body {
+  background-color: #f9f9f9; }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Source Sans Pro', 'Open Sans', sans-serif; }
