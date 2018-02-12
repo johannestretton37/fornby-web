@@ -4,6 +4,7 @@ import { PageSlug } from '../../constants'
 import SubPage from '../SubPage'
 import ErrorPage from '../ErrorPage'
 import ApplyForm from '../ApplyForm'
+import CoursesPage from '../CoursesPage';
 import './PagesContainer.css'
 
 /**
@@ -67,7 +68,7 @@ class PagesContainer extends Component {
 
   render() {
     const {
-      content: { name, shortInfo, body, error },
+      content: { name, shortInfo, body, error, courseCategories },
       subPageSlug,
       subPages
     } = this.state
@@ -82,6 +83,8 @@ class PagesContainer extends Component {
         <p dangerouslySetInnerHTML={{ __html: body }} />
         {page === PageSlug.ANSOK ? <ApplyForm /> : null}
         {subPageSlug && subPages[subPageSlug]}
+        {courseCategories && <p>Här ska alla kurser visas när <b>CoursesPage</b> är färdigbyggd</p>}
+        {/* {courseCategories && <CoursesPage courseCategories={courseCategories} />} */}
       </div>
     )
   }

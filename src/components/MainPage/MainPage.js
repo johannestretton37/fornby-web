@@ -39,33 +39,11 @@ class MainPage extends Component {
 
   componentDidMount() {
     const { page } = this.props.match.params
-    switch (page) {
-      case ContentGroup.COURSES:
-        this.getCourses()
-      break
-      default:
-        this.getPageContent(page)
-      break;
-    }
+    this.getPageContent(page)
   }
 
   /**
-   * If URL matches /kurser, get courses content
-   */
-  getCourses = () => {
-    return new Promise(async resolve => {
-      const pageContent = await cms.getCourses()
-      this.setState({
-        pageContent,
-        isLoading: false,
-        title: pageContent.name
-      })
-      resolve()
-    })
-  }
-
-  /**
-   * If URL does NOT match /kurser, get requested content
+   * Get requested content
    */
   getPageContent = (page) => {
     cms.getPageContent(page)

@@ -27,13 +27,15 @@ class CMS {
     return Promise.all([this.mainMenuItems(), this.getSlides(), this.getCourses()])
   }
 
-  createMainMenuItem = (item, parent) => {
+  /**
+   * Helper function to create a main menu item
+   * @param {object} item - object fetched from flamelink mainNavigation collection
+   * @returns {object} - A main menu item object
+   */
+  createMainMenuItem = (item) => {
     let { id, title, url, cssClass, order } = item
     let separator = url.indexOf('#') !== -1 ? '#' : '/'
     let slug = separator + getSlug(title, { lang: 'sv' })
-    if (parent) {
-      slug = parent.url + slug
-    }
     if (title === 'Start') slug = '/'
     return {
       id,
@@ -63,18 +65,6 @@ class CMS {
           if (item.parentIndex === 0) {
             // This is a root link, e.g. '/kurser'
             mainMenu.push(this.createMainMenuItem(item))
-          } else {
-            /* Get this from MainPages instead */
-            // This is a sub link, e.g. '/kurser/mer-info'
-            // Find parent and add child to parent's subItems array
-            // We can assume that the parent is already added to mainMenu,
-            // search from end of array
-            // const array = mainMenu
-            // let parent = this.findParentFor(item, array)
-            // if (parent) {
-            //   if (!parent.subItems) parent.subItems = []
-            //   parent.subItems.push(this.createMainMenuItem(item, parent))
-            // }
           }
         })
         this.cache.mainMenu = mainMenu
@@ -85,67 +75,58 @@ class CMS {
     })
   }
 
-  /**
-   * Helper function to find a parent for a child
-   * This method will search recursively through passed
-   * array and return a parent object if found
-   *
-   * @param {object} item - The child that searches for its' parent
-   * @param {array} array - The array to search through
-   *
-   * @returns - An `object` that is the child's parent, or `undefined` if search fails
-   */
-  DEPRECATED_findParentFor = (item, array) => {
-    let parent
-    let i = array.length - 1
-    while (parent === undefined && i >= 0) {
-      const possibleParent = array[i]
-      if (possibleParent.id === item.parentIndex) {
-        parent = possibleParent
-      } else if (possibleParent.subItems) {
-        return this.findParentFor(item, possibleParent.subItems)
-      }
-      i--
-    }
-    return parent
-  }
-
-  DEPRECATED_getDetailPages = () => {
+  getCoursesMainPage = () => {
     return new Promise(async (resolve, reject) => {
       // Return cached data if it exists
-      if (this.cache.detailPages) return resolve(this.cache.detailPages)
-      // No cache, fetch detailPages
+      if (this.cache.coursesMainPage) return resolve(this.cache.coursesMainPage)
+      // No cache, fetch coursesMainPage
       try {
-        const detailPagesData = await this.flamelinkApp.content.get(
-          ContentGroup.DETAIL_PAGES + 'xxx'
-        )
-        // Convert result to array
-        const detailPages = this.arrayFromFirebaseData(detailPagesData)
-        this.cache.detailPages = detailPages
-        return resolve(detailPages)
+        const coursesMainPage = await this.flamelinkApp.content.get(ContentGroup.COURSES_MAIN_PAGE, 1518008977981, {
+          populate: ['courseCategory']
+        })
+        if (!coursesMainPage) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta översiktssidan för kurser. Försök igen senare', true)
+        this.cache.coursesMainPage = coursesMainPage
+        return resolve(coursesMainPage)
       } catch (error) {
         return reject(error)
       }
     })
   }
 
-  getCourses = () => {
-    return new Promise(async resolve => {
-
-      if (this.cache.courseMainPage) return resolve(this.cache.courseMainPage)
-      const coursePageContent = await this.flamelinkApp.content.get(ContentGroup.COURSES_MAIN_PAGE, 1518008977981);
-      if (!coursePageContent) return resolve(null);
-      const options = { populate: ['courses'] };
-      const courseCategories = this.arrayFromFirebaseData(await this.flamelinkApp.content.get(ContentGroup.COURSES_CATEGORIES, options));
-
-      for (let i = 0; i < coursePageContent.courseCategory.length; i++) {
-        let courseCategory = courseCategories.find(c => c.id === coursePageContent.courseCategory[i]);
-        if (courseCategory) {
-          coursePageContent.courseCategory[i] = courseCategory;
-        }
+  getCourseCategories = () => {
+    return new Promise(async (resolve, reject) => {
+      // Return cached data if it exists
+      if (this.cache.courseCategories) return resolve(this.cache.courseCategories)
+      // No cache, fetch courseCategories
+      try {
+        const courseCategories = await this.flamelinkApp.content.get(ContentGroup.COURSE_CATEGORIES)
+        if (!courseCategories) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta några kurskategorier. Försök igen senare', true)
+        this.cache.courseCategories = courseCategories
+        return resolve(courseCategories)
+      } catch (error) {
+        return reject(error)
       }
-      this.cache.courseMainPage = coursePageContent;
-      return resolve(coursePageContent);
+    })
+  }
+
+  /**
+   * Fetch all courses from flamelink
+   * @returns {Promise} - A Promise that resolves to an array of course objects
+   */
+  getCourses = () => {
+    return new Promise(async (resolve, reject) => {
+      if(this.cache.courses) return resolve(this.cache.courses)
+      try {
+        const options = { populate: ['mainImage'] };
+        const coursesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options)
+        if (!coursesData) throw new CustomError('Här var det tomt.', 'Vi kunde inte hitta några kurser för de valda alternativen.', true, '/kurser', 'Klicka här för att se alla våra kurser.')
+        const courses = this.arrayFromFirebaseData(coursesData)
+        this.cache.courses = courses;
+        return resolve(courses);
+      } catch (error) {
+        console.error('getCourses()')
+        return reject(error)
+      }
     })
   }
 
@@ -171,42 +152,6 @@ class CMS {
         console.log(content);
         this.cache[group] = content
         console.log(`[${group}] CMS Cache\n`, this.cache)
-        return resolve(content)
-      } catch (error) {
-        return reject(error)
-      }
-    })
-  }
-
-  /**
-   * Return a single content object
-   * @param {string} groupName - A string representing a group, e.g. 'kurser'
-   * @param {string} slug - A string representing a slug, e.g. 'konstkurs-VT-18'
-   * @returns - A Promise that resolves to a content object
-   */
-  DEPRECATED_getContent = (groupName, slug) => {
-    console.log('WOW!!! hämtar ' + groupName);
-    // Convert group name from friendly URL to camelCase
-    let group = camelCase(groupName)
-    return new Promise(async (resolve, reject) => {
-      if (!this.cache[group]) {
-        await this.getContentGroup(groupName)
-      }
-      // Return cached group if present
-      if (this.cache[group]) {
-        let cachedItem = this.cache[group].find(item => item.slug === slug)
-        if (cachedItem) return resolve(cachedItem)
-      }
-      try {
-        let id = this.idFromSlug(group, slug)
-        if (!id) {
-          await this.getContentGroup(group, { fields: ['id', 'name'] })
-          id = this.idFromSlug(group, slug)
-          if (!id) reject(`Kunde inte hitta /${group}/${slug}`)
-        }
-        // Get data from flamelink
-        const content = await this.flamelinkApp.content.get(group, id)
-
         return resolve(content)
       } catch (error) {
         return reject(error)
@@ -296,18 +241,42 @@ class CMS {
         // Check if any main page matched
         if (mainPage) {
           // Extract props we don't need to return
-          let { __meta__, subPages, ...neededProps } = mainPage
+          let { __meta__, subPages, showCourses, ...neededProps } = mainPage
           // Add the rest to our content object
           content = { ...neededProps }
           // If the mainPage has subPages
           if (mainPage.subPages) {
-            /** 
+            /**
+             * `subPages` is an array of objects.
+             * Each object has a `subPage` array
+             * 
              * Since flamelink doesn't allow us to query which subPages we want,
              * we need to fetch all subPages and cache them
              * 
              * NOTE: - We need to specify every field we want to get!
              */
-            const subPageIds = mainPage.subPages.map(item => item.subPage)
+            const subPageIds = mainPage.subPages.map(item => {
+              return item.subPage
+            })
+            if (showCourses === true) {
+              // Let's display all courses that applies to this page
+              const allCourses = await this.getCourses()
+              const categories = await this.getCourseCategories()
+              content.courseCategories = {}
+              Object.values(categories).forEach(category => {
+                let courses = allCourses.filter(course => {
+                  return course.courseCategory.includes(category.id)
+                })
+                if (courses.length > 0) {
+                  content.courseCategories[category.id] = {
+                    courses,
+                    ...category
+                  }
+                }
+              })
+              
+              console.log(content)
+            }
             if (this.cache.subPages) {
               content.subPages = this.cache.subPages.filter(subPage => subPageIds.includes(subPage.id))
             } else {

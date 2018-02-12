@@ -35,7 +35,9 @@ class StartPageCarousel extends Component {
       case 'ludvika':
       case 'falun':
         this.getPageContent(city)
-        this.setState({ isVisible: true })
+        this.setState({
+          isVisible: true
+        })
       break
       case '/': 
       case undefined:
@@ -71,14 +73,17 @@ class StartPageCarousel extends Component {
     // if (!this.state.isVisible) return null
     const cities = [
       {
+        id: 'falun',
         title: 'FALUN',
         url: '/falun'
       },
       {
+        id: 'borlange',
         title: 'BORLÄNGE',
         url: '/'
       },
       {
+        id: 'ludvika',
         title: 'LUDVIKA',
         url: '/ludvika'
       },
@@ -99,7 +104,7 @@ class StartPageCarousel extends Component {
                   {cities.map((city, i) => {
                     return (
                       <Col xs='12' md='4' key={i}>
-                        <Link onClick={this.handleClick} className={`city${i === cities.length - 1 ? ' last' : ''}`} to={city.url}>{city.title}</Link>
+                        <Link id={city.id} onClick={this.handleClick} className={`city${i === cities.length - 1 ? ' last' : ''}`} to={city.url}>{city.title}</Link>
                       </Col>
                     )
                   })}

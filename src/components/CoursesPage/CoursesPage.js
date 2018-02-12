@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Container, Row, Col } from 'reactstrap'
+import {withRouter} from 'react-router-dom'
 import Gallery from '../Gallery'
 import './CoursesPage.css'
 import { object } from 'prop-types'
@@ -10,7 +11,8 @@ class CoursesPage extends Component {
 
   static propTypes = {
     match: object.isRequired,
-    content: object.isRequired
+    content: object.isRequired,
+    courseCategories: object.isRequired
   }
 
   state = {
@@ -98,4 +100,4 @@ class CoursesPage extends Component {
   }
 }
 
-export default CoursesPage;
+export default withRouter(CoursesPage)

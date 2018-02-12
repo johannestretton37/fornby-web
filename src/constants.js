@@ -24,8 +24,8 @@ export const ContentGroup = {
   START_PAGE_SLIDES: 'startPageSlides',
   START_PAGE_BANNERS: 'startPageBanners',
   COURSES_MAIN_PAGE:'coursesMainPage',
-  COURSES_CATEGORIES: 'kurser',
-  COURSES: 'kurser',
+  COURSE_CATEGORIES: 'courseCategories',
+  COURSES: 'courses',
 }
 
 /**
