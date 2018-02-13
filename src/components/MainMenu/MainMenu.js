@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
 import { object, array, bool } from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import MainMenuItem from '../MainMenuItem'

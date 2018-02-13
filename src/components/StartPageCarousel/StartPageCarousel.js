@@ -1,31 +1,59 @@
 import React, { Component } from 'react'
-import {object} from 'prop-types'
-import {Link} from 'react-router-dom'
+import {object, array} from 'prop-types'
+// import {withRouter} from 'react-router-dom'
 import {Transition} from 'react-transition-group'
 import { Container, Row, Col } from 'reactstrap'
 import heroImg from '../../assets/heroImg.jpg'
 import Image from '../Image'
 import cms from '../../cms'
 import './StartPageCarousel.css'
+import StartPageCarouselItem from '../StartPageCarouselItem'
 
 class StartPageCarousel extends Component {
   state = {
     isVisible: false,
-    left: '50%'
+    left: '50%',
+    activeItem: 1
   }
 
   static propTypes = {
-    match: object
+    match: object,
+    location: object,
+    history: object,
+    items: array
+  }
+
+  static defaultProps = {
+    items: [
+      {
+        id: 'falun',
+        title: 'FALUN',
+        url: '/falun'
+      },
+      {
+        id: 'borlange',
+        title: 'BORLÄNGE',
+        url: '/'
+      },
+      {
+        id: 'ludvika',
+        title: 'LUDVIKA',
+        url: '/ludvika'
+      },
+    ]
   }
 
   componentDidMount() {
     this.update()
+    this.findActiveItem()
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.match.params.city !== this.props.match.params.city) {
+      // Default to start page '/' if city is undefined
       let cityParam = nextProps.match.params.city || '/'
       this.update(cityParam)
+      this.findActiveItem(cityParam)
     }
   }
   
@@ -52,44 +80,60 @@ class StartPageCarousel extends Component {
     }
   }
 
+  findActiveItem = (pageSlug) => {
+    const { location, items } = this.props
+    const mainPath = pageSlug || location.pathname.split('/')[1]
+    let activeItem = items.findIndex(
+      item => item.url === '/' + mainPath
+    )
+    // Default to start page if no match is found
+    if (activeItem === -1 || activeItem === undefined) activeItem = 1
+    this.setState({
+      activeItem
+    })
+  }
+
+  moveIndicator = (activeItem, indicatorPosition, withOutTransition) => {
+    if (this.activeIndicator && withOutTransition) {
+      if (this.activeIndicator.style.transition !== 'none') {
+        this.indicatorTransition = this.activeIndicator.style.transition
+      }
+      this.activeIndicator.style.transition = 'none'
+      setTimeout(() => {
+        this.activeIndicator.style.transition = this.indicatorTransition
+      }, 100)
+    }
+    this.setState({
+      activeItem,
+      left: indicatorPosition
+    })
+  }
+
+  navigate = href => {
+    let { location, history } = this.props
+    if (href !== location.pathname) {
+      history.push(href)
+    }
+  }
+
   getPageContent = (page) => {
     cms.getPageContent(page)
       .then(pageContent => {
-        this.setState({ pageContent })
+        this.setState({
+          pageContent
+        })
       })
       .catch(error => {
         console.error(error)
       })
   }
 
-  handleClick = e => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    this.setState({
-      left: `${rect.left + (rect.width * 0.5)}px`
-    })
-  }
-
   render() {
     // if (!this.state.isVisible) return null
-    const cities = [
-      {
-        id: 'falun',
-        title: 'FALUN',
-        url: '/falun'
-      },
-      {
-        id: 'borlange',
-        title: 'BORLÄNGE',
-        url: '/'
-      },
-      {
-        id: 'ludvika',
-        title: 'LUDVIKA',
-        url: '/ludvika'
-      },
-    ]
+    const { items: cities } = this.props
+    const { isVisible, activeItem } = this.state
     return (
-      <Transition in={this.state.isVisible} timeout={300}>
+      <Transition in={isVisible} timeout={300}>
         {state => {
           return (
             <div className='carousel-container' style={{
@@ -104,12 +148,18 @@ class StartPageCarousel extends Component {
                   {cities.map((city, i) => {
                     return (
                       <Col xs='12' md='4' key={i}>
-                        <Link id={city.id} onClick={this.handleClick} className={`city${i === cities.length - 1 ? ' last' : ''}`} to={city.url}>{city.title}</Link>
+                        <StartPageCarouselItem
+                          item={city}
+                          order={i}
+                          navigate={this.navigate}
+                          moveIndicator={this.moveIndicator}
+                          isActive={activeItem === i}
+                          isLast={i === cities.length - 1} />
                       </Col>
                     )
                   })}
                   </Row>
-                  <div id='city-indicator' style={{ left: this.state.left }} ></div>
+                  <div id='city-indicator' ref={activeIndicator => { this.activeIndicator = activeIndicator }} style={{ left: this.state.left }} ></div>
                 </Container>
               </div>
             </div>

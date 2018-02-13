@@ -4,7 +4,6 @@ import { PageSlug } from '../../constants'
 import SubPage from '../SubPage'
 import ErrorPage from '../ErrorPage'
 import ApplyForm from '../ApplyForm'
-import CoursesPage from '../CoursesPage';
 import './PagesContainer.css'
 
 /**

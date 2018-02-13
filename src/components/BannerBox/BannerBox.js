@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Col, Button } from 'reactstrap'
+import { Col } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import './BannerBox.css'
