@@ -1,15 +1,19 @@
 @import 'styles/_colors.scss';
 
 .debug-message {
+  padding: 0;
+  position: fixed;
+  margin: 5px;
+  font-size: 12px;
+  background: rgba(238, 238, 238, 0.7);
+  border-radius: 0.5em;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  max-width: 400px;
+  p {
+    margin: 5px 0;
+  }
   .close-button {
-    &.open {
-      position: absolute;
-      top: 1.6em;
-      right: 2em;
-    }
-    &.closed {
-      position: relative;
-    }
     padding: 5px;
     width: 70px;
     color: #fff;
@@ -19,16 +23,17 @@
       background: lighten($brand-primary, 20%);
     }
   }
-  position: fixed;
-  margin: 5px;
-  padding: 1.6em 2em;
-  font-size: 12px;
-  background: rgba(238, 238, 238, 0.815);
-  border-radius: 0.5em;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  z-index: 999;
-  max-width: 400px;
-  p {
-    margin: 5px 0;
+  &.open {
+    padding: 1.6em 2em;
+    & .close-button {
+      position: absolute;
+      top: 1.6em;
+      right: 2em;
+    }
+  }
+  &.closed {
+    & .close-button {
+      position: relative;
+    }
   }
 }

@@ -13,8 +13,8 @@ class DebugMessage extends Component {
   render() {
     const {isVisible} = this.state
     return (
-      <div className='debug-message'>
-        <div onClick={this.toggleIsVisible} className={`close-button${isVisible ? ' open' : ' closed'}`}>{isVisible ? 'CLOSE' : 'INFO'}</div>
+      <div className={`debug-message${isVisible ? ' open' : ' closed'}`}>
+        <div onClick={this.toggleIsVisible} className='close-button'>{isVisible ? 'CLOSE' : 'INFO'}</div>
         {isVisible && 
         <div>
           <h5>STAGING SITE</h5>
