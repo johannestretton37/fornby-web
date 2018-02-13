@@ -33,15 +33,15 @@ class Gallery extends Component {
   }
 
   render() {
-    const { match, history } = this.props
-    const items = this.props.items.map(item => {
+    const { items } = this.props
+    const galleryItems = items.map(item => {
       if (item.portrait) {
         item.img = item.portrait[0].url
       }
       return item
     })
     return (
-      <GalleryItems items={items} />
+      <GalleryItems items={galleryItems} />
     )
   }
 }

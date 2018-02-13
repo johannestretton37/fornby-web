@@ -115,7 +115,7 @@ class CMS {
    */
   getCourses = () => {
     return new Promise(async (resolve, reject) => {
-      if(this.cache.courses) return resolve(this.cache.courses)
+      if (this.cache.courses) return resolve(this.cache.courses)
       try {
         const options = { populate: ['mainImage'] };
         const coursesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options)
@@ -265,7 +265,7 @@ class CMS {
               content.courseCategories = {}
               Object.values(categories).forEach(category => {
                 let courses = allCourses.filter(course => {
-                  return course.courseCategory.includes(category.id)
+                  return course.courseCategories ? course.courseCategory.includes(category.id) : [];
                 })
                 if (courses.length > 0) {
                   content.courseCategories[category.id] = {
@@ -274,7 +274,7 @@ class CMS {
                   }
                 }
               })
-              
+              content.courseCategories = this.arrayFromFirebaseData(content.courseCategories);
               console.log(content)
             }
             if (this.cache.subPages) {

@@ -89,7 +89,6 @@ class AdminContext extends Component {
     }).catch(function(error) {
       // An error happened.
       console.error(error)
-      debugger
     });
   }
   render() {

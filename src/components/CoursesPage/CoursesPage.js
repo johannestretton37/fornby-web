@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Container, Row, Col } from 'reactstrap'
-import {withRouter} from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import Gallery from '../Gallery'
 import './CoursesPage.css'
 import { object } from 'prop-types'
@@ -21,8 +21,13 @@ class CoursesPage extends Component {
   }
 
   componentDidMount() {
-    const categories = this.props.content.courseCategory;
+    const categories = this.props.content.courseCategories;
     let category = {};
+
+    this.setState({
+      categories,
+      title: this.props.content.name
+    })
     if (categories.category) {
       categories.category.forEach(cat => {
         category[cat.slug] = (
@@ -30,10 +35,6 @@ class CoursesPage extends Component {
         )
       })
     }
-    this.setState({
-      categories,
-      title: this.props.content.name
-    })
   }
 
   componentWillReceiveProps(nextProps) {
