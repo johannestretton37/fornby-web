@@ -3,6 +3,7 @@ import { object } from 'prop-types'
 import { PageSlug } from '../../constants'
 import SubPage from '../SubPage'
 import ErrorPage from '../ErrorPage'
+// import CoursesPage from '../CoursesPage'
 import ApplyForm from '../ApplyForm'
 import './PagesContainer.css'
 

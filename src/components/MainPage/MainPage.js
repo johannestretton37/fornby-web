@@ -82,8 +82,9 @@ class MainPage extends Component {
             :
             <Switch>
               <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} />} />
-              <Route path='/:page?/:subpage?' render={props => <PagesContainer {...props } content={pageContent} />} />
+              <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent} />} />
               <Route path='/:page' component={PageContainer} />
+              <Route path='/' render={props => <PagesContainer {...props } content={pageContent} />} />
             </Switch>
           }
           </Col>

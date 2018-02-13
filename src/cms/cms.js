@@ -17,6 +17,7 @@ class CMS {
     this.cache = {
       imageUrls: {}
     }
+    this.pending = {}
     // this.getBasicInfo()
   }
 
@@ -50,9 +51,12 @@ class CMS {
    * Main Menu
    */
   mainMenuItems = () => {
-    return new Promise(async (resolve, reject) => {
-      // Return cached main menu if present
-      if (this.cache.mainMenu) return resolve(this.cache.mainMenu)
+    // Return cached main menu if present
+    if (this.cache.mainMenu) return Promise.resolve(this.cache.mainMenu)
+    // Check if promise is pending
+    if (this.pending.mainMenu) return this.pending.mainMenu
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending.mainMenu = new Promise(async (resolve, reject) => {
       try {
         const mainNavigation = await this.flamelinkApp.nav.get('mainNavigation', {
           fields: ['items']
@@ -73,6 +77,7 @@ class CMS {
         return reject(error)
       }
     })
+    return this.pending.mainMenu
   }
 
   getCoursesMainPage = () => {
