@@ -27,8 +27,9 @@
     "build-css": "node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/",
     "watch-css": "yarn build-css && node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive",
     "eject": "react-scripts eject",
-    "deploy:dev": "firebase deploy -P staging",
+    "deploy:dev": "firebase deploy -P staging --only hosting",
     "deploy:prod": "firebase deploy -P default",
+    "deploy:functions:prod": "firebase deploy -P default --only functions",
     "release:dev": "NODE_ENV=development REACT_APP_DATABASE=staging yarn build && yarn deploy:dev",
     "release:prod": "NODE_ENV=production REACT_APP_DATABASE=production yarn build && yarn deploy:prod"
   },

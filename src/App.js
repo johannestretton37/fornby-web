@@ -5,6 +5,7 @@ import Header from './components/Header'
 import Content from './components/Content'
 import StartPageCarousel from './components/StartPageCarousel'
 import Footer from './components/Footer'
+import DebugMessage from './components/DebugMessage'
 import cms from './cms'
 class App extends Component {
   state = {
@@ -30,6 +31,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <div id="app">
+          {!cms.isProd && <DebugMessage />}
           <div className="full-width wrapper main-content">
             <Header />
             <Route path="/:city?" component={StartPageCarousel} />

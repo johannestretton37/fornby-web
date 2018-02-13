@@ -265,6 +265,7 @@ class CMS {
               content.courseCategories = {}
               Object.values(categories).forEach(category => {
                 let courses = allCourses.filter(course => {
+                  if (!course.courseCategory) return false
                   return course.courseCategory.includes(category.id)
                 })
                 if (courses.length > 0) {
@@ -282,7 +283,7 @@ class CMS {
             } else {
               let subPages = await this.flamelinkApp.content.get(ContentGroup.SUB_PAGES, {
                 fields: [
-                  'id', 'name', 'showByDefault', ContentGroup.DETAIL_PAGES, ContentGroup.STAFF
+                  'id', 'name', 'slug', 'showByDefault', ContentGroup.DETAIL_PAGES, ContentGroup.STAFF
                 ],
                 populate: [
                   {
@@ -405,21 +406,9 @@ class CMS {
         // Don't show unpublished content
         return;
       }
-
       let result = {}
       // Check if data is in edit mode
-      let dataObject = value
-      if (value.isEditing) {
-        // If this is prod, show stored values
-        if (this.isProd) {
-          // Show stored values
-          dataObject = value._prodContent
-          if (!dataObject) {
-            debugger
-          }
-        }
-      }
-
+      let dataObject = this.checkEditMode(value)
       Object.entries(dataObject).forEach(([field, val]) => {
         result[field] = val
       })
@@ -430,6 +419,21 @@ class CMS {
       array.push(result)
     })
     return array
+  }
+
+  checkEditMode = value => {
+    let dataObject = value
+    if (value.isEditing) {
+      // If this is prod, show stored values
+      if (this.isProd) {
+        // Show stored values
+        dataObject = value._prodContent
+        if (!dataObject) {
+          console.error('Found no _prodContent for data in edit mode.', value)
+        }
+      }
+    }
+    return dataObject
   }
 
   idFromSlug = (group, slug) => {
