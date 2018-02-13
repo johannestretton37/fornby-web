@@ -115,7 +115,7 @@ class CMS {
    */
   getCourses = () => {
     return new Promise(async (resolve, reject) => {
-      if(this.cache.courses) return resolve(this.cache.courses)
+      if (this.cache.courses) return resolve(this.cache.courses)
       try {
         const options = { populate: ['mainImage'] };
         const coursesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options)
