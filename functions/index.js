@@ -107,6 +107,11 @@ exports.editDetected = functions.database
         console.log('Switched from true to false, publish and clean up')
         return deltaSnapshot.ref.child('_prodContent').remove()
       }
+      if (editedItem.isEditing === false) {
+        // Remove any trash
+        console.log('Item saved with isEditing set to false, clean up any leftovers')
+        return deltaSnapshot.ref.child('_prodContent').remove()
+      }
     } else {
       // This is a creation
       if (editedItem.isEditing === true) {

@@ -376,7 +376,7 @@ class CMS {
    */
   getSlides = () => {
     return new Promise(async (resolve, reject) => {
-      // Get all slides
+      if (this.cache.slides) return resolve(this.cache.slides)
       try {
         const slides = await this.getContentGroup(
           ContentGroup.START_PAGE_SLIDES,
@@ -386,9 +386,10 @@ class CMS {
           }
         )
         if (!slides) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta slides')
-        resolve(slides)
+        this.cache.slides = slides
+        return resolve(slides)
       } catch (error) {
-        reject(error)
+        return reject(error)
       }
     })
   }
