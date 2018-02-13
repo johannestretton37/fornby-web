@@ -19,15 +19,16 @@ class StartPage extends Component {
   }
 
   componentDidMount() {
-    const { page } = this.props
+    const {page} = this.props
     switch (page) {
       case 'ludvika':
       case 'falun':
-      this.setState({ left: '10px' })
+        this.setState({ left: '10px' })
         this.getPageContent(page)
       break
       default:
         this.getBanners()
+        this.getPageContent('borlange')
       break
     }
   }
@@ -85,8 +86,8 @@ class StartPage extends Component {
   render() {
     const { banners, pageContent } = this.state
     return (
-      <div style={{ position: 'relative' }}>
-        {pageContent && <Route path='/:page/:subpage?/:slug?' render={props => <MainPage {...props} content={pageContent} subMenu={false} />} />}
+      <div style={{position: 'relative'}}>
+        {pageContent && <Route path='/:page?/:subpage?/:slug?' render={props => <MainPage {...props} content={pageContent} subMenu={false} />} />}
         {banners.length > 0 &&
         <div className='banner-boxes-container full-width'>
           <Container className='banner-boxes'>

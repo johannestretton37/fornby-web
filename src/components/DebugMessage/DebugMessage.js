@@ -3,7 +3,7 @@ import './DebugMessage.css'
   
 class DebugMessage extends Component {
   state = {
-    isVisible: true
+    isVisible: false
   }
 
   toggleIsVisible = () => {
@@ -14,7 +14,7 @@ class DebugMessage extends Component {
     const {isVisible} = this.state
     return (
       <div className={`debug-message${isVisible ? ' open' : ' closed'}`}>
-        <div onClick={this.toggleIsVisible} className='close-button'>{isVisible ? 'CLOSE' : 'INFO'}</div>
+        <div onClick={this.toggleIsVisible} className='close-button'>{isVisible ? 'CLOSE' : 'DEV INFO'}</div>
         {isVisible && 
         <div>
           <h5>STAGING SITE</h5>

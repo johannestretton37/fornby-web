@@ -244,6 +244,27 @@ class CMS {
           let { __meta__, subPages, showCourses, ...neededProps } = mainPage
           // Add the rest to our content object
           content = { ...neededProps }
+          // Check if page should display CoursesPage or not
+          if (showCourses === true) {
+            // Let's display all courses that applies to this page
+            const allCourses = await this.getCourses()
+            const categories = await this.getCourseCategories()
+            content.courseCategories = {}
+            Object.values(categories).forEach(category => {
+              let courses = allCourses.filter(course => {
+                if (!course.courseCategory) return false
+                return course.courseCategory.includes(category.id)
+              })
+              if (courses.length > 0) {
+                content.courseCategories[category.id] = {
+                  courses,
+                  ...category
+                }
+              }
+            })
+            
+            console.log(content)
+          }
           // If the mainPage has subPages
           if (mainPage.subPages) {
             /**
@@ -258,26 +279,6 @@ class CMS {
             const subPageIds = mainPage.subPages.map(item => {
               return item.subPage
             })
-            if (showCourses === true) {
-              // Let's display all courses that applies to this page
-              const allCourses = await this.getCourses()
-              const categories = await this.getCourseCategories()
-              content.courseCategories = {}
-              Object.values(categories).forEach(category => {
-                let courses = allCourses.filter(course => {
-                  if (!course.courseCategory) return false
-                  return course.courseCategory.includes(category.id)
-                })
-                if (courses.length > 0) {
-                  content.courseCategories[category.id] = {
-                    courses,
-                    ...category
-                  }
-                }
-              })
-              
-              console.log(content)
-            }
             if (this.cache.subPages) {
               content.subPages = this.cache.subPages.filter(subPage => subPageIds.includes(subPage.id))
             } else {
@@ -376,7 +377,7 @@ class CMS {
    */
   getSlides = () => {
     return new Promise(async (resolve, reject) => {
-      if (this.cache.slides) return resolve(this.cache.slides)
+      if (this.cache[ContentGroup.START_PAGE_SLIDES]) return resolve(this.cache[ContentGroup.START_PAGE_SLIDES])
       try {
         const slides = await this.getContentGroup(
           ContentGroup.START_PAGE_SLIDES,
@@ -386,7 +387,7 @@ class CMS {
           }
         )
         if (!slides) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta slides')
-        this.cache.slides = slides
+        this.cache[ContentGroup.START_PAGE_SLIDES] = slides
         return resolve(slides)
       } catch (error) {
         return reject(error)

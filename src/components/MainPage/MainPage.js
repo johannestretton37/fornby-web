@@ -37,7 +37,7 @@ class MainPage extends Component {
   }
 
   componentDidMount() {
-    const { page } = this.props.match.params
+    const page = this.props.match.params.page || 'borlange'
     this.getPageContent(page)
   }
 
@@ -82,7 +82,7 @@ class MainPage extends Component {
             :
             <Switch>
               <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} />} />
-              <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent} />} />
+              <Route path='/:page?/:subpage?' render={props => <PagesContainer {...props } content={pageContent} />} />
               <Route path='/:page' component={PageContainer} />
             </Switch>
           }
