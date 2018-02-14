@@ -264,7 +264,7 @@ class CMS {
               let courses = allCourses.filter(course => {
                 // If courseCategory is undefined, default to `övriga kurser`
                 if (!course.courseCategory) {
-                  otherCourses.add(course)
+                  otherCourses.set(course)
                   return false
                 }
                 return course.courseCategory.includes(category.id)
