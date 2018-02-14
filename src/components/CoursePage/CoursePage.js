@@ -25,7 +25,7 @@ function CoursePage({ content, mainImageURL, onApplyClicked }) {
   } = content;
 
   return (
-    <div>
+    <div className='course' >
       {name && <div className='course-image_wrapper'>
         <Image className='full-width' src={happy_student} height={400} />
         <p className='course-title'>{name}</p>
