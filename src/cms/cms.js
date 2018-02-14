@@ -284,7 +284,7 @@ class CMS {
               isEditing: false,
               isPublished: true,
               slug: 'ovriga-kurser',
-              shortInfo: 'TODO: lägg till i flamelink',
+              shortInfo: 'Beskrivning här...',
               courses: Array.from(otherCourses.values())
             })
           }

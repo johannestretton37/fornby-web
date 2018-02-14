@@ -1,12 +1,11 @@
 import React from 'react'
-import { array, object } from 'prop-types'
-import { Container, Row, Col } from 'reactstrap'
-import { Link } from 'react-router-dom'
+import {array, object} from 'prop-types'
+import {Container, Row, Col} from 'reactstrap'
+import {Link} from 'react-router-dom'
 import logoWhite from '../../assets/logoWhite.svg'
 import './Footer.css'
 
 const Footer = ({ navLinks = [], location }) => {
-  console.log(navLinks)
   return (
     <footer>
       <Container>

@@ -25,6 +25,8 @@ class DebugMessage extends Component {
           <p>When things look the way you want, go back into flamelink, switch off <i>isEditing</i> and switch on <i>isPublished</i>.</p>
           <p>Your changes will now be published live.</p>
           <hr/>
+          <p style={{textAlign: 'center'}}>For a detailed explanation, <a href='https://indd.adobe.com/view/632f8bd2-e6c4-4a0d-a6f1-9faac9677565' target="_blank" rel="noopener noreferrer">click here</a></p>
+          <hr/>
           <p style={{textAlign: 'center'}}><a href="https://fornby-web.firebaseapp.com" target="_blank" rel="noopener noreferrer">Click here</a> for the official site</p>
         </div>}
       </div>
