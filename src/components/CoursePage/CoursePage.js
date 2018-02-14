@@ -32,13 +32,6 @@ function CoursePage({ content, mainImageURL, onApplyClicked }) {
           <button className='btn default' color="primary" size="lg" onClick={onApplyClicked}>{'Ansök till ' + name}</button>
         </p>
       </div>
-      {(() => {
-        if (mainImage) {
-          return (<ImagePreLoader previewImg={''}>
-            <img src={mainImageURL} alt={content.name} />
-          </ImagePreLoader>)
-        }
-      })()}
       <p className='course-main-body' dangerouslySetInnerHTML={{ __html: mainBody }} />
     </div>
   )
