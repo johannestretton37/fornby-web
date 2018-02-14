@@ -66,7 +66,7 @@ class CoursesPage extends Component {
       if (items && items.courses) {
         let course = this.findCategory(items.courses, slug);
         if (course) {
-          title = course.name;
+          title = null;
           content = <CoursePage content={course} onApplyChanged={() => { }} />
         }
       }
@@ -85,9 +85,11 @@ class CoursesPage extends Component {
         <Container>
           <Row>
             <Col>
+            {title &&
               <div style={{ textAlign: 'left', borderBottom: "2px solid" }}>
                 <h1>{title}</h1>
               </div>
+            }
             </Col>
           </Row>
           <Row>
