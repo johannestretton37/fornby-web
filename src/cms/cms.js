@@ -253,22 +253,40 @@ class CMS {
           if (showCourses === true) {
             // Let's display all courses that applies to this page
             const allCourses = await this.getCourses()
-            const categories = await this.getCourseCategories()
-            content.courseCategories = {}
-            Object.values(categories).forEach(category => {
+            const allCategories = await this.getCourseCategories()
+            // Temp container for unspecified courses
+            let otherCourses = new Map()
+            // Init array to hold categories
+            content.courseCategories = []
+            // Loop all categories
+            Object.values(allCategories).forEach(category => {
+              // Extract courses that should be in this category
               let courses = allCourses.filter(course => {
-                if (!course.courseCategory) return false
+                // If courseCategory is undefined, default to `övriga kurser`
+                if (!course.courseCategory) {
+                  otherCourses.add(course)
+                  return false
+                }
                 return course.courseCategory.includes(category.id)
               })
               if (courses.length > 0) {
-                content.courseCategories[category.id] = {
+                // Add courses to categories array
+                content.courseCategories.push({
                   courses,
                   ...category
-                }
+                })
               }
             })
-            
-            console.log(content)
+            // Lastly, add otherCourses
+            if (otherCourses.size > 0) content.courseCategories.push({
+              id: 1337,
+              name: 'Övriga kurser',
+              isEditing: false,
+              isPublished: true,
+              slug: 'ovriga-kurser',
+              shortInfo: 'TODO: lägg till i flamelink',
+              courses: Array.from(otherCourses.values())
+            })
           }
           // If the mainPage has subPages
           if (mainPage.subPages) {
