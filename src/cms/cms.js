@@ -255,7 +255,7 @@ class CMS {
             const allCourses = await this.getCourses()
             const allCategories = await this.getCourseCategories()
             // Temp container for unspecified courses
-            let otherCourses = new Map()
+            let otherCourses = new Set()
             // Init array to hold categories
             content.courseCategories = []
             // Loop all categories
@@ -264,7 +264,7 @@ class CMS {
               let courses = allCourses.filter(course => {
                 // If courseCategory is undefined, default to `övriga kurser`
                 if (!course.courseCategory) {
-                  otherCourses.set(course)
+                  otherCourses.add(course)
                   return false
                 }
                 return course.courseCategory.includes(category.id)
