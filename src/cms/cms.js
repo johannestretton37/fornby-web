@@ -52,7 +52,7 @@ class CMS {
    * Main Menu
    */
   mainMenuItems = () => {
-    // Return cached main menu if present
+    // Return cached content if present
     if (this.cache.mainMenu) return Promise.resolve(this.cache.mainMenu)
     // Check if promise is pending
     if (this.pending.mainMenu) return this.pending.mainMenu
@@ -108,10 +108,12 @@ class CMS {
   }
 
   getCourseCategories = () => {
-    return new Promise(async (resolve, reject) => {
-      // Return cached data if it exists
-      if (this.cache.courseCategories) return resolve(this.cache.courseCategories)
-      // No cache, fetch courseCategories
+    // Return cached content if present
+    if (this.cache.courseCategories) return Promise.resolve(this.cache.courseCategories)
+    // Check if promise is pending
+    if (this.pending.courseCategories) return this.pending.courseCategories
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending.courseCategories = new Promise(async (resolve, reject) => {
       try {
         const courseCategories = await this.flamelinkApp.content.get(ContentGroup.COURSE_CATEGORIES)
         if (!courseCategories) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta några kurskategorier. Försök igen senare', true)
@@ -121,6 +123,7 @@ class CMS {
         return reject(error)
       }
     })
+    return this.pending.courseCategories
   }
 
   /**
@@ -128,8 +131,12 @@ class CMS {
    * @returns {Promise} - A Promise that resolves to an array of course objects
    */
   getCourses = () => {
-    return new Promise(async (resolve, reject) => {
-      if (this.cache.courses) return resolve(this.cache.courses)
+    // Return cached content if present
+    if (this.cache.courses) return Promise.resolve(this.cache.courses)
+    // Check if promise is pending
+    if (this.pending.courses) return this.pending.courses
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending.courses = new Promise(async (resolve, reject) => {
       try {
         const options = { populate: ['images'] };
         const coursesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options)
@@ -142,6 +149,7 @@ class CMS {
         return reject(error)
       }
     })
+    return this.pending.courses
   }
 
   /**
@@ -155,9 +163,12 @@ class CMS {
     console.log('getContentGroup ' + groupName + ',', options);
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
-    // Return cached group if present
-    return new Promise(async (resolve, reject) => {
-      if (this.cache[group]) return resolve(this.cache[group])
+    // Return cached content if present
+    if (this.cache[group]) return Promise.resolve(this.cache[group])
+    // Check if promise is pending
+    if (this.pending[group]) return this.pending[group]
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending[group] = new Promise(async (resolve, reject) => {
       try {
         const contentData = await this.flamelinkApp.content.get(group, options)
         if (!contentData) throw new Error(`Could not find content group: ${groupName}`)
@@ -169,6 +180,7 @@ class CMS {
         return reject(error)
       }
     })
+    return this.pending[group]
   }
 
   /**
@@ -181,9 +193,12 @@ class CMS {
    * @returns {Promise} - Returns Promise that resolves to an array of Main Page objects
    */
   getMainPages = () => {
-    return new Promise(async (resolve, reject) => {
-      // If mainPages is cached, return cache
-      if (this.cache.mainPages) return resolve(this.cache.mainPages)
+    // Return cached content if present
+    if (this.cache.mainPages) return Promise.resolve(this.cache.mainPages)
+    // Check if promise is pending
+    if (this.pending.mainPages) return this.pending.mainPages
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending.mainPages = new Promise(async (resolve, reject) => {
       try {
         let mainPagesData = await this.flamelinkApp.content.get(ContentGroup.MAIN_PAGES)
         if (!mainPagesData) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Pages')
@@ -196,6 +211,7 @@ class CMS {
         return reject(error)
       }
     })
+    return this.pending.mainPages
   }
 
   /**
@@ -208,9 +224,13 @@ class CMS {
    * @returns {Promise} - Returns Promise that resolves to an object of Staff objects
    */
   getStaffPages = () => {
-    return new Promise(async (resolve, reject) => {
+    // Return cached content if present
+    if (this.cache.staffPages) return Promise.resolve(this.cache.staffPages)
+    // Check if promise is pending
+    if (this.pending.staffPages) return this.pending.staffPages
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending.staffPages = new Promise(async (resolve, reject) => {
       // If staffPages is cached, return cache
-      if (this.cache.staffPages) return resolve(this.cache.staffPages)
       try {
         const staffPages = await this.flamelinkApp.content.get(ContentGroup.STAFF, {
           // fields: ['name', 'phone', 'email', 'images', 'role', 'slug'],
@@ -225,6 +245,7 @@ class CMS {
         return reject(error)
       }
     })
+    return this.pending.staffPages
   }
 
   /**
@@ -238,9 +259,12 @@ class CMS {
   getPageContent = (pageName) => {
     // Convert page name from friendly URL to camelCase
     let page = camelCase(pageName)
-    return new Promise(async (resolve, reject) => {
-      // If page is cached, return cache
-      if (this.cache[page]) return resolve(this.cache[page])
+    // Return cached content if present
+    if (this.cache[page]) return Promise.resolve(this.cache[page])
+    // Check if promise is pending
+    if (this.pending[page]) return this.pending[page]
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending[page] = new Promise(async (resolve, reject) => {
       try {
         let content = {}
         // Get array of main pages
@@ -355,6 +379,7 @@ class CMS {
         return reject(error)
       }
     })
+    return this.pending[page]
   }
 
   /**
@@ -382,8 +407,12 @@ class CMS {
   // }
 
   getURL = (id, size) => {
-    return new Promise(async (resolve, reject) => {
-      if (this.cache.imageUrls[id]) return resolve(this.cache.imageUrls[id])
+    // Return cached content if present
+    if (this.cache.imageUrls[id]) return Promise.resolve(this.cache.imageUrls[id])
+    // Check if promise is pending
+    if (this.pending.imageUrls[id]) return this.pending.imageUrls[id]
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending.imageUrls[id] = new Promise(async (resolve, reject) => {
       try {
         const url = await this.flamelinkApp.storage.getURL(id, { size: size || 'device' })
         if (!url) throw new CustomError('Ett fel uppstod', `No URL found for ${id}`)
@@ -393,6 +422,7 @@ class CMS {
         return reject(`No URL found for ${id}`)
       }
     })
+    return this.pending.imageUrls[id]
   }
 
   /**
@@ -406,8 +436,12 @@ class CMS {
    * }
    */
   getSlides = () => {
-    return new Promise(async (resolve, reject) => {
-      if (this.cache[ContentGroup.START_PAGE_SLIDES]) return resolve(this.cache[ContentGroup.START_PAGE_SLIDES])
+    // Return cached content if present
+    if (this.cache[ContentGroup.START_PAGE_SLIDES]) return Promise.resolve(this.cache[ContentGroup.START_PAGE_SLIDES])
+    // Check if promise is pending
+    if (this.pending[ContentGroup.START_PAGE_SLIDES]) return this.pending[ContentGroup.START_PAGE_SLIDES]
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending[ContentGroup.START_PAGE_SLIDES] = new Promise(async (resolve, reject) => {
       try {
         const slides = await this.getContentGroup(
           ContentGroup.START_PAGE_SLIDES,
@@ -423,6 +457,7 @@ class CMS {
         return reject(error)
       }
     })
+    return this.pending[ContentGroup.START_PAGE_SLIDES]
   }
 
   /**
