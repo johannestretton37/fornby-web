@@ -1,5 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import {array, string, object} from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import { withRouter } from 'react-router-dom'
 import placeholderImg from '../../assets/placeholderImg.svg'
@@ -18,14 +18,15 @@ import './GalleryItems.css'
 
 
 GalleryItems.propTypes = {
-  items: PropTypes.array.isRequired,
-  match: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired
+  items: array.isRequired,
+  rootUrl: string,
+  match: object.isRequired,
+  history: object.isRequired
 }
 /**
  * Display an overview of an array of items
  */
-function GalleryItems ({ items = [], history, match }) {
+function GalleryItems ({ items = [], history, match, rootUrl }) {
   return (
     <Row>
       {items.map((item, i) => {
@@ -48,7 +49,7 @@ function GalleryItems ({ items = [], history, match }) {
                     block
                     outline
                     color="primary"
-                    onClick={() => history.push(`${match.url}/${item.slug}`)}
+                    onClick={() => history.push(`${rootUrl ? rootUrl : match.url}/${item.slug}`)}
                   >
                     {item.cta || 'BUTTON'}
                   </Button>

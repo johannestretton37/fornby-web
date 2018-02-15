@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { string } from 'prop-types'
 import { Route } from 'react-router-dom'
 import { Container, Row} from 'reactstrap'
-import {ContentGroup} from '../../constants'
+import {ContentGroup, defaultFields} from '../../constants'
 import MainPage from '../MainPage'
 import BannerBox from '../BannerBox'
 import cms from '../../cms'
@@ -46,19 +46,10 @@ class StartPage extends Component {
   getBanners = () => {
     // Get content from cms.js
     const options = {
-      fields: ['title', 'shortInfo', 'isVisible', 'action', 'actionSubPage', 'actionDetailPage', 'image'],
+      fields: ['title', 'shortInfo', ...defaultFields, 'link'],
       populate: [
         {
-          field: 'action'
-        },
-        {
-          field: 'actionSubPage'
-        },
-        {
-          field: 'actionDetailPage'
-        },
-        {
-          field: 'image'
+          field: 'images'
         }
       ]
     }

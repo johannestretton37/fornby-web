@@ -1,31 +1,20 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { CSSTransition } from 'react-transition-group'
+import {string, array, object} from 'prop-types'
 import { withRouter } from 'react-router-dom'
-import placeholderImg from '../../assets/placeholderImg.svg'
-import {
-  Row,
-  Col,
-  Card,
-  CardImg,
-  CardTitle,
-  CardText,
-  CardBody,
-  CardSubtitle,
-  Button
-} from 'reactstrap'
 import GalleryItems from '../GalleryItems'
 import './Gallery.css'
 
 
 /**
  * Display a Gallery with an overview of an array of items
+ * @param {string?} rootUrl - Pass a string that serves as the root url for displayed items, e.g. '/kurser' (optional)
  */
 class Gallery extends Component {
   static propTypes = {
-    items: PropTypes.array.isRequired,
-    match: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired
+    items: array.isRequired,
+    match: object.isRequired,
+    history: object.isRequired,
+    rootUrl: string
   }
 
   static defaultProps = {
@@ -33,19 +22,17 @@ class Gallery extends Component {
   }
 
   render() {
-    const { items } = this.props
+    const { items, rootUrl } = this.props
     const galleryItems = items.map(item => {
-      if (item.portrait) {
-        item.img = item.portrait[0].url
+      if (item.images) {
+        item.img = item.images[0].url
       }
       return item
     })
     return (
-      <GalleryItems items={galleryItems} />
+      <GalleryItems items={galleryItems} rootUrl={rootUrl} />
     )
   }
 }
-
-
 
 export default withRouter(Gallery)

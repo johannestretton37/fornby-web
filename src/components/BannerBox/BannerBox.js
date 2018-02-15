@@ -11,12 +11,11 @@ class BannerBox extends Component {
   }
 
   render() {
-    const { content: { title, shortInfo, image: images, action: actions } } = this.props
+    const { content: { title, shortInfo, images, link } } = this.props
     let url = images[0].url
-    let slug = actions[0].slug
     return (
       <Col xs="12" md="6" xl="4" className='banner-box'>
-        <Link to={slug}>
+        <Link to={link||'/'}>
           <div className='banner'>
             <figure className='hero-image-container'>
               <div className='hero-image' style={{ backgroundImage: `url(${url})` }}>

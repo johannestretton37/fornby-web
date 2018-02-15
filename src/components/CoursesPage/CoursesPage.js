@@ -3,7 +3,7 @@ import { Container, Row, Col } from 'reactstrap'
 import { withRouter } from 'react-router-dom'
 import Gallery from '../Gallery'
 import './CoursesPage.css'
-import { object } from 'prop-types'
+import { object, string } from 'prop-types'
 import CoursePage from '../CoursePage';
 import BackButton from '../BackButton/BackButton';
 
@@ -12,29 +12,45 @@ class CoursesPage extends Component {
   static propTypes = {
     match: object.isRequired,
     content: object.isRequired,
-    courseCategories: object.isRequired
+    title: string,
+    city: string,
+    rootUrl: string
+  }
+
+  static defaultProps = {
+    title: ''
   }
 
   state = {
     categories: [],
-    title: ''
+    title: '',
+    city: ''
   }
 
   componentDidMount() {
-    const categories = this.props.content.courseCategories;
-    let category = {};
-
+    // NOTE: - we're extracting vars from this.props.content and renaming
+    //         this.props.content.courseCategories to categories
+    const {city, title, content: {name, courseCategories: categories }} = this.props
+    // If this.props.title has been provided, use that. Even if it's an empty string
+    let pageTitle
+    if (title === '') {
+      pageTitle = ''
+    } else {
+      pageTitle = title || name
+    }
+    // Commented out because it doesn't do anything:
+    //
+    // let category = {};
+    // courseCategories.forEach(cat => {
+    //   category[cat.slug] = (
+    //     <Gallery items={this.state.courseCategories} />
+    //   )
+    // })
     this.setState({
       categories,
-      title: this.props.content.name
+      title: pageTitle,
+      city
     })
-    if (categories.category) {
-      categories.category.forEach(cat => {
-        category[cat.slug] = (
-          <Gallery items={this.state.categories} />
-        )
-      })
-    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -48,15 +64,18 @@ class CoursesPage extends Component {
   }
 
   RenderPage(galleryItems, field) {
+    let {match, rootUrl} = this.props
+    let root = rootUrl || match.url
     const { body } = field;
     return (
       <div>
         {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
-        <Gallery items={galleryItems} />
+        <Gallery items={galleryItems} rootUrl={root} />
       </div>);
   }
   render() {
-    const { categories } = this.state;
+    const { categories, city } = this.state;
+    if (city && city !== '') console.warn(`this.props.city provided. We should filter courses here and only show ${city} courses`)
     const { category, slug } = this.props.match.params
     let title = this.state.title;
 
@@ -76,20 +95,16 @@ class CoursesPage extends Component {
         title = items.name;
         content = this.RenderPage(items.courses, items);
       }
-    } else {
+    } else if (this.props.content) {
       content = this.RenderPage(categories, this.props.content);
     }
 
     return (
-      <div>
+      <div className='courses-page'>
         <Container>
           <Row>
             <Col>
-            {title &&
-              <div style={{ textAlign: 'left', borderBottom: "2px solid" }}>
-                <h1>{title}</h1>
-              </div>
-            }
+            {title && <h2>{title}</h2>}
             </Col>
           </Row>
           <Row>

@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { object } from 'prop-types'
+import { object, string } from 'prop-types'
 import { PageSlug } from '../../constants'
 import SubPage from '../SubPage'
 import ErrorPage from '../ErrorPage'
-// import CoursesPage from '../CoursesPage'
+import CoursesPage from '../CoursesPage'
 import ApplyForm from '../ApplyForm'
 import './PagesContainer.css'
 
@@ -23,7 +23,8 @@ class PagesContainer extends Component {
 
   static propTypes = {
     content: object.isRequired,
-    match: object.isRequired
+    match: object.isRequired,
+    rootUrl: string
   }
 
   static defaultProps = {
@@ -68,7 +69,8 @@ class PagesContainer extends Component {
 
   render() {
     const {
-      content: { name, shortInfo, body, error, courseCategories },
+      content,
+      content: { name, shortInfo, body, error },
       subPageSlug,
       subPages
     } = this.state
@@ -77,14 +79,13 @@ class PagesContainer extends Component {
       error ?
       <ErrorPage error={error} />
       :
-      <div>
+      <div className={`${page && page + ' '}pages-container`}>
         <h2>{name}</h2>
         <p className="short-info">{shortInfo}</p>
         <p dangerouslySetInnerHTML={{ __html: body }} />
         {page === PageSlug.ANSOK ? <ApplyForm /> : null}
         {subPageSlug && subPages[subPageSlug]}
-        {courseCategories && <p>Här ska alla kurser visas när <b>CoursesPage</b> är färdigbyggd</p>}
-        {/* {courseCategories && <CoursesPage courseCategories={courseCategories} />} */}
+        {content.courseCategories && <CoursesPage city={page} title='' content={content} rootUrl={this.props.rootUrl} />}
       </div>
     )
   }

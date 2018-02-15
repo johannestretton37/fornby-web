@@ -31,8 +31,8 @@ class PageContainer extends Component {
     let content = nextProps.items.find(item => item.slug === nextProps.match.params.slug)
     if (content) {
       this.setState({content})
-      if (content.mainImage) {
-        cms.getURL(content.mainImage[0]).then(mainImageURL => {
+      if (content.images) {
+        cms.getURL(content.images[0]).then(mainImageURL => {
           this.setState({ mainImageURL })
         })
       }
@@ -47,8 +47,8 @@ class PageContainer extends Component {
     try {
         let content = await cms.getContent(group, id)
         this.setState({ content })
-        if (content.mainImage) {
-          let mainImageURL = await cms.getURL(content.mainImage[0])
+        if (content.images) {
+          let mainImageURL = await cms.getURL(content.images[0])
           this.setState({ mainImageURL })
         }
       } catch (error) {

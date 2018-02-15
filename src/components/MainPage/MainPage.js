@@ -68,7 +68,7 @@ class MainPage extends Component {
 
   render() {
     const { subMenu } = this.props
-    const { isLoading, pageContent, error } = this.state
+    const { isLoading, pageContent, title, error } = this.state
     return (
       <Container>
       {isLoading ?
@@ -81,8 +81,8 @@ class MainPage extends Component {
             <ErrorPage error={error} />
             :
             <Switch>
-              <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} content={pageContent} />} />
-              <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent} />} />
+              <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} title={title} content={pageContent} />} />
+              <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent} rootUrl={'/kurser'} />} />
               <Route path='/:page' component={PageContainer} />
               <Route path='/' render={props => <PagesContainer {...props } content={pageContent} />} />
             </Switch>

@@ -1,0 +1,10 @@
+@import 'styles/_colors.scss';
+
+.courses-page {
+  h2 {
+    padding-bottom: 0.5em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    border-bottom: 2px solid $brand-secondary;
+  }
+}

@@ -13,7 +13,7 @@ function ErrorPage({ error: {title, message, rescueLink, rescueText, showSearch}
   return (
     <div className='error-page'>
       <h2>{title}</h2>
-      <p>{message}</p>
+      <p className="short-info">{message}</p>
       {rescueLink && <Link to={rescueLink}>{rescueText || 'Klicka här'}</Link>}
       {showSearch && <div>
         <p>Du kan söka efter det du letar efter här</p>

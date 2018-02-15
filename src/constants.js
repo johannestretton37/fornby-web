@@ -38,3 +38,15 @@ export const PageSlug = {
   KONFERENS: 'konferens',
   OM_FORNBY: 'om-fornby',
 }
+
+/**
+ * Define fields that we'll always fetch from flamelink
+ */
+export const defaultFields = [
+  'id',
+  'name',
+  'slug',
+  'images',
+  'isPublished',
+  'isEditing',
+]

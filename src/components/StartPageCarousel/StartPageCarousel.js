@@ -47,7 +47,8 @@ class StartPageCarousel extends Component {
   componentDidMount() {
     cms.getSlides().then(startPageSlides => {
       const imgUrls = startPageSlides.map(slide => {
-        const url = slide.image[0].url
+        if (!slide.images) return null
+        const url = slide.images[0].url
         // Preload image
         let img = new Image()
         img.src = url

@@ -2,7 +2,7 @@ import getSlug from 'speakingurl'
 import firebaseApp from '../config/firebase.app'
 import flamelink from 'flamelink'
 import CustomError from '../models/CustomError'
-import { ContentGroup } from '../constants'
+import { ContentGroup, defaultFields } from '../constants'
 import { camelCase } from '../Helpers'
 
 /**
@@ -12,7 +12,7 @@ import { camelCase } from '../Helpers'
 
 class CMS {
   constructor() {
-    this.isProd = process.env.REACT_APP_DATABASE === 'production'
+    this.isProd = true // process.env.REACT_APP_DATABASE === 'production'
     this.flamelinkApp = flamelink({ firebaseApp })
     this.cache = {
       imageUrls: {}
@@ -80,7 +80,7 @@ class CMS {
     return this.pending.mainMenu
   }
 
-  getCoursesMainPage = () => {
+  DEPRECATED_getCoursesMainPage = () => {
     return new Promise(async (resolve, reject) => {
       // Return cached data if it exists
       if (this.cache.coursesMainPage) return resolve(this.cache.coursesMainPage)
@@ -122,7 +122,7 @@ class CMS {
     return new Promise(async (resolve, reject) => {
       if (this.cache.courses) return resolve(this.cache.courses)
       try {
-        const options = { populate: ['mainImage'] };
+        const options = { populate: ['images'] };
         const coursesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options)
         if (!coursesData) throw new CustomError('Här var det tomt.', 'Vi kunde inte hitta några kurser för de valda alternativen.', true, '/kurser', 'Klicka här för att se alla våra kurser.')
         const courses = this.arrayFromFirebaseData(coursesData)
@@ -143,7 +143,7 @@ class CMS {
    * @returns - A Promise that resolves to an array of objects
    */
   getContentGroup = (groupName, options = {}) => {
-    console.log('getContentGroup ' + groupName);
+    console.log('getContentGroup ' + groupName + ',', options);
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
     // Return cached group if present
@@ -153,8 +153,6 @@ class CMS {
         const contentData = await this.flamelinkApp.content.get(group, options)
         if (!contentData) throw new Error(`Could not find content group: ${groupName}`)
         let content = this.arrayFromFirebaseData(contentData)
-        console.log('Got content');
-        console.log(content);
         this.cache[group] = content
         console.log(`[${group}] CMS Cache\n`, this.cache)
         return resolve(content)
@@ -206,8 +204,8 @@ class CMS {
       if (this.cache.staffPages) return resolve(this.cache.staffPages)
       try {
         const staffPages = await this.flamelinkApp.content.get(ContentGroup.STAFF, {
-          // fields: ['name', 'phone', 'email', 'portrait', 'role', 'slug'],
-          populate: ['portrait']
+          // fields: ['name', 'phone', 'email', 'images', 'role', 'slug'],
+          populate: ['images']
         })
         if (!staffPages) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Staff Pages')
         // Cache staffPages
@@ -307,7 +305,7 @@ class CMS {
             } else {
               let subPages = await this.flamelinkApp.content.get(ContentGroup.SUB_PAGES, {
                 fields: [
-                  'id', 'name', 'slug', 'showByDefault', ContentGroup.DETAIL_PAGES, ContentGroup.STAFF
+                  'showByDefault', ...defaultFields, ContentGroup.DETAIL_PAGES, ContentGroup.STAFF
                 ],
                 populate: [
                   {
@@ -405,8 +403,8 @@ class CMS {
         const slides = await this.getContentGroup(
           ContentGroup.START_PAGE_SLIDES,
           {
-            fields: ['title', 'alt', 'subtitle', 'image'],
-            populate: ['image']
+            fields: ['title', 'alt', 'subtitle', ...defaultFields],
+            populate: ['images']
           }
         )
         if (!slides) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta slides')
@@ -429,6 +427,7 @@ class CMS {
     Object.values(data).forEach(value => {
       if (this.isProd && !value.isPublished) {
         // Don't show unpublished content
+        console.log('Don\'t show unpublished content', value)
         return;
       }
       let result = {}
