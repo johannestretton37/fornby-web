@@ -12,7 +12,7 @@ import { camelCase } from '../Helpers'
 
 class CMS {
   constructor() {
-    this.isProd = true // process.env.REACT_APP_DATABASE === 'production'
+    this.isProd = process.env.REACT_APP_DATABASE === 'production'
     this.flamelinkApp = flamelink({ firebaseApp })
     this.cache = {
       imageUrls: {}
