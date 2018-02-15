@@ -1,8 +1,13 @@
 import React, { Component } from 'react'
 import { object, number, bool, func } from 'prop-types'
+import Icon from '../Icon'
 import './MainMenuItem.css'
 
 class MainMenuItem extends Component {
+  state = {
+    showSubItems: false
+  }
+
   static propTypes = {
     item: object.isRequired,
     navigate: func.isRequired,
@@ -51,21 +56,23 @@ class MainMenuItem extends Component {
 
   handleClick = e => {
     e.preventDefault()
+    let url = e.currentTarget.href.replace(window.location.origin, '')
     this.moveIndicator()
-    this.navigate()
+    this.navigate(url)
   }
   
   titleSpanMeasurements = () => {
-    const left = this.titleSpan.offsetLeft + 'px'
-    const top = this.titleSpan.offsetTop + 'px'
+    const left = this.titleSpan.parentElement.parentElement.offsetLeft + this.titleSpan.parentElement.offsetLeft + this.titleSpan.offsetLeft + 'px'
+    const top = this.titleSpan.parentElement.parentElement.offsetTop + this.titleSpan.parentElement.offsetTop + this.titleSpan.offsetTop + 'px'
     const width = this.titleSpan.offsetWidth + 'px'
     const height = this.titleSpan.offsetHeight + 'px'
     return {left, top, width, height}
   }
   
-  navigate = () => {
+  navigate = (href) => {
     const { navigate, item: { url } } = this.props
-    navigate(url)
+    this.setState({ showSubItems: false })
+    navigate(href || url)
   }
 
   updateIsVertical = (isVertical) => {
@@ -76,17 +83,41 @@ class MainMenuItem extends Component {
     this.props.moveIndicator(order, this.titleSpanMeasurements(), withOutTransition)
   }
 
+  subItemsToggler = () => {
+    if (this.props.item.children.length === 0) return null
+    return <a className={`sub-items-toggler${this.state.showSubItems ? ' open' : ''}`} onClick={this.toggleSubItem}><Icon name="plus" size={20} /></a>
+  }
+
+  toggleSubItem = e => {
+    e.preventDefault()
+    this.setState(prevState => ({showSubItems: !prevState.showSubItems}))
+  }
+
   render() {
-    const { item, isActive, isFirst, isLast } = this.props
+    const { item, isActive, isFirst, isLast, item: { children } } = this.props
     return (
       <div className="nav-item">
-        <a
-          onClick={this.handleClick}
-          className={`nav-link${isFirst ? ' first' : ''}${isLast ? ' last' : ''}${isActive ? ' active' : ''}`}
-          href={item.url}
-        >
-          <span ref={(titleSpan) => { this.titleSpan = titleSpan }}>{item.title}</span>
-        </a>
+        <div className="main-item-container">
+          <a
+            onClick={this.handleClick}
+            className={`nav-link${isFirst ? ' first' : ''}${isLast ? ' last' : ''}${isActive ? ' active' : ''}`}
+            href={item.url}
+          >
+            <span ref={(titleSpan) => { this.titleSpan = titleSpan }}>{item.title}</span>
+          </a>
+          {this.subItemsToggler()}
+        </div>
+        {children.length > 0 &&
+        <div className={`nav-sub-items ${this.state.showSubItems ? 'open' : 'closed'}`}>
+          {children.map(subItem => {
+            return (
+              <a onClick={this.handleClick} href={subItem.url} key={subItem.url} className={`nav-item nav-link nav-sub-item`}>
+                <i>{subItem.title}</i>
+              </a>
+            )
+          })}
+        </div>
+        }
       </div>
     )
   }

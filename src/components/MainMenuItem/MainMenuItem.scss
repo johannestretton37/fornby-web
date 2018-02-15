@@ -1,0 +1,63 @@
+@import 'styles/_colors.scss';
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
+
+.main-item-container {
+  display: flex;
+  position: relative;
+  .nav-link {
+    flex-grow: 1;
+  }
+  .sub-items-toggler {
+    display: block;
+    @include media-breakpoint-up(md) {
+      display: none;
+    }
+    cursor: pointer;
+    padding: 0.45rem;
+    // width: 30px;
+    // height: 30px;
+    text-align: center;
+    .icon-container .icon {
+      stroke-width: 58px;
+      stroke: $brand-secondary;
+      transition: transform 300ms ease-out, stroke 300ms ease-out;
+    }
+    &:hover {
+      .icon-container .icon {
+        transform: rotateZ(90deg);
+      }
+    }
+    &.open, &.open:hover {
+      .icon-container .icon {
+        transform: rotateZ(135deg);
+        stroke: $brand-primary;
+      }
+    }
+  }
+}
+.nav-sub-items {
+  display: block;
+  @include media-breakpoint-up(md) {
+    display: none;
+  }
+  transition: max-height 400ms ease-out;
+  overflow: hidden;
+  margin-left: 1em;
+  padding-bottom: 0.5em;
+  font-size: 0.85em;
+  &.open {
+    max-height: 150px;
+    border-bottom: 1px solid #eee;
+  }
+  &.closed {
+    max-height: 0px;
+    padding: 0;
+  }
+  .nav-sub-item {
+    cursor: pointer;
+    padding: 0.25em 1em;
+    text-transform: none !important;
+  }
+}

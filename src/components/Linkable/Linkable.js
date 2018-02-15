@@ -6,8 +6,8 @@ import './Linkable.css'
 const Linkable = ({ id, title, url }) => {
   return (
     <h4 id={id} className="linkable">
-      <a href={url}><Icon name='link-bold' size={26} /></a>
       {title}
+      <a href={url}><Icon name='link-bold' size={26} /></a>
     </h4>
   )
 }

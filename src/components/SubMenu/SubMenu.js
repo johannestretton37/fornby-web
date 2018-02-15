@@ -74,7 +74,7 @@ class SubMenu extends Component {
     const { menuItems } = this.state
     return (
       menuItems && menuItems.length > 0 ?
-      <Col md="3">
+      <Col md="3" className='sub-menu-container'>
         <Nav className='sub-menu' vertical>
           {menuItems.map(this.menuItem)}
         </Nav>

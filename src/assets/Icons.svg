@@ -26,4 +26,9 @@
     <line class="b" x1="611.61" y1="612.74" x2="812" y2="813.13"/>
   </symbol>
 
+  <symbol id="icon-plus" viewBox="0 0 1024 1024">
+    <line class="b" x1="133" y1="512" x2="891" y2="512"/>
+    <line class="b" x1="512" y1="133" x2="512" y2="891"/>
+  </symbol>
+
 </svg>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { object, array, bool } from 'prop-types'
+import { object, array, bool, func } from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import MainMenuItem from '../MainMenuItem'
 import './MainMenu.css'
@@ -19,6 +19,7 @@ class MainMenu extends Component {
   static propTypes = {
     items: array.isRequired,
     isOpen: bool,
+    closeMenu: func,
     location: object,
     history: object,
     match: object
@@ -59,6 +60,7 @@ class MainMenu extends Component {
 
   navigate = href => {
     let { location, history } = this.props
+    this.props.closeMenu()
     if (href !== location.pathname) {
       history.push(href)
     }

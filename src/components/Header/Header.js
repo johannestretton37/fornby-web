@@ -50,6 +50,10 @@ class Header extends Component {
     })
   }
 
+  closeMenu = () => {
+    this.setState({ isMainMenuOpen: false })
+  }
+
   /**
    * Search bar
    */
@@ -120,7 +124,7 @@ class Header extends Component {
             performSearch={this.performSearch}
             results={results} />
         </div>
-        <Route path='/:page?' render={props => <MainMenu {...props} items={mainMenuItems} isOpen={isMainMenuOpen} />} />
+        <Route path='/:page?' render={props => <MainMenu {...props} closeMenu={this.closeMenu} items={mainMenuItems} isOpen={isMainMenuOpen} />} />
         <SearchBar
           isOpen={isSearchBarOpen}
           expandHorizontal={false}

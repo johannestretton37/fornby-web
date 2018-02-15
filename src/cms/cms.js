@@ -43,7 +43,8 @@ class CMS {
       title,
       url: slug,
       cssClass,
-      order
+      order,
+      children: []
     }
   }
 
@@ -64,11 +65,19 @@ class CMS {
         if (!mainNavigation) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Navigation')
         if (!mainNavigation.items) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Navigation items')
         // Structure menu
-        let mainMenu = []
+        // This is all the root links, e.g. '/kurser'
+        let rootLinks = mainNavigation.items.filter(item => item.parentIndex === 0)
+        // Convert root links to mainMenuItems
+        let mainMenu = rootLinks.map(item => this.createMainMenuItem(item))
+        // Populate root links with children
         mainNavigation.items.forEach(item => {
-          if (item.parentIndex === 0) {
-            // This is a root link, e.g. '/kurser'
-            mainMenu.push(this.createMainMenuItem(item))
+          if (item.parentIndex > 0) {
+            // This is a sub link, e.g. '/kurser/musikkurs'
+            let parent = mainMenu.find(rootItem => rootItem.id === item.parentIndex)
+            if (parent) {
+              item.url = parent.url + item.url
+              parent.children.push(item)
+            }
           }
         })
         this.cache.mainMenu = mainMenu

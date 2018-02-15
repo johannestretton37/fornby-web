@@ -1,4 +1,7 @@
 @import 'styles/_colors.scss';
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .sub-menu {
   border-top: 1px solid #eee;
@@ -49,5 +52,12 @@
        }
      }
    }
+  }
+}
+
+/* Hide submenu on small screens */
+@include media-breakpoint-down(sm) {
+  .sub-menu-container {
+    display: none;
   }
 }
