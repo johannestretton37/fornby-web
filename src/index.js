@@ -8,7 +8,7 @@ import WebFont from 'webfontloader'
 
 WebFont.load({
   google: {
-    families: ['Nunito', 'Source Sans Pro', 'Libre Baskerville:400i', 'Open Sans']
+    families: ['Nunito', 'Source Sans Pro', 'Libre Baskerville:400i', 'Open Sans', 'Barlow+Condensed:500']
   }
 })
 

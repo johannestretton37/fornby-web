@@ -79,7 +79,7 @@ class PagesContainer extends Component {
       error ?
       <ErrorPage error={error} />
       :
-      <div className={`${page && page + ' '}pages-container`}>
+      <div className={`${page ? page + ' ' : ''}pages-container`}>
         <h2>{name}</h2>
         <p className="short-info">{shortInfo}</p>
         <p dangerouslySetInnerHTML={{ __html: body }} />

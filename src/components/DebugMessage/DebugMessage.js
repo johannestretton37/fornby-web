@@ -21,7 +21,8 @@ class DebugMessage extends Component {
           <p>This is only a preview site, built for editing purposes.</p>
           <hr/>
           <h6>To update content</h6>
-          <p>Make your changes in <a href="https://app.flamelink.io/dashboard" target="_blank" rel="noopener noreferrer">flamelink</a> with the <i>isEditing</i> switch turned on. Then come back here to see the results. You might have to <a href='/'>reload</a> the page to see your changes.</p>
+          <p>Make your changes in <a href="https://app.flamelink.io/dashboard" target="_blank" rel="noopener noreferrer">flamelink</a> with the <i>isEditing</i> switch turned on. Then come back here to see the results.</p>
+          <p>You might have to <a href='/'>reload</a> the page to see your changes.</p>
           <p>When things look the way you want, go back into flamelink, switch off <i>isEditing</i> and switch on <i>isPublished</i>.</p>
           <p>Your changes will now be published live.</p>
           <hr/>
