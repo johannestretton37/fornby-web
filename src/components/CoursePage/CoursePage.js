@@ -23,8 +23,9 @@ class CoursePage extends Component {
     courseIsFull: PropTypes.bool
   }
   renderColumn(array) {
+    if (!array || array.length == 0) return;
     return <div className='course-box-columns-column' >
-      {array.map((row) => this.renderRow(row.bold, row.text))}
+      {array.map((row) => row && this.renderRow(row.bold, row.text))}
     </div>
 
   }
@@ -56,24 +57,25 @@ class CoursePage extends Component {
     } = this.props.content;
 
     let isFullText = courseIsFull && courseIsFull ? 'Nej' : 'Ja';
-    const firstColumn = [
-      this.createBoxContent('Kursstart', DateHelper.formatDate(courseStartDate)),
-      this.createBoxContent('Ansök senast', DateHelper.formatDate(applicationDeadline))
-    ];
-    const secondColumn = [
-      this.createBoxContent('Kurstyp', courseType),
-      this.createBoxContent('Studietakt', courseTempo + '%'),
-      this.createBoxContent('Antagningsvillkor', courseAdmissionConditions),
-    ];
-    const thirdColumn = [
-      this.createBoxContent('Längd', courseLength),
-      this.createBoxContent('Lediga platser', isFullText),
-      this.createBoxContent('Internat', city),
-    ];
-    const fourthColumn = [
-      this.createBoxContent('Kostnader', courseExpenses),
-      this.createBoxContent('Studiestödsnivå(CSN)', courseStudyLevel),
-    ];
+
+    const firstColumn = [];
+    courseStartDate && firstColumn.push(this.createBoxContent('Kursstart', DateHelper.formatDate(courseStartDate)));
+    applicationDeadline && firstColumn.push(this.createBoxContent('Ansök senast', DateHelper.formatDate(applicationDeadline)));
+
+    const secondColumn = [];
+    courseType && secondColumn.push(this.createBoxContent('Kurstyp', courseType));
+    courseTempo && secondColumn.push(this.createBoxContent('Studietakt', courseTempo));
+    courseAdmissionConditions && secondColumn.push(this.createBoxContent('Antagningsvillkor', courseAdmissionConditions));
+
+    const thirdColumn = [];
+    courseLength && thirdColumn.push(this.createBoxContent('Längd', courseLength));
+    isFullText && thirdColumn.push(this.createBoxContent('Lediga platser', isFullText));
+    city && thirdColumn.push(this.createBoxContent('Internat', city));
+
+    const fourthColumn = [];
+    courseExpenses && fourthColumn.push(this.createBoxContent('Kostnader', courseExpenses));
+    courseStudyLevel && fourthColumn.push(this.createBoxContent('Studiestödsnivå(CSN)', courseStudyLevel));
+
     return (
       <div className='course-box-columns'>
         {this.renderColumn(firstColumn)}
