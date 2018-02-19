@@ -3,7 +3,7 @@ import {object, array} from 'prop-types'
 // import {withRouter} from 'react-router-dom'
 import {Transition} from 'react-transition-group'
 import { Container, Row, Col } from 'reactstrap'
-import Image from '../Image'
+import SmoothImage from '../SmoothImage'
 import cms from '../../cms'
 import './StartPageCarousel.css'
 import StartPageCarouselItem from '../StartPageCarouselItem'
@@ -156,7 +156,7 @@ class StartPageCarousel extends Component {
               display: state === 'exited' ? 'none' : 'block',
               maxHeight: state === 'exiting' ? '0px' : '600px',
             }} >
-              <Image className='full-width' src={imgUrls[imgIndex]} height={400} />
+              <SmoothImage className='full-width' src={imgUrls[imgIndex]} height={400} />
               <div className='city-links full-width'>
                 <Container>
                   <Row>             

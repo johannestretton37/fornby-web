@@ -3,7 +3,7 @@ import './CoursePage.css'
 import PropTypes from 'prop-types'
 import DateHelper from '../../Helpers'
 import ImagePreLoader from '../ImagePreLoader'
-import Image from '../Image'
+import SmoothImage from '../SmoothImage'
 import happy_student from '../../assets/happy_student.jpg'
 import { formatDate } from '../../Helpers'
 
@@ -94,7 +94,7 @@ class CoursePage extends Component {
     return (
       <div className='course' >
         {name && <div className='course-image_wrapper'>
-          <Image className='full-width' src={happy_student} height={400} />
+          <SmoothImage className='full-width' src={happy_student} height={400} />
           <p className='course-title'>{name}</p>
           <div className='course-attend_button'>
             <span>ANSÖK TILL {name}</span>

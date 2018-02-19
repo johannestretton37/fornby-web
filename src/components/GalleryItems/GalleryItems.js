@@ -2,6 +2,7 @@ import React from 'react'
 import {array, string, object} from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import { withRouter } from 'react-router-dom'
+import SmoothImage from '../SmoothImage'
 import placeholderImg from '../../assets/placeholderImg.svg'
 import {
   Row,
@@ -30,6 +31,8 @@ function GalleryItems ({ items = [], history, match, rootUrl }) {
   return (
     <Row>
       {items.map((item, i) => {
+        const src = item.images ? item.images[0].url : undefined
+        const preview = item.previews ? item.previews[0].dataURI : undefined
         return (
           <Col xs="12" md="6" lg="4" xl="3" key={i}>
             <CSSTransition
@@ -40,7 +43,8 @@ function GalleryItems ({ items = [], history, match, rootUrl }) {
               component="li"
             >
               <Card>
-                <CardImg top src={item.img || placeholderImg} alt={item.name} />
+                {src && <SmoothImage src={src} preview={preview} />}
+                {/* <CardImg top src={item.img || placeholderImg} alt={item.name} /> */}
                 <CardBody>
                   <CardTitle>{item.name}</CardTitle>
                   <CardSubtitle>{item.shortInfo}</CardSubtitle>
