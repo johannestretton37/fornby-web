@@ -3,6 +3,14 @@
     "flamelink": {
       ".read": true,
       ".write": "auth != null"
+    },
+    "imgRefs": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "previews": {
+      ".read": "auth != null",
+      ".write": "auth != null"
     }
   }
 }

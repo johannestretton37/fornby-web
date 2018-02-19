@@ -2,6 +2,13 @@ const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 const getSlug = require('speakingurl')
 
+const gcs = require('@google-cloud/storage')()
+const spawn = require('child-process-promise').spawn
+const path = require('path')
+const os = require('os')
+const fs = require('fs')
+const imageDataURI = require('image-data-uri')
+
 admin.initializeApp(functions.config().firebase)
 
 const updateSlug = (id, deltaSnapshot) => {
@@ -14,40 +21,44 @@ const updateSlug = (id, deltaSnapshot) => {
  * Add or update slug (friendly url) when new content is added
  * If content has a `name` property, create a slug from it
  */
-exports.addOrUpdateSlug = functions.database
-  .ref('/flamelink/environments/production/content/{page}/en-US/{contentId}')
-  .onWrite(event => {
-    const deltaSnapshot = event.data
-    if (!deltaSnapshot.exists()) {
-      // This is a delete action, do nothing
-      console.log('Item deleted - no need for slug creation')
-      return null
-    }
-    // The item that was written
-    const editedItem = deltaSnapshot.val()
-    if (!deltaSnapshot.previous.exists()) {
-      // This is a creation, create slug
-      console.log('This is a creation, create slug')
-      const id = event.params.contentId
-      return updateSlug(id, deltaSnapshot)
-    } else {
-      // This is an update, update slug if it changed
-      // The previous item (before write took place)
-      const prevItem = deltaSnapshot.previous.val()
-      if (editedItem.name !== prevItem.name) {
-        // `name` property changed, update slug
-        console.log('name property changed, update slug')
-        const id = event.params.contentId
-        return updateSlug(id, deltaSnapshot)
-      } else {
-        // No change detected
-        console.log('No change to name property detected, return null')
-        return null
-      }
-    }
-  })
+// exports.addOrUpdateSlug = functions.database
+//   .ref('/flamelink/environments/production/content/{page}/en-US/{contentId}')
+//   .onWrite(event => {
+//     const deltaSnapshot = event.data
+//     if (!deltaSnapshot.exists()) {
+//       // This is a delete action, do nothing
+//       console.log('Item deleted - no need for slug creation')
+//       return null
+//     }
+//     // The item that was written
+//     const editedItem = deltaSnapshot.val()
+//     if (!deltaSnapshot.previous.exists()) {
+//       // This is a creation, create slug
+//       console.log('This is a creation, create slug')
+//       const id = event.params.contentId
+//       return updateSlug(id, deltaSnapshot)
+//     } else {
+//       // This is an update, update slug if it changed
+//       // The previous item (before write took place)
+//       const prevItem = deltaSnapshot.previous.val()
+//       if (editedItem.name !== prevItem.name) {
+//         // `name` property changed, update slug
+//         console.log('name property changed, update slug')
+//         const id = event.params.contentId
+//         return updateSlug(id, deltaSnapshot)
+//       } else {
+//         // No change detected
+//         console.log('No change to name property detected, return null')
+//         return null
+//       }
+//     }
+//   })
 
 /**
+ * Monitor edits to content
+ * 
+ * Add or update slug
+ * Add or update preview dataURI
  * Copy production data to _prodContent property if someone is editing a site
  */
 exports.editDetected = functions.database
@@ -56,7 +67,6 @@ exports.editDetected = functions.database
     const deltaSnapshot = event.data
     if (!deltaSnapshot.exists()) {
       // This is a delete action, do nothing
-      console.log('Item deleted, return null')
       return null
     }
     // The item that was written
@@ -64,66 +74,216 @@ exports.editDetected = functions.database
     console.log('Write detected', editedItem)
     // If no isEditing switch exists, do nothing
     if (editedItem.isEditing === undefined) {
-      console.log('isEditing is undefined, return null')
       return null
     }
     // Prevent recursive loop
     if (editedItem._prodContent) {
-      console.log('_prodContent found - meaning this is already a _prodContent object, return null')
       return null
     }
+    // Store all edit promises
+    let edits = []
+    // Update or creation?
     if (deltaSnapshot.previous.exists()) {
       // This is an update
       // The previous item (before write took place)
       const prevItem = deltaSnapshot.previous.val()
+      // Slug
+      if (prevItem.slug) {
+        if (prevItem.name !== editedItem.name) {
+          const slug = getSlug(editedItem.name, { lang: 'sv' })
+          console.log('update slug', prevItem.slug, '=>', slug)
+          edits.push(deltaSnapshot.ref.child('slug').set(slug))
+        } else {
+          console.log('preserve slug')
+          edits.push(deltaSnapshot.ref.child('slug').set(prevItem.slug))
+        }
+      }
+      // Previews
+      if (prevItem.previews) {
+        // If there's no images written, there's no need for previews
+        if (editedItem.images) {
+          // Images written
+          if (prevItem.images.length === editedItem.images.length && prevItem.images.every((val, i) => val === editedItem.images[i])) {
+            // No change to images, preserve previews
+            console.log('preserve previews', prevItem.previews)
+            edits.push(deltaSnapshot.ref.child('previews').set(prevItem.previews))
+          } else {
+
+            console.log('|====> DO WE HAVE TO CREATE PREVIEWS HERE?')
+            // let previewPromises = []
+            // editedItem.images.forEach(imageId => {
+            //   previewPromises
+            // })
+            // edits.push()
+          }
+        }
+      }
+
       // Check if isEditing was switched
-      console.log(
-        `[isEditing]: prev.isEditing (${
-          prevItem.isEditing
-        }) === writtenItem.isEditing (${editedItem.isEditing})`
-      )
-      if (
-        prevItem.isEditing === true && editedItem.isEditing === true
-      ) {
+      if (prevItem.isEditing === true && editedItem.isEditing === true) {
         // Still in edit mode, update _prodContent
-        console.log(
-          `Still in edit mode, prev.isEditing (${
-            prevItem.isEditing
-          }) === item.isEditing (${editedItem.isEditing}), update _prodContent`
+        edits.push(deltaSnapshot.ref
+          .child('_prodContent')
+          .set(prevItem._prodContent)
         )
-        // Update 
-        return deltaSnapshot.ref.child('_prodContent').set(prevItem._prodContent)
+        return Promise.all(edits)
       }
       if (prevItem.isEditing === false && editedItem.isEditing === true) {
         // Switched from false to true, go into edit mode
         console.log('Switched from false to true, go into edit mode')
         // Store all variables in editingObject
-        return deltaSnapshot.ref
-          .child('_prodContent')
-          .set(prevItem)
+        edits.push(deltaSnapshot.ref.child('_prodContent').set(prevItem))
+        return Promise.all(edits)
       }
       if (prevItem.isEditing === true && editedItem.isEditing === false) {
         // Switched from true to false, publish and clean up
         console.log('Switched from true to false, publish and clean up')
-        return deltaSnapshot.ref.child('_prodContent').remove()
+        edits.push(deltaSnapshot.ref.child('_prodContent').remove())
+        return Promise.all(edits)
       }
       if (editedItem.isEditing === false) {
         // Remove any trash
-        console.log('Item saved with isEditing set to false, clean up any leftovers')
-        return deltaSnapshot.ref.child('_prodContent').remove()
+        console.log(
+          'Item saved with isEditing set to false, clean up any leftovers'
+        )
+        edits.push(deltaSnapshot.ref.child('_prodContent').remove())
+        return Promise.all(edits)
       }
     } else {
       // This is a creation
       if (editedItem.isEditing === true) {
         console.log('Init item with _prodContent')
-        return deltaSnapshot.ref
-          .child('_prodContent')
-          .set(editedItem)
+        edits.push(deltaSnapshot.ref.child('_prodContent').set(editedItem))
+        return Promise.all(edits)
       } else {
-        console.log('Created item was released straight to prod, return null')
-        return null
+        console.log('Created item was released straight to prod, ignore _prodContent')
+        return Promise.all(edits)
       }
     }
     console.log('Did nothing')
     return null
   })
+
+  exports.addDataURI = functions.database
+  .ref('/flamelink/environments/production/content/{page}/en-US/{contentId}/images/{imageIndex}')
+  .onWrite(event => {
+    const deltaSnapshot = event.data
+    if (!deltaSnapshot.exists()) {
+      // This is a delete action, do nothing
+      console.log('Image[' + event.params.imageIndex + '] deleted - do nothing')
+      return null
+    }
+    // The item that was written
+    const imageId = deltaSnapshot.val()
+    if (!deltaSnapshot.previous.exists()) {
+      // This is a creation, add dataURI
+      console.log('Add dataURI to imageId:', imageId)
+      // Get dataURI
+      return deltaSnapshot.ref.root
+        .child(`/previews/${imageId}`)
+        .once('value')
+        .then(snapshot => {
+          let dataURI = snapshot.val()
+          console.log('|====> Found dataURI', dataURI)
+          return deltaSnapshot.ref.parent.parent.child('previews').set({
+            [event.params.imageIndex]: dataURI
+          })
+        })
+      return null
+    } else {
+      // This is an update, update dataURI if it changed
+      // The previous item (before write took place)
+      console.log('[TODO:] This is an update to images!')
+      const prevItem = deltaSnapshot.previous.val()
+      console.log('[TODO:] check if image changed', prevItem)
+      return null
+      // if (editedItem.name !== prevItem.name) {
+      //   // `name` property changed, update slug
+      //   console.log('name property changed, update slug')
+      //   const id = event.params.contentId
+      //   return updateSlug(id, deltaSnapshot)
+      // } else {
+      //   // No change detected
+      //   console.log('No change to name property detected, return null')
+      //   return null
+      // }
+    }
+  })
+
+exports.imageUploaded = functions.storage.object().onChange(event => {
+  const object = event.data // The Storage object.
+  const fileBucket = object.bucket // The Storage bucket that contains the file.
+  const filePath = object.name // File path in the bucket.
+  const contentType = object.contentType // File content type.
+  const resourceState = object.resourceState // The resourceState is 'exists' or 'not_exists' (for file/folder deletions).
+  const metageneration = object.metageneration // Number of times metadata has been generated. New objects have a value of 1.
+  // [END eventAttributes]
+
+  // [START stopConditions]
+  // Exit if this is triggered on a file that is not an image.
+  if (!contentType.startsWith('image/')) {
+    console.log('This is not an image.')
+    return null
+  }
+
+  // Get the file name.
+  const fileName = path.basename(filePath)
+  if (filePath.includes('/sized/')) {
+    console.log('Ignore resized image')
+    return null
+  }
+
+  // Exit if this is a move or deletion event.
+  if (resourceState === 'not_exists') {
+    console.log('This is a deletion event.')
+    return null
+  }
+
+  // Exit if file exists but is not new and is only being triggered
+  // because of a metadata change.
+  if (resourceState === 'exists' && metageneration > 1) {
+    console.log('This is a metadata change event.')
+    return null
+  }
+  // [END stopConditions]
+
+  // [START thumbnailGeneration]
+  // Download file from bucket.
+  const bucket = gcs.bucket(fileBucket)
+  const tempFilePath = path.join(os.tmpdir(), fileName)
+  const metadata = {
+    contentType: contentType
+  }
+  return bucket
+    .file(filePath)
+    .download({
+      destination: tempFilePath
+    })
+    .then(() => {
+      // Generate a thumbnail using ImageMagick.
+      return spawn('convert', [
+        tempFilePath,
+        '-resize',
+        '20x20>',
+        tempFilePath
+      ])
+    })
+    .then(result => {
+      console.log('Thumbnail created, create dataURI')
+      return imageDataURI.encodeFromFile(tempFilePath)
+    })
+    .then(dataURI => {
+      let match = /^([0-9]*)_/.exec(fileName)
+      let fileId = match !== null ? match[1] : 0
+      return admin.database().ref(`/previews/${fileId}`).set({
+       dataURI
+      })
+    })
+    .then(res => {
+      console.log(res)
+      console.log('=================')
+      fs.unlinkSync(tempFilePath)
+    })
+  // [END thumbnailGeneration]
+})
+
