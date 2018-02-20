@@ -37,7 +37,6 @@ class SmoothImage extends Component {
   render() {
     const { src, preview, width, height, className } = this.props
     let { isLoaded } = this.state
-    if (!src) return null
     return (
       <div className={`image-container${className ? ' ' + className : ''}`} style={{width: `${width}px`, height: `${height}px`}}>
         <div className='final-img' style={{
