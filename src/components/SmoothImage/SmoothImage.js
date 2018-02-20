@@ -36,9 +36,13 @@ class SmoothImage extends Component {
     let { isLoaded } = this.state
     if (!src) return null
     return (
-      <div className={`image-container${className ? ' ' + className : ''}`} style={{ height: `${height}px` }}>
+      <div className={`image-container${className ? ' ' + className : ''}`} style={{height: `${height}px`}}>
         <div className='final-img' style={{ backgroundImage: `url(${src})`}}>
-          {preview && <div className='preview-img' style={{ opacity: isLoaded ? 0 : 1, backgroundImage: `url(${preview})`}}></div>}
+          {preview && <div className='preview-img' style={{
+            opacity: isLoaded ? 0 : 1,
+            filter: isLoaded ? 'blur(0px)':'blur(10px)',
+            backgroundImage: `url(${preview})`
+            }}></div>}
         </div>
       </div>
     )

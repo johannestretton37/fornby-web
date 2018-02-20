@@ -1,8 +1,9 @@
 import getSlug from 'speakingurl'
 import firebaseApp from '../config/firebase.app'
 import flamelink from 'flamelink'
+import sanitizeHtml from 'sanitize-html-react'
 import CustomError from '../models/CustomError'
-import { ContentGroup, defaultFields } from '../constants'
+import { ContentGroup, defaultFields, htmlFields, sanitizeSettings } from '../constants'
 import { camelCase } from '../Helpers'
 
 /**
@@ -478,7 +479,12 @@ class CMS {
       // Check if data is in edit mode
       let dataObject = this.checkEditMode(value)
       Object.entries(dataObject).forEach(([field, val]) => {
-        result[field] = val
+        if (htmlFields.includes(field)) {
+          // This field may contain html - sanitize it
+          result[field] = sanitizeHtml(val, sanitizeSettings)
+        } else {
+          result[field] = val
+        }
       })
       if (result.slug === undefined && result.name !== undefined) {
         console.warn("Didn't find a slug - creating one from", result.name)
@@ -488,7 +494,7 @@ class CMS {
     })
     return array
   }
-
+  
   checkEditMode = value => {
     let dataObject = value
     if (value.isEditing) {

@@ -1,6 +1,8 @@
 .iframe-container {
   display: flex;
-  margin: 2rem auto;
+  margin: 2rem auto 40px;
+  background: #fff;
+  box-shadow: 0 0 30px 30px #fff;
   #schoolsoft {
     flex-grow: 1;
     height: 100%;
