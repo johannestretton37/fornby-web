@@ -24,7 +24,7 @@ const updateSlug = (id, deltaSnapshot) => {
  * Add or update preview dataURI
  * Copy production data to _prodContent property if someone is editing a site
  */
-exports.editDetected = functions.database
+exports.contentChangeDetected = functions.database
   .ref('/flamelink/environments/production/content/{page}/en-US/{contentId}')
   .onWrite(event => {
     const deltaSnapshot = event.data
@@ -199,7 +199,7 @@ exports.addDataURI = functions.database
     }
   })
 
-exports.imageUploaded = functions.storage.object().onChange(event => {
+exports.imageChangeDetected = functions.storage.object().onChange(event => {
   const object = event.data // The Storage object.
   const fileBucket = object.bucket // The Storage bucket that contains the file.
   const filePath = object.name // File path in the bucket.
@@ -215,8 +215,11 @@ exports.imageUploaded = functions.storage.object().onChange(event => {
     return null
   }
 
-  // Get the file name.
+  // Get the file name and flamelink id.
   const fileName = path.basename(filePath)
+  const match = /^([0-9]*)_/.exec(fileName)
+  const fileId = match !== null ? match[1] : 0
+
   if (filePath.includes('/sized/')) {
     console.log('Ignore resized image')
     return null
@@ -224,8 +227,12 @@ exports.imageUploaded = functions.storage.object().onChange(event => {
 
   // Exit if this is a move or deletion event.
   if (resourceState === 'not_exists') {
-    console.log('This is a deletion event.')
-    return null
+    console.log(fileName, 'deleted. Remove previews/' + fileId)
+    // Delete previews
+    return admin
+    .database()
+    .ref(`/previews/${fileId}`)
+    .remove()
   }
 
   // Exit if file exists but is not new and is only being triggered
@@ -255,8 +262,6 @@ exports.imageUploaded = functions.storage.object().onChange(event => {
     })
     .then(dataURI => {
       console.log('dataURI created')
-      let match = /^([0-9]*)_/.exec(fileName)
-      let fileId = match !== null ? match[1] : 0
       return admin
         .database()
         .ref(`/previews/${fileId}`)
