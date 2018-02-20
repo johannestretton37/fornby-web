@@ -10,6 +10,7 @@ class SmoothImage extends Component {
   static propTypes = {
     src: string,
     preview: string,
+    width: number,
     height: number,
     className: string
   }
@@ -31,12 +32,13 @@ class SmoothImage extends Component {
     }
     img.src = src
   }
+
   render() {
-    const { src, preview, height, className } = this.props
+    const { src, preview, width, height, className } = this.props
     let { isLoaded } = this.state
     if (!src) return null
     return (
-      <div className={`image-container${className ? ' ' + className : ''}`} style={{height: `${height}px`}}>
+      <div className={`image-container${className ? ' ' + className : ''}`} style={{width: `${width}px`, height: `${height}px`}}>
         <div className='final-img' style={{ backgroundImage: `url(${src})`}}>
           {preview && <div className='preview-img' style={{
             opacity: isLoaded ? 0 : 1,

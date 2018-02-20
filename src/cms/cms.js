@@ -116,7 +116,8 @@ class CMS {
     // Cache pending promise to prevent multiple calls to cms
     this.pending.courseCategories = new Promise(async (resolve, reject) => {
       try {
-        const courseCategories = await this.flamelinkApp.content.get(ContentGroup.COURSE_CATEGORIES)
+        const options = { populate: ['images'] };
+        const courseCategories = await this.flamelinkApp.content.get(ContentGroup.COURSE_CATEGORIES, options)
         if (!courseCategories) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta några kurskategorier. Försök igen senare', true)
         this.cache.courseCategories = courseCategories
         return resolve(courseCategories)

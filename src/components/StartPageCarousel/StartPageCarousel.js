@@ -13,8 +13,8 @@ class StartPageCarousel extends Component {
     isVisible: false,
     left: '50%',
     activeItem: 1,
-    imgUrls: [],
-    imgIndex: 0
+    images: [],
+    imageIndex: 0
   }
 
   static propTypes = {
@@ -46,17 +46,18 @@ class StartPageCarousel extends Component {
 
   componentDidMount() {
     cms.getSlides().then(startPageSlides => {
-      const imgUrls = startPageSlides.map(slide => {
+      const images = startPageSlides.map(slide => {
         if (!slide.images) return null
-        const url = slide.images[0].url
-        // Preload image
-        let img = new Image()
-        img.src = url
-        return url
+        const src = slide.images[0].url
+        const preview = slide.previews ? slide.previews[0].dataURI : ''
+        return {
+          src,
+          preview
+        }
       })
       this.setState({
-        imgUrls,
-        imgIndex: 0
+        images,
+        imageIndex: 0
       })
     })
     this.update()
@@ -146,7 +147,7 @@ class StartPageCarousel extends Component {
   render() {
     // if (!this.state.isVisible) return null
     const { items: cities } = this.props
-    const { isVisible, activeItem, imgUrls, imgIndex } = this.state
+    const { isVisible, activeItem, images, imageIndex } = this.state
     return (
       <Transition in={isVisible} timeout={300}>
         {state => {
@@ -156,7 +157,7 @@ class StartPageCarousel extends Component {
               display: state === 'exited' ? 'none' : 'block',
               maxHeight: state === 'exiting' ? '0px' : '600px',
             }} >
-              <SmoothImage className='full-width' src={imgUrls[imgIndex]} height={400} />
+              <SmoothImage className='full-width' src={images[imageIndex] ? images[imageIndex].src : ''} preview={images[imageIndex] ? images[imageIndex].preview : ''} height={400} />
               <div className='city-links full-width'>
                 <Container>
                   <Row>             

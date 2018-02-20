@@ -2,10 +2,9 @@ import React, { Component } from 'react'
 import './CoursePage.css'
 import PropTypes from 'prop-types'
 import DateHelper from '../../Helpers'
-import ImagePreLoader from '../ImagePreLoader'
 import SmoothImage from '../SmoothImage'
 import happy_student from '../../assets/happy_student.jpg'
-import { formatDate } from '../../Helpers'
+// import { formatDate } from '../../Helpers'
 
 
 class CoursePage extends Component {
@@ -23,7 +22,7 @@ class CoursePage extends Component {
     courseIsFull: PropTypes.bool
   }
   renderColumn(array) {
-    if (!array || array.length == 0) return;
+    if (!array || array.length === 0) return;
     return <div className='course-box-columns-column' >
       {array.map((row) => row && this.renderRow(row.bold, row.text))}
     </div>
@@ -89,12 +88,13 @@ class CoursePage extends Component {
 
   render() {
     const {
-      courseStartDate, applicationDeadline, summary, mainBody, mainImage, name
+      // courseStartDate, applicationDeadline, images, previews,
+      summary, mainBody, name
     } = this.props.content;
     return (
       <div className='course' >
         {name && <div className='course-image_wrapper'>
-          <SmoothImage className='full-width' src={happy_student} height={400} />
+          <SmoothImage className='full-width' src={happy_student} preview={''} height={400} />
           <p className='course-title'>{name}</p>
           <div className='course-attend_button'>
             <span>ANSÖK TILL {name}</span>

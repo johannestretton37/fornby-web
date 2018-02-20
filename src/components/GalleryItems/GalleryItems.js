@@ -3,12 +3,12 @@ import {array, string, object} from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import { withRouter } from 'react-router-dom'
 import SmoothImage from '../SmoothImage'
-import placeholderImg from '../../assets/placeholderImg.svg'
+// import placeholderImg from '../../assets/placeholderImg.svg'
 import {
   Row,
   Col,
   Card,
-  CardImg,
+  // CardImg,
   CardTitle,
   CardText,
   CardBody,
