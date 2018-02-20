@@ -11,12 +11,6 @@ const imageDataURI = require('image-data-uri')
 
 admin.initializeApp(functions.config().firebase)
 
-const updateSlug = (id, deltaSnapshot) => {
-  const addedItem = deltaSnapshot.val()
-  const slug = getSlug(addedItem.name, { lang: 'sv' })
-  return deltaSnapshot.ref.child('slug').set(slug)
-}
-
 /**
  * Monitor edits to content
  *
@@ -34,7 +28,6 @@ exports.contentChangeDetected = functions.database
     }
     // The item that was written
     const editedItem = deltaSnapshot.val()
-    console.log('Write detected', editedItem)
     // If no isEditing switch exists, do nothing
     if (editedItem.isEditing === undefined) {
       return null
@@ -89,7 +82,7 @@ exports.contentChangeDetected = functions.database
               deltaSnapshot.ref.child('previews').set(prevItem.previews)
             )
           } else {
-            console.log(`|====> DO WE HAVE TO CREATE PREVIEWS FOR ${editedItem.name}?`)
+            console.log(`[TODO:] WE SHOULD CREATE PREVIEWS FOR ${editedItem}`)
             // let previewPromises = []
             // editedItem.images.forEach(imageId => {
             //   previewPromises
@@ -151,7 +144,7 @@ exports.contentChangeDetected = functions.database
     return null
   })
 
-exports.addDataURI = functions.database
+exports.addPreview = functions.database
   .ref(
     '/flamelink/environments/production/content/{page}/en-US/{contentId}/images/{imageIndex}'
   )
@@ -165,20 +158,18 @@ exports.addDataURI = functions.database
     // The item that was written
     const imageId = deltaSnapshot.val()
     if (!deltaSnapshot.previous.exists()) {
-      // This is a creation, add dataURI
-      console.log('Add dataURI to imageId:', imageId)
-      // Get dataURI
+      // This is a creation, add preview
+      console.log('Add preview to imageId:', imageId)
+      // Get preview
       return deltaSnapshot.ref.root
         .child(`/previews/${imageId}`)
         .once('value')
         .then(snapshot => {
-          let dataURI = snapshot.val()
-          console.log('|====> Found dataURI', dataURI)
+          let preview = snapshot.val()
           return deltaSnapshot.ref.parent.parent.child('previews').set({
-            [event.params.imageIndex]: dataURI
+            [event.params.imageIndex]: preview
           })
         })
-      return null
     } else {
       // This is an update, update dataURI if it changed
       // The previous item (before write took place)
@@ -262,12 +253,25 @@ exports.imageChangeDetected = functions.storage.object().onChange(event => {
     })
     .then(dataURI => {
       console.log('dataURI created')
+      let preview = {
+        dataURI,
+        color: '#fff'
+      }
+      return spawn('convert', [tempFilePath, '-resize', '1x1', 'txt:'], {capture: ['stdout']}).then(result => {
+        let regex = /#([A-F0-9]){6}/gi
+        let matches = regex.exec(result.stdout)
+        if (matches != null) {
+          preview.color = matches[0]
+        }
+        console.log('STDOUT:', result.stdout.toString())
+        return preview
+      })
+    })
+    .then(preview => {
       return admin
         .database()
         .ref(`/previews/${fileId}`)
-        .set({
-          dataURI
-        })
+        .set(preview)
     })
     .then(() => {
       fs.unlinkSync(tempFilePath)

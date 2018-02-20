@@ -47,6 +47,7 @@ export const defaultFields = [
   'name',
   'slug',
   'images',
+  'previews',
   'isPublished',
   'isEditing',
 ]

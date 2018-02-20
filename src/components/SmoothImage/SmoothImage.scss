@@ -2,14 +2,24 @@
   overflow: hidden;
   background: #fff;
   height: 200px;
-  .final-img, .preview-img {
+  .final-img, .preview-img, .preview-img-container {
     margin: 0;
     height: 100%;
     width: 100%;
     background-size: cover;
     background-position: center center;
   }
+  .final-img {
+    display: flex;
+    position: relative;
+  }
   .preview-img {
-    transition: all 300ms ease-in;
+    &, &-container {
+      transition: all 300ms ease-in;
+    }
+    &-container {
+      position: absolute;
+      opacity: 1;
+    }
   }
 }

@@ -32,7 +32,7 @@ function GalleryItems ({ items = [], history, match, rootUrl }) {
     <Row>
       {items.map((item, i) => {
         const src = item.images ? item.images[0].url : undefined
-        const preview = item.previews ? item.previews[0].dataURI : undefined
+        const preview = item.previews ? item.previews[0] : undefined
         return (
           <Col xs="12" md="6" lg="4" xl="3" key={i}>
             <CSSTransition

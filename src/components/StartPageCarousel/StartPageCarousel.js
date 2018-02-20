@@ -49,7 +49,7 @@ class StartPageCarousel extends Component {
       const images = startPageSlides.map(slide => {
         if (!slide.images) return null
         const src = slide.images[0].url
-        const preview = slide.previews ? slide.previews[0].dataURI : ''
+        const preview = slide.previews ? slide.previews[0] : undefined
         return {
           src,
           preview
@@ -157,7 +157,7 @@ class StartPageCarousel extends Component {
               display: state === 'exited' ? 'none' : 'block',
               maxHeight: state === 'exiting' ? '0px' : '600px',
             }} >
-              <SmoothImage className='full-width' src={images[imageIndex] ? images[imageIndex].src : ''} preview={images[imageIndex] ? images[imageIndex].preview : ''} height={400} />
+              <SmoothImage className='full-width' src={images[imageIndex] ? images[imageIndex].src : ''} preview={images[imageIndex] ? images[imageIndex].preview : undefined} height={400} />
               <div className='city-links full-width'>
                 <Container>
                   <Row>             
