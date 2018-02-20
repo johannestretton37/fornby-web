@@ -18,45 +18,8 @@ const updateSlug = (id, deltaSnapshot) => {
 }
 
 /**
- * Add or update slug (friendly url) when new content is added
- * If content has a `name` property, create a slug from it
- */
-// exports.addOrUpdateSlug = functions.database
-//   .ref('/flamelink/environments/production/content/{page}/en-US/{contentId}')
-//   .onWrite(event => {
-//     const deltaSnapshot = event.data
-//     if (!deltaSnapshot.exists()) {
-//       // This is a delete action, do nothing
-//       console.log('Item deleted - no need for slug creation')
-//       return null
-//     }
-//     // The item that was written
-//     const editedItem = deltaSnapshot.val()
-//     if (!deltaSnapshot.previous.exists()) {
-//       // This is a creation, create slug
-//       console.log('This is a creation, create slug')
-//       const id = event.params.contentId
-//       return updateSlug(id, deltaSnapshot)
-//     } else {
-//       // This is an update, update slug if it changed
-//       // The previous item (before write took place)
-//       const prevItem = deltaSnapshot.previous.val()
-//       if (editedItem.name !== prevItem.name) {
-//         // `name` property changed, update slug
-//         console.log('name property changed, update slug')
-//         const id = event.params.contentId
-//         return updateSlug(id, deltaSnapshot)
-//       } else {
-//         // No change detected
-//         console.log('No change to name property detected, return null')
-//         return null
-//       }
-//     }
-//   })
-
-/**
  * Monitor edits to content
- * 
+ *
  * Add or update slug
  * Add or update preview dataURI
  * Copy production data to _prodContent property if someone is editing a site
@@ -87,7 +50,11 @@ exports.editDetected = functions.database
       // This is an update
       // The previous item (before write took place)
       const prevItem = deltaSnapshot.previous.val()
-      // Slug
+      /**
+       * Slug
+       * Every entry that has a name property needs a slug property,
+       * a friendly url.
+       */
       if (prevItem.slug) {
         if (prevItem.name !== editedItem.name) {
           const slug = getSlug(editedItem.name, { lang: 'sv' })
@@ -97,19 +64,32 @@ exports.editDetected = functions.database
           console.log('preserve slug')
           edits.push(deltaSnapshot.ref.child('slug').set(prevItem.slug))
         }
+      } else if (editedItem.name) {
+        // Create slug
+        const slug = getSlug(editedItem.name, { lang: 'sv' })
+        console.log('create slug:', slug)
+        edits.push(deltaSnapshot.ref.child('slug').set(slug))
       }
-      // Previews
+      /**
+       * Previews
+       * If entry has an images array, we need to add a preview array,
+       * containing dataURI thumbnails
+       */
       if (prevItem.previews) {
-        // If there's no images written, there's no need for previews
+        // Check if there are images, otherwise there's no need for previews
         if (editedItem.images) {
-          // Images written
-          if (prevItem.images.length === editedItem.images.length && prevItem.images.every((val, i) => val === editedItem.images[i])) {
+          // Images exist, check for changes
+          if (
+            prevItem.images.length === editedItem.images.length &&
+            prevItem.images.every((val, i) => val === editedItem.images[i])
+          ) {
             // No change to images, preserve previews
             console.log('preserve previews', prevItem.previews)
-            edits.push(deltaSnapshot.ref.child('previews').set(prevItem.previews))
+            edits.push(
+              deltaSnapshot.ref.child('previews').set(prevItem.previews)
+            )
           } else {
-
-            console.log('|====> DO WE HAVE TO CREATE PREVIEWS HERE?')
+            console.log(`|====> DO WE HAVE TO CREATE PREVIEWS FOR ${editedItem.name}?`)
             // let previewPromises = []
             // editedItem.images.forEach(imageId => {
             //   previewPromises
@@ -119,12 +99,17 @@ exports.editDetected = functions.database
         }
       }
 
+      /**
+       * Edit mode
+       * When someone create/edits content a _prodContent property will be added.
+       * If `isEditing` is true, this _prodContent will be displayed in production
+       * and the content being edited will be shown on staging site (and in dev environment)
+       */
       // Check if isEditing was switched
       if (prevItem.isEditing === true && editedItem.isEditing === true) {
         // Still in edit mode, update _prodContent
-        edits.push(deltaSnapshot.ref
-          .child('_prodContent')
-          .set(prevItem._prodContent)
+        edits.push(
+          deltaSnapshot.ref.child('_prodContent').set(prevItem._prodContent)
         )
         return Promise.all(edits)
       }
@@ -156,16 +141,20 @@ exports.editDetected = functions.database
         edits.push(deltaSnapshot.ref.child('_prodContent').set(editedItem))
         return Promise.all(edits)
       } else {
-        console.log('Created item was released straight to prod, ignore _prodContent')
+        console.log(
+          'Created item was released straight to prod, ignore _prodContent'
+        )
         return Promise.all(edits)
       }
     }
-    console.log('Did nothing')
+    console.log('Did nothing, should I have? edits array has', edits.length, 'entries.')
     return null
   })
 
-  exports.addDataURI = functions.database
-  .ref('/flamelink/environments/production/content/{page}/en-US/{contentId}/images/{imageIndex}')
+exports.addDataURI = functions.database
+  .ref(
+    '/flamelink/environments/production/content/{page}/en-US/{contentId}/images/{imageIndex}'
+  )
   .onWrite(event => {
     const deltaSnapshot = event.data
     if (!deltaSnapshot.exists()) {
@@ -251,9 +240,6 @@ exports.imageUploaded = functions.storage.object().onChange(event => {
   // Download file from bucket.
   const bucket = gcs.bucket(fileBucket)
   const tempFilePath = path.join(os.tmpdir(), fileName)
-  const metadata = {
-    contentType: contentType
-  }
   return bucket
     .file(filePath)
     .download({
@@ -261,29 +247,25 @@ exports.imageUploaded = functions.storage.object().onChange(event => {
     })
     .then(() => {
       // Generate a thumbnail using ImageMagick.
-      return spawn('convert', [
-        tempFilePath,
-        '-resize',
-        '20x20>',
-        tempFilePath
-      ])
+      return spawn('convert', [tempFilePath, '-resize', '20x20>', tempFilePath])
     })
-    .then(result => {
-      console.log('Thumbnail created, create dataURI')
+    .then(() => {
+      console.log('Thumbnail created')
       return imageDataURI.encodeFromFile(tempFilePath)
     })
     .then(dataURI => {
+      console.log('dataURI created')
       let match = /^([0-9]*)_/.exec(fileName)
       let fileId = match !== null ? match[1] : 0
-      return admin.database().ref(`/previews/${fileId}`).set({
-       dataURI
-      })
+      return admin
+        .database()
+        .ref(`/previews/${fileId}`)
+        .set({
+          dataURI
+        })
     })
-    .then(res => {
-      console.log(res)
-      console.log('=================')
+    .then(() => {
       fs.unlinkSync(tempFilePath)
     })
   // [END thumbnailGeneration]
 })
-
