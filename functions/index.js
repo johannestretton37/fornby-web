@@ -171,7 +171,7 @@ exports.addPreview = functions.database
           })
         })
     } else {
-      // This is an update, update dataURI if it changed
+      // This is an update, update preview if it changed
       // The previous item (before write took place)
       console.log('[TODO:] This is an update to images!')
       const prevItem = deltaSnapshot.previous.val()

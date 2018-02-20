@@ -42,11 +42,12 @@
   @include media-breakpoint-up(md) {
     display: none;
   }
-  transition: max-height 400ms ease-out;
+  transition: max-height 400ms ease-in-out, padding 400ms ease-in-out;
   overflow: hidden;
   margin-left: 1em;
   padding-bottom: 0.5em;
   font-size: 0.85em;
+  border-bottom: 1px solid transparent;
   &.open {
     max-height: 150px;
     border-bottom: 1px solid #eee;

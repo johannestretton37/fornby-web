@@ -49,7 +49,7 @@ class SmoothImage extends Component {
             backgroundColor: preview.color
           }}>
             <div className='preview-img' style={{
-              filter: isLoaded ? 'blur(0px)':'blur(10px)',
+              filter: isLoaded ? 'blur(3px)':'blur(15px)',
               backgroundImage: `url(${preview.dataURI})`
             }}></div>
           </div>}

@@ -20,7 +20,7 @@ function ErrorPage({ error: {title, message, rescueLink, rescueText, showSearch}
         <SearchBar
           isOpen={true}
           expandHorizontal={false} />
-        <p>{'Eller klicka nedan för att komma tillbaka till tryggheten.'}</p>
+        <p style={{marginTop: '1em'}}>{'Eller klicka nedan för att komma tillbaka till tryggheten.'}</p>
         <Link to='/'>Till startsidan</Link>
       </div>}
     </div>

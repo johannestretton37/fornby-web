@@ -22,11 +22,6 @@ class BannerBox extends Component {
             <SmoothImage src={src} preview={preview} className='hero-image-container'>
               <h3 style={{margin: 'auto auto 0.3em 20px', color: '#fff'}}>{title}</h3>
             </SmoothImage>
-            {/* <figure className='hero-image-container'>
-              <div className='hero-image' style={{ backgroundImage: `url(${src})` }}>
-                <h3>{title}</h3>
-              </div>
-            </figure> */}
             <div className='banner-body'>
               <p>{shortInfo}</p>
               <div className='read-more'>
