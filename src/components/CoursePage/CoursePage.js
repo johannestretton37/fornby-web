@@ -89,12 +89,15 @@ class CoursePage extends Component {
   render() {
     const {
       // courseStartDate, applicationDeadline, images, previews,
-      summary, mainBody, name
+      summary, mainBody, name, images
     } = this.props.content;
+    let src = images[0].url;
+    let preview = images[0].sizes[0];
+
     return (
       <div className='course' >
         {name && <div className='course-image_wrapper'>
-          <SmoothImage className='full-width' src={happy_student} preview={''} height={400} />
+          {src && preview && <SmoothImage className='full-width' src={src} preview={preview} height={400} />}
           <p className='course-title'>{name}</p>
           <div className='course-attend_button'>
             <span>ANSÖK TILL {name}</span>
