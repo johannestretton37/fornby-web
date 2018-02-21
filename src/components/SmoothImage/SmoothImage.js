@@ -45,7 +45,7 @@ class SmoothImage extends Component {
           {preview &&
           <div className='preview-img-container' style={{
             opacity: isLoaded ? 0 : 1,
-            backgroundColor: preview.color
+            backgroundColor: preview.color || '#FFF'
           }}>
             <div className='preview-img' style={{
               filter: isLoaded ? 'blur(3px)':'blur(15px)',

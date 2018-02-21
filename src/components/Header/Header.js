@@ -68,21 +68,8 @@ class Header extends Component {
   }
 
   performSearch = (searchText) => {
-    console.log('PERFORMING SEARCH FOR', searchText)
-    let results = [
-      {
-        heading: 'Musikkurser',
-        url: '/kurser/musikkurser',
-        body:
-          'Här hittar du alla våra musikkurser. Men du, detta är bara ett exempel, sökfunktionen är inte implementerad ännu.'
-        }
-      ]
-    if (searchText.length > 3) results.push({
-      heading: 'Konstkurser',
-      url: '/kurser/konstkurser',
-      body:
-        'Om konst är din melodi kan du...'
-    })
+    const results = cms.search(searchText)
+    console.log(results)
     this.setState({
       results
     })

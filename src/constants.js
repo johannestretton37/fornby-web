@@ -56,6 +56,14 @@ export const defaultFields = [
  */
 export const htmlFields = [
   'body',
+  'summary',
+  'mainBody'
+]
+
+export const searchableFields = [
+  'name',
+  'shortInfo',
+  'body'
 ]
 
 export const sanitizeSettings = {

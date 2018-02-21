@@ -4,7 +4,7 @@ const im = require('imagemagick')
 const path = require('path')
 
 
-// im.convert([path.join(__dirname, 'test.jpg'), '-resize', '30x20', 'inline:-'], function(err, stdout){
+// im.convert([path.join(__dirname, 'test.jpg'), '-resize', '20x20>', 'inline:-'], function(err, stdout){
 //   if (err) throw err;
 //   console.log(stdout);
 //   fs.writeFile('index.html', preview('output.jpg'), function(err) {

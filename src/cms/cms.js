@@ -3,14 +3,13 @@ import firebaseApp from '../config/firebase.app'
 import flamelink from 'flamelink'
 import sanitizeHtml from 'sanitize-html-react'
 import CustomError from '../models/CustomError'
-import { ContentGroup, defaultFields, htmlFields, sanitizeSettings } from '../constants'
+import { ContentGroup, defaultFields, htmlFields, searchableFields, sanitizeSettings } from '../constants'
 import { camelCase } from '../Helpers'
 
 /**
  * CMS
  * This is an API for easy access to the Flamelink Content Managing System.
  */
-
 class CMS {
   constructor() {
     this.isProd = process.env.REACT_APP_DATABASE === 'production'
@@ -19,6 +18,7 @@ class CMS {
       imageUrls: {}
     }
     this.pending = {}
+    this.searchIndex = []
     // this.getBasicInfo()
   }
 
@@ -90,24 +90,6 @@ class CMS {
     return this.pending.mainMenu
   }
 
-  DEPRECATED_getCoursesMainPage = () => {
-    return new Promise(async (resolve, reject) => {
-      // Return cached data if it exists
-      if (this.cache.coursesMainPage) return resolve(this.cache.coursesMainPage)
-      // No cache, fetch coursesMainPage
-      try {
-        const coursesMainPage = await this.flamelinkApp.content.get(ContentGroup.COURSES_MAIN_PAGE, 1518008977981, {
-          populate: ['courseCategory']
-        })
-        if (!coursesMainPage) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta översiktssidan för kurser. Försök igen senare', true)
-        this.cache.coursesMainPage = coursesMainPage
-        return resolve(coursesMainPage)
-      } catch (error) {
-        return reject(error)
-      }
-    })
-  }
-
   getCourseCategories = () => {
     // Return cached content if present
     if (this.cache.courseCategories) return Promise.resolve(this.cache.courseCategories)
@@ -140,10 +122,21 @@ class CMS {
     // Cache pending promise to prevent multiple calls to cms
     this.pending.courses = new Promise(async (resolve, reject) => {
       try {
-        const options = { populate: ['images'] };
+        const options = {
+          populate: ['images', 'courseContactStaff']
+        };
         const coursesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options)
         if (!coursesData) throw new CustomError('Här var det tomt.', 'Vi kunde inte hitta några kurser för de valda alternativen.', true, '/kurser', 'Klicka här för att se alla våra kurser.')
         const courses = this.arrayFromFirebaseData(coursesData)
+        const staffPages = await this.getStaffPages()
+        courses.forEach((course, i) => {
+          courses[i].staff = []
+          if (course.courseContactStaff) {
+            course.courseContactStaff.forEach(person => {
+              courses[i].staff.push(staffPages[person.id])
+            })
+          }
+        })
         this.cache.courses = courses;
         return resolve(courses);
       } catch (error) {
@@ -408,25 +401,6 @@ class CMS {
   //   })
   // }
 
-  getURL = (id, size) => {
-    // Return cached content if present
-    if (this.cache.imageUrls[id]) return Promise.resolve(this.cache.imageUrls[id])
-    // Check if promise is pending
-    if (this.pending.imageUrls[id]) return this.pending.imageUrls[id]
-    // Cache pending promise to prevent multiple calls to cms
-    this.pending.imageUrls[id] = new Promise(async (resolve, reject) => {
-      try {
-        const url = await this.flamelinkApp.storage.getURL(id, { size: size || 'device' })
-        if (!url) throw new CustomError('Ett fel uppstod', `No URL found for ${id}`)
-        this.cache.imageUrls[id] = url
-        return resolve(url)
-      } catch (error) {
-        return reject(`No URL found for ${id}`)
-      }
-    })
-    return this.pending.imageUrls[id]
-  }
-
   /**
    * Fetch images for the start page carousel
    * @returns - A Promise that resolves to an array of objects, e.g.
@@ -486,6 +460,14 @@ class CMS {
         } else {
           result[field] = val
         }
+        if (searchableFields.includes(field)) {
+          // Index value for searches
+          this.searchIndex.push({
+            text: val.toLowerCase(),
+            field,
+            content: dataObject
+          })
+        }
       })
       if (result.slug === undefined && result.name !== undefined) {
         console.warn("Didn't find a slug - creating one from", result.name)
@@ -511,12 +493,80 @@ class CMS {
     return dataObject
   }
 
+  getURL = (id, size) => {
+    // Return cached content if present
+    if (this.cache.imageUrls[id]) return Promise.resolve(this.cache.imageUrls[id])
+    // Check if promise is pending
+    if (this.pending.imageUrls[id]) return this.pending.imageUrls[id]
+    // Cache pending promise to prevent multiple calls to cms
+    this.pending.imageUrls[id] = new Promise(async (resolve, reject) => {
+      try {
+        const url = await this.flamelinkApp.storage.getURL(id, { size: size || 'device' })
+        if (!url) throw new CustomError('Ett fel uppstod', `No URL found for ${id}`)
+        this.cache.imageUrls[id] = url
+        return resolve(url)
+      } catch (error) {
+        return reject(`No URL found for ${id}`)
+      }
+    })
+    return this.pending.imageUrls[id]
+  }
+
   idFromSlug = (group, slug) => {
     if (!this.cache[group]) return undefined
     let ids = this.cache[group].filter(member => {
       return member.slug === slug
     })
     return ids.length > 0 ? ids[0].id : undefined
+  }
+
+  /**
+   * Search
+   */
+  search = searchInputValue => {
+    if (!searchInputValue) return []
+    this.searchTerm = searchInputValue.toLowerCase()
+    let results = this.searchIndex.filter(this.stringMatch)
+    if (this.searchTerm !== '') {
+      results = results.map(result => {
+        console.log(result)
+        let heading = this.highlightedSearchResult(result.content.name, this.searchTerm)
+        let paragraph = this.highlightedSearchResult(result.content[result.field], this.searchTerm)
+        return {
+          heading,
+          paragraph,
+          url: 'todo'
+        }
+      })
+    }
+    return results
+  }
+
+  highlightedSearchResult = (text, searchTerm) => {
+    if (!searchTerm) return text
+    if (!text) return undefined
+    const textOnly = sanitizeHtml(text, {allowedTags: [],
+      allowedAttributes: []})
+    const regex = new RegExp(`(${searchTerm})`, 'gi')
+    let parts = textOnly.split(regex)
+    if (parts[0].toLowerCase() !== searchTerm && parts[0].length > 20) {
+      let wordBreak = parts[0].indexOf(' ', 20)
+      if (wordBreak > -1) {
+        parts[0] = '...' + parts[0].substr(wordBreak)
+      }
+    }
+    let highlighted = parts.map(part => {
+      if (part.toLowerCase() === searchTerm) return `<span class="highlighted">${part}</span>`
+      return part
+    }).join('')
+    if (highlighted.length > 120) {
+      highlighted = highlighted.substr(0, 120) + ' ...'
+    }
+    return highlighted
+}
+
+  stringMatch = libraryItem => {
+    return libraryItem.text.indexOf(this.searchTerm) !== -1
   }
 }
 

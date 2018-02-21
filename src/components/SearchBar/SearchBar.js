@@ -48,9 +48,7 @@ class SearchBar extends Component {
 
   performSearch = () => {
     let searchText = this.search.value
-    if (searchText) {
-      this.props.performSearch(searchText)
-    }
+    this.props.performSearch(searchText)
   }
 
   handleSubmit = e => {
@@ -76,17 +74,20 @@ class SearchBar extends Component {
               name="search"
               innerRef={search => this.search = search}
               onChange={this.handleChange}
-              placeholder="search will be implemented soon..."
+              placeholder="Sök"
             />
             <ListGroup className='searchResults'>
-              {results.map((result, i) => (
-                <ListGroupItem key={i} active={false}>
-                  <a href={result.url}>
-                    <ListGroupItemHeading>{result.heading}</ListGroupItemHeading>
-                    <ListGroupItemText>{result.body}</ListGroupItemText>
-                  </a>
-                </ListGroupItem>
-              ))}
+              {results.map((result, i) => {
+                const {heading, paragraph} = result
+                return (
+                  <ListGroupItem key={i} active={false}>
+                    <a href={'/to/do/'}>
+                      <ListGroupItemHeading><span dangerouslySetInnerHTML={{ __html: heading}} /></ListGroupItemHeading>
+                      <ListGroupItemText><span dangerouslySetInnerHTML={{ __html: paragraph}} /></ListGroupItemText>
+                    </a>
+                  </ListGroupItem>
+                )
+              })}
             </ListGroup>
           </Form>
         </div>

@@ -3,7 +3,7 @@ import './CoursePage.css'
 import PropTypes from 'prop-types'
 import DateHelper from '../../Helpers'
 import SmoothImage from '../SmoothImage'
-
+import Gallery from '../Gallery'
 
 class CoursePage extends Component {
   static propTypes = {
@@ -87,7 +87,7 @@ class CoursePage extends Component {
   render() {
     const {
       // courseStartDate, applicationDeadline, images, previews,
-      summary, mainBody, name, images, previews
+      summary, mainBody, name, images, previews, staff
     } = this.props.content;
     let src = images ? images[0].url : null;
     const preview = previews ? previews[0] : null
@@ -110,7 +110,7 @@ class CoursePage extends Component {
         </figure>
 
         {summary && <p className='course-main-body' dangerouslySetInnerHTML={{ __html: mainBody }} />}
-
+        {staff && <Gallery items={staff} />}
       </div>
     )
   }
