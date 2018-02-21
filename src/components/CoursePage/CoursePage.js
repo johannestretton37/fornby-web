@@ -3,8 +3,6 @@ import './CoursePage.css'
 import PropTypes from 'prop-types'
 import DateHelper from '../../Helpers'
 import SmoothImage from '../SmoothImage'
-import happy_student from '../../assets/happy_student.jpg'
-// import { formatDate } from '../../Helpers'
 
 
 class CoursePage extends Component {
