@@ -94,11 +94,12 @@ class CoursePage extends Component {
     return (
       <div className='course' >
         {name && <div className='course-image_wrapper'>
-          <SmoothImage className='full-width' src={happy_student} preview={''} height={400} />
-          <p className='course-title'>{name}</p>
-          <div className='course-attend_button'>
-            <span>ANSÖK TILL {name}</span>
-          </div>
+          <SmoothImage className='full-width' src={happy_student} height={400}>
+            <p className='course-title'>{name}</p>
+            <div className='course-attend_button'>
+              <span>ANSÖK TILL {name}</span>
+            </div>
+          </SmoothImage>
         </div>}
         {summary && <div className='course-header'>
           <p className='course-summary' dangerouslySetInnerHTML={{ __html: summary }} />
