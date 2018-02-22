@@ -28,6 +28,7 @@ class Content extends Component {
           appear={true}>
           <section className='main-container'>
             <Switch location={location}>
+              <Route path="/borlange" component={StartPage} />
               <Route
                 location={location}
                 key={location.key}

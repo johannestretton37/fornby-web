@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {string, number, element, object} from 'prop-types'
+import {string, number, element, object, oneOfType, arrayOf } from 'prop-types'
 import './SmoothImage.css'
   
 class SmoothImage extends Component {
@@ -13,7 +13,7 @@ class SmoothImage extends Component {
     width: number,
     height: number,
     className: string,
-    children: element
+    children: oneOfType([element, arrayOf(element)])
   }
 
   componentDidMount() {

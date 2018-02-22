@@ -84,6 +84,7 @@ class StartPageCarousel extends Component {
         })
       break
       case '/': 
+      case 'borlange': 
       case undefined:
         this.setState({
           left: '50%',

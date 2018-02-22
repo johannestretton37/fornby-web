@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { bool, func, array } from 'prop-types'
+import {Link, withRouter} from 'react-router-dom'
+import { bool, func, array, object } from 'prop-types'
 import Toggler from '../Toggler'
 import {
   Form,
@@ -12,12 +13,17 @@ import {
 import './SearchBar.css'
 
 class SearchBar extends Component {
+  state = {
+    isSelected: -1
+  }
+
   static propTypes = {
     results: array.isRequired,
     isOpen: bool,
     expandHorizontal: bool,
     toggleSearchBar: func,
     performSearch: func,
+    history: object
   }
 
   static defaultProps = {
@@ -46,18 +52,55 @@ class SearchBar extends Component {
     this.performSearch()
   }
 
+  handleKeyDown = e => {
+    switch (e.key) {
+      case 'ArrowDown':
+        this.setState(prevState => {
+          let index = prevState.isSelected + 1
+          if (index === this.props.results.length) index = this.props.results.length - 1
+          return {
+            isSelected: index
+          }
+        })
+      break
+      case 'ArrowUp':
+      this.setState(prevState => {
+        let index = prevState.isSelected - 1
+        if (index < 0) index = -1
+        return {
+          isSelected: index
+        }
+      })
+    break
+    }
+  }
+
   performSearch = () => {
     let searchText = this.search.value
+    this.setState({ isSelected: -1 })
     this.props.performSearch(searchText)
+  }
+
+  clearResults = () => {
+    this.search.value = ''
+    this.performSearch()
   }
 
   handleSubmit = e => {
     e.preventDefault()
+    const {isSelected} = this.state
+    const {history, results} = this.props
+    if (isSelected > -1) {
+      let selectedResult = results[isSelected]
+      this.clearResults()
+      history.push(selectedResult.url)
+    }
     this.performSearch()
   }
 
   render() {
     const { expandHorizontal, isOpen, results } = this.props
+    const { isSelected } = this.state
     return (
         <div className={`searchbar-container${expandHorizontal ? ' horizontal' : ' vertical' }${isOpen ? ' open' : ' closed'}`}>
           {expandHorizontal && <Toggler
@@ -72,19 +115,21 @@ class SearchBar extends Component {
             <Input
               type="search"
               name="search"
+              autoComplete="off"
               innerRef={search => this.search = search}
               onChange={this.handleChange}
+              onKeyDown={this.handleKeyDown}
               placeholder="Sök"
             />
             <ListGroup className='searchResults'>
               {results.map((result, i) => {
-                const {heading, paragraph} = result
+                const {heading, paragraph, url} = result
                 return (
-                  <ListGroupItem key={i} active={false}>
-                    <a href={'/to/do/'}>
+                  <ListGroupItem key={i} className={isSelected === i ? 'selected' : ''}>
+                    <Link onClick={this.clearResults} to={url}>
                       <ListGroupItemHeading><span dangerouslySetInnerHTML={{ __html: heading}} /></ListGroupItemHeading>
                       <ListGroupItemText><span dangerouslySetInnerHTML={{ __html: paragraph}} /></ListGroupItemText>
-                    </a>
+                    </Link>
                   </ListGroupItem>
                 )
               })}
@@ -95,4 +140,4 @@ class SearchBar extends Component {
   }
 }
 
-export default SearchBar
+export default withRouter(SearchBar)

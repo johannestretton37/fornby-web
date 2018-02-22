@@ -127,7 +127,7 @@ class CMS {
         };
         const coursesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options)
         if (!coursesData) throw new CustomError('Här var det tomt.', 'Vi kunde inte hitta några kurser för de valda alternativen.', true, '/kurser', 'Klicka här för att se alla våra kurser.')
-        const courses = this.arrayFromFirebaseData(coursesData)
+        const courses = this.arrayFromFirebaseData(coursesData, ContentGroup.COURSES)
         const staffPages = await this.getStaffPages()
         courses.forEach((course, i) => {
           courses[i].staff = []
@@ -167,7 +167,7 @@ class CMS {
       try {
         const contentData = await this.flamelinkApp.content.get(group, options)
         if (!contentData) throw new Error(`Could not find content group: ${groupName}`)
-        let content = this.arrayFromFirebaseData(contentData)
+        let content = this.arrayFromFirebaseData(contentData, groupName)
         this.cache[group] = content
         console.log(`[${group}] CMS Cache\n`, this.cache)
         return resolve(content)
@@ -197,7 +197,7 @@ class CMS {
       try {
         let mainPagesData = await this.flamelinkApp.content.get(ContentGroup.MAIN_PAGES)
         if (!mainPagesData) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Pages')
-        let mainPages = this.arrayFromFirebaseData(mainPagesData)
+        let mainPages = this.arrayFromFirebaseData(mainPagesData, ContentGroup.MAIN_PAGES)
         // Cache main pages
         this.cache.mainPages = mainPages
         console.log('getMainPages() cached:', this.cache)
@@ -304,15 +304,19 @@ class CMS {
               }
             })
             // Lastly, add otherCourses
-            if (otherCourses.size > 0) content.courseCategories.push({
-              id: 1337,
-              name: 'Övriga kurser',
-              isEditing: false,
-              isPublished: true,
-              slug: 'ovriga-kurser',
-              shortInfo: 'Beskrivning här...',
-              courses: Array.from(otherCourses.values())
-            })
+            if (otherCourses.size > 0) {
+              let otherCoursesCategory = {
+                id: 1337,
+                name: 'Övriga kurser',
+                isEditing: false,
+                isPublished: true,
+                slug: 'ovriga-kurser',
+                shortInfo: 'Beskrivning här...',
+                courses: Array.from(otherCourses.values())
+              }
+              content.courseCategories.push(otherCoursesCategory)
+              this.indexForSearch(otherCoursesCategory, ['name', 'shortInfo'])
+            }
           }
           // If the mainPage has subPages
           if (mainPage.subPages) {
@@ -344,7 +348,31 @@ class CMS {
               })
               if (subPages) {
                 // Convert subPages to array
-                const allSubPages = this.arrayFromFirebaseData(subPages)
+                const allSubPages = this.arrayFromFirebaseData(subPages, ContentGroup.SUB_PAGES)
+                // Index detailPages for search
+                allSubPages.forEach(subPage => {
+                  // Find subPage's mainPage
+                  let subPageParent = this.cache.mainPages.find(mainPage => {
+                    if (!mainPage.subPages) return false
+                    return mainPage.subPages.find(mainPageSubPage => {
+                      return subPage.id === mainPageSubPage.subPage
+                    })
+                  })
+                  if (subPageParent) {
+                    subPage.parentUrl = '/' + subPageParent.slug
+                  } else {
+                    subPage.parentUrl = '/error'
+                  }
+                  if (subPage.detailPages) {
+                    subPage.detailPages.forEach(detailPage => {
+                      detailPage.detailPage.forEach(page => {
+                        page.contentGroup = ContentGroup.DETAIL_PAGES
+                        page.parentUrl = subPage.parentUrl + '/' + subPage.slug
+                        this.indexForSearch(page, searchableFields)
+                      })
+                    })
+                  }
+                })
                 // Check for staffPages
                 let staffPages = await this.getStaffPages()
                 if (staffPages) {
@@ -376,30 +404,6 @@ class CMS {
     })
     return this.pending[page]
   }
-
-  /**
-   * Populate passed in content object with any existing subPages content
-   */
-  // populateSubPages = async content => {
-  //   return new Promise(async resolve => {
-  //     let subPagesSlugs = []
-  //     content.subPages.forEach(subPage => {
-  //       subPagesSlugs.push(getSlug(subPage.name, { lang: 'sv' }))
-  //     })
-  //     // Fetch detailPages
-  //     const detailPagesData = await this.flamelinkApp.content.get(
-  //       ContentGroup.DETAIL_PAGES
-  //     )
-  //     // Convert result to array
-  //     const detailPages = this.arrayFromFirebaseData(detailPagesData)
-  //     // Add relevant pages to content.subContent
-  //     const subContent = detailPages.filter(detailPage =>
-  //       subPagesSlugs.includes(detailPage.slug)
-  //     )
-  //     content.subContent = subContent
-  //     resolve()
-  //   })
-  // }
 
   /**
    * Fetch images for the start page carousel
@@ -438,10 +442,11 @@ class CMS {
 
   /**
    * Helper function to transform a firebase object into an array
-   * @param data - The data returned from a flamelink operation, such as `get`
+   * @param {object} data - The data returned from a flamelink operation, such as `get`
+   * @param {string} contentGroup - A string corresponding to a flamelink Collection
    * @returns - An array of objects
    */
-  arrayFromFirebaseData = data => {
+  arrayFromFirebaseData = (data, contentGroup) => {
     let array = []
     if (!data) return array
     Object.values(data).forEach(value => {
@@ -450,7 +455,9 @@ class CMS {
         console.log('Don\'t show unpublished content', value)
         return;
       }
-      let result = {}
+      let result = {
+        contentGroup
+      }
       // Check if data is in edit mode
       let dataObject = this.checkEditMode(value)
       Object.entries(dataObject).forEach(([field, val]) => {
@@ -460,22 +467,35 @@ class CMS {
         } else {
           result[field] = val
         }
-        if (searchableFields.includes(field)) {
-          // Index value for searches
-          this.searchIndex.push({
-            text: val.toLowerCase(),
-            field,
-            content: dataObject
-          })
-        }
       })
       if (result.slug === undefined && result.name !== undefined) {
         console.warn("Didn't find a slug - creating one from", result.name)
         result.slug = getSlug(result.name, { lang: 'sv' })
       }
+      // Index value for searches
+      this.indexForSearch(result, searchableFields)
       array.push(result)
     })
     return array
+  }
+
+  /**
+   * Store an object in searchIndex for easy access
+   * @param {object} content - the content object to store
+   * @param {array} fields - an array of strings, corresponding to the fields
+   * that should be searchable
+   */
+  indexForSearch = (content, fields) => {
+    fields.forEach(field => {
+      const value = content[field]
+      if (value) {
+        this.searchIndex.push({
+          text: value.toLowerCase(),
+          field,
+          content
+        })
+      }
+    })
   }
   
   checkEditMode = value => {
@@ -529,46 +549,96 @@ class CMS {
     let results = this.searchIndex.filter(this.stringMatch)
     if (this.searchTerm !== '') {
       results = results.map(result => {
-        console.log(result)
         let heading = this.highlightedSearchResult(result.content.name, this.searchTerm)
         let paragraph = this.highlightedSearchResult(result.content[result.field], this.searchTerm)
+        console.log(result)
         return {
           heading,
           paragraph,
-          url: 'todo'
+          url: this.baseUrlFor(result.content) + result.content.slug,
+          field: result.field
         }
       })
     }
-    return results
+    // Sort results according to match priority
+    return results.sort((resultA, resultB) => {
+      if (resultA.field === resultB.field) return 0
+      if (resultA.field === 'name') return -1
+      if (resultA.field === 'shortInfo' && resultB.field === 'body') return -1
+      if (resultA.field === 'body') return 1
+      return 1
+    })
   }
 
   highlightedSearchResult = (text, searchTerm) => {
     if (!searchTerm) return text
     if (!text) return undefined
-    const textOnly = sanitizeHtml(text, {allowedTags: [],
-      allowedAttributes: []})
+    // Remove html tags
+    const textOnly = sanitizeHtml(text, {
+      allowedTags: [],
+      allowedAttributes: []
+    })
+    // Split text at match positions
     const regex = new RegExp(`(${searchTerm})`, 'gi')
     let parts = textOnly.split(regex)
-    if (parts[0].toLowerCase() !== searchTerm && parts[0].length > 20) {
-      let wordBreak = parts[0].indexOf(' ', 20)
-      if (wordBreak > -1) {
-        parts[0] = '...' + parts[0].substr(wordBreak)
+    // Limit the search result to `maxCharacters` characters
+    const maxCharacters = 200
+    const charsBeforeFirstMatch = 20
+    if (parts[0].toLowerCase() !== searchTerm && parts[0].length > charsBeforeFirstMatch) {
+      // Limit the text before the first match to approx. `charsBeforeFirstMatch` characters
+      // We don't want to break up words, so find the nearest space character
+      let firstWordBreak = parts[0].indexOf(' ', charsBeforeFirstMatch)
+      if (firstWordBreak > -1) {
+        parts[0] = '...' + parts[0].substr(firstWordBreak)
       }
     }
     let highlighted = parts.map(part => {
       if (part.toLowerCase() === searchTerm) return `<span class="highlighted">${part}</span>`
       return part
     }).join('')
-    if (highlighted.length > 120) {
-      highlighted = highlighted.substr(0, 120) + ' ...'
+    if (highlighted.length > maxCharacters) {
+      // Limit the text to approx. `maxCharacters` characters
+      // We still don't want to break up words, so find the nearest space character
+      let lastWordBreak = highlighted.indexOf(' ', maxCharacters)
+      if (lastWordBreak > -1) {
+        highlighted = highlighted.substr(0, lastWordBreak) + ' ...'
+      } else {
+        highlighted = highlighted.substr(0, maxCharacters) + ' ...'
+      }
     }
     return highlighted
-}
+  }
 
   stringMatch = libraryItem => {
     return libraryItem.text.indexOf(this.searchTerm) !== -1
   }
+
+  baseUrlFor = content => {
+    let baseUrl = '/', categoryId, categorySlug
+    switch (content.contentGroup) {
+      case ContentGroup.COURSES:
+        if (content.courseCategory) {
+          categoryId = content.courseCategory[0]
+          categorySlug = this.cache.courseCategories[categoryId].slug
+          return '/kurser/' + categorySlug + '/'
+        } else {
+          // Course has no category
+          return '/kurser/ovriga-kurser/'
+        }
+      case ContentGroup.STAFF:
+        return '/om-fornby/personal/'
+      case ContentGroup.SUB_PAGES:
+        return content.parentUrl + '/'
+      case ContentGroup.DETAIL_PAGES:
+        return content.parentUrl + '#'
+      default:
+        console.warn('No baseUrl defined for', content.contentGroup)
+      break
+    }
+    return baseUrl
+  }
 }
 
 const cms = new CMS()
+if (!this.isProd) window.cms = cms
 export default cms
