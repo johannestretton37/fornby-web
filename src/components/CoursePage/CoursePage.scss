@@ -6,7 +6,9 @@
     font-weight: normal;
     color: $default-text-color;
   }
- 
+  a{
+    color: $link-text-color;
+  }
   &-image_wrapper{
     position: relative;
     background-color: #f0f;
