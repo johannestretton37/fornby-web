@@ -42,7 +42,7 @@ function GalleryItems ({ items = [], history, match, rootUrl }) {
               timeout={400}
               component="li"
             >
-              <Card>
+              <Card id={item.slug}>
                 {src && <SmoothImage src={src} preview={preview} />}
                 {/* <CardImg top src={item.img || placeholderImg} alt={item.name} /> */}
                 <CardBody>

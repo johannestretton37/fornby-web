@@ -13,8 +13,8 @@ class BannerBox extends Component {
 
   render() {
     const { content: { title, shortInfo, images, previews, link } } = this.props
-    let src = images[0].url
-    let preview = previews[0]
+    let src = images ? images[0].url || '' : ''
+    let preview = previews ? previews[0] : undefined
     return (
       <Col xs="12" md="6" xl="4" className='banner-box'>
         <Link to={link||'/'}>

@@ -3,7 +3,7 @@ import firebaseApp from '../config/firebase.app'
 import flamelink from 'flamelink'
 import sanitizeHtml from 'sanitize-html-react'
 import CustomError from '../models/CustomError'
-import { ContentGroup, defaultFields, htmlFields, searchableFields, sanitizeSettings } from '../constants'
+import { ContentGroup, PageSlug, defaultFields, htmlFields, searchableFields, sanitizeSettings } from '../constants'
 import { camelCase } from '../Helpers'
 
 /**
@@ -19,6 +19,7 @@ class CMS {
     }
     this.pending = {}
     this.searchIndex = []
+    this.searchInited = false
     // this.getBasicInfo()
   }
 
@@ -80,6 +81,8 @@ class CMS {
               parent.children.push(item)
             }
           }
+          // Index for search
+          this.indexForSearch(item, ['title'])
         })
         this.cache.mainMenu = mainMenu
         return resolve(mainMenu)
@@ -232,6 +235,11 @@ class CMS {
           populate: ['images']
         })
         if (!staffPages) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Staff Pages')
+        // Index for search
+        Object.values(staffPages).forEach(staffPage => {
+          staffPage.contentGroup = ContentGroup.STAFF
+          this.indexForSearch(staffPage, ['name', 'role', 'phone', 'summary'])
+        })
         // Cache staffPages
         this.cache.staffPages = staffPages
         console.log('getStaffPages() cached:', this.cache)
@@ -545,13 +553,39 @@ class CMS {
    */
   search = searchInputValue => {
     if (!searchInputValue) return []
+    if (searchInputValue.length > 3 && !this.searchInited) {
+      // Search firebase
+      // Only do this once
+      this.searchInited = true
+      // Check for content groups that has not been cached yet
+      Object.values(ContentGroup).forEach(group => {
+        if (this.cache[group] === undefined && this.pending[group] === undefined) {
+          // Search content that we have not cached yet
+          switch (group) {
+            case ContentGroup.COURSES:
+              // Kurser is not cached, fetch courses, courseCategories.
+              // This will also cache staffPages
+              Promise.all([
+                this.getCourseCategories(),
+                this.getCourses()
+              ])
+            break
+            case ContentGroup.SUB_PAGES:
+              // Fetch Sub pages
+              Promise.all([
+                this.getPageContent(PageSlug.PRAKTISK_INFO)
+              ])
+          }
+        }
+      })
+
+    }
     this.searchTerm = searchInputValue.toLowerCase()
     let results = this.searchIndex.filter(this.stringMatch)
     if (this.searchTerm !== '') {
       results = results.map(result => {
         let heading = this.highlightedSearchResult(result.content.name, this.searchTerm)
         let paragraph = this.highlightedSearchResult(result.content[result.field], this.searchTerm)
-        console.log(result)
         return {
           heading,
           paragraph,
@@ -626,7 +660,7 @@ class CMS {
           return '/kurser/ovriga-kurser/'
         }
       case ContentGroup.STAFF:
-        return '/om-fornby/personal/'
+        return '/om-fornby/personal#'
       case ContentGroup.SUB_PAGES:
         return content.parentUrl + '/'
       case ContentGroup.DETAIL_PAGES:
