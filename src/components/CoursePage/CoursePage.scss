@@ -61,8 +61,10 @@
     column-rule: 1px dotted #ddd;
     margin-bottom: 50px;
   }
-
-  .course-summary {
+  &-main-body{
+    margin-bottom: 50px;
+  }
+  &-summary {
     text-align: center;
     width:100%;
     padding: 0 5% 0 5%;
