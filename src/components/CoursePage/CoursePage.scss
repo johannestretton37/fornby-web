@@ -46,9 +46,16 @@
       }
     }
   }
-  &-header {
-
+  .course-box{
+    padding-left: 0.8em;
+    padding-right: 0.8em;
+    &.info{
+    }
+    &.contact{
+      background-color: $brand-fourth;
+    }
   }
+
   &-box-container{
     columns: 4 200px;
     column-fill: auto;
@@ -56,7 +63,6 @@
     padding: 38px;
     min-height: 300px;
     column-fill: all;
-    column-gap: 2em;
     height: auto;
     column-rule: 1px dotted #ddd;
     margin-bottom: 50px;

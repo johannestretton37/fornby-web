@@ -22,21 +22,22 @@ class CoursePage extends Component {
   renderColumn(array) {
     if (!array || array.length === 0) return;
     return <div className='course-box-columns-column' >
-      {array.map((row) => row && this.renderRow(row.bold, row.text))}
+      {array.map((row) => row && this.renderRow(row.bold, row.text, row.className))}
     </div>
   }
 
-  renderRow(bold, text) {
+  renderRow(bold, text, className) {
     return (
-      <p key={bold}>
+      <p className={'course-box ' + className} key={bold}>
         <strong>{bold}: </strong>
+
         {text}
       </p>
     );
   }
-  createBoxContent(bold, text) {
+  createBoxContent(bold, text, className) {
     if (!text) return null;
-    return { bold: bold, text: text }
+    return { bold: bold, text: text, className: className }
   }
 
   renderBox() {
@@ -62,19 +63,26 @@ class CoursePage extends Component {
     let contactEmailRef = contactEmail ? 'mailto:' + contactEmail : null;
     let fixedCity = city === 'borlange' ? 'Borlänge' : city;
     const firstColumn = [];
-    courseStartDate && firstColumn.push(this.createBoxContent('Kursstart', DateHelper.formatDate(courseStartDate)));
-    applicationDeadline && firstColumn.push(this.createBoxContent('Ansök senast', DateHelper.formatDate(applicationDeadline)));
-    courseType && firstColumn.push(this.createBoxContent('Kurstyp', courseType));
-    courseTempo && firstColumn.push(this.createBoxContent('Studietakt', courseTempo));
-    courseAdmissionConditions && firstColumn.push(this.createBoxContent('Antagningsvillkor', courseAdmissionConditions));
-    courseLength && firstColumn.push(this.createBoxContent('Längd', courseLength));
-    isFullText && firstColumn.push(this.createBoxContent('Lediga platser', isFullText));
-    fixedCity && firstColumn.push(this.createBoxContent('Internat', fixedCity));
-    courseExpenses && firstColumn.push(this.createBoxContent('Kostnader', courseExpenses));
-    courseStudyLevel && firstColumn.push(this.createBoxContent('Studiestödsnivå(CSN)', courseStudyLevel));
-    contactName && firstColumn.push(this.createBoxContent('Kontakt', contactName));
-    contactPhone && firstColumn.push(this.createBoxContent('Telefon', contactPhone));
-    contactEmail && firstColumn.push(this.createBoxContent('E-post', <a href={contactEmailRef}>{contactEmail}</a>));
+    courseStartDate && firstColumn.push(this.createBoxContent('Kursstart', <span><br />{DateHelper.formatDate(courseStartDate)}</span>, 'info'));
+    applicationDeadline && firstColumn.push(this.createBoxContent('Ansök senast', <span><br />{DateHelper.formatDate(applicationDeadline)}</span>, 'info'));
+    courseType && firstColumn.push(this.createBoxContent('Kurstyp', courseType, 'info'));
+    courseTempo && firstColumn.push(this.createBoxContent('Studietakt', (courseTempo + '%'), 'info'));
+    courseAdmissionConditions && firstColumn.push(this.createBoxContent('Antagningsvillkor', courseAdmissionConditions, 'info'));
+    courseLength && firstColumn.push(this.createBoxContent('Längd', courseLength, 'info'));
+    isFullText && firstColumn.push(this.createBoxContent('Lediga platser', isFullText, 'info'));
+    fixedCity && firstColumn.push(this.createBoxContent('Internat', fixedCity, 'info'));
+    courseExpenses && firstColumn.push(this.createBoxContent('Kostnader', courseExpenses, 'info'));
+    courseStudyLevel && firstColumn.push(this.createBoxContent('Studiestödsnivå(CSN)', courseStudyLevel, 'info'));
+    contactName && firstColumn.push(this.createBoxContent('Kontakt',
+      <span>
+        {contactName}
+        <br />
+        {contactPhone}
+        <br />
+        <a href={contactEmailRef}>{contactEmail}</a>
+      </span>, 'contact'));
+    //contactPhone && firstColumn.push(this.createBoxContent('Telefon', contactPhone));
+    //contactEmail && firstColumn.push(this.createBoxContent('E-post', <a href={contactEmailRef}>{contactEmail}</a>));
 
     return (
       <div className='course-box-columns'>
@@ -88,8 +96,7 @@ class CoursePage extends Component {
       // courseStartDate, applicationDeadline, images, previews,
       summary, mainBody, name, images, previews, staff
     } = this.props.content;
-    console.log('Hej, nu');
-    console.log(this.props.content);
+
     let src = images ? images[0].url : null;
     const preview = previews ? previews[0] : null
 
@@ -98,7 +105,7 @@ class CoursePage extends Component {
         {name && <div className='course-image_wrapper'>
           <SmoothImage className='full-width' src={src} preview={preview} height={400}>
             <p className='course-title'>{name}</p>
-            <div className='course-attend_button'>
+            <div className='course-attend_button' >
               <span>ANSÖK TILL {name}</span>
             </div>
           </SmoothImage>
