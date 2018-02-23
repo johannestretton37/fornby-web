@@ -25,6 +25,7 @@ export const ContentGroup = {
   START_PAGE_BANNERS: 'startPageBanners',
   COURSE_CATEGORIES: 'courseCategories',
   COURSES: 'courses',
+  MAIN_MENU_ITEMS: 'MAIN_MENU_ITEMS'
 }
 
 /**

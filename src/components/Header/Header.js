@@ -3,6 +3,7 @@ import { withRouter, Route } from 'react-router-dom'
 import cms from '../../cms'
 import MainMenu from '../MainMenu'
 import Toggler from '../Toggler'
+import Search from '../Search'
 import SearchBar from '../SearchBar'
 import logo from '../../assets/fornby-logo.svg'
 import './Header.css'
@@ -17,8 +18,7 @@ class Header extends Component {
     height: '0px',
     isMainMenuOpen: false,
     isSearchBarOpen: false,
-    isVertical: false,
-    results: []
+    isVertical: false
   }
 
   componentDidMount() {
@@ -67,16 +67,8 @@ class Header extends Component {
     })
   }
 
-  performSearch = (searchText) => {
-    const results = cms.search(searchText)
-    console.log(results)
-    this.setState({
-      results
-    })
-  }
-
   render() {
-    const { mainMenuItems, isMainMenuOpen, isSearchBarOpen, results } = this.state
+    const { mainMenuItems, isMainMenuOpen, isSearchBarOpen } = this.state
     return (
       <header className="container">
         <div className="header-top-container">
@@ -104,20 +96,16 @@ class Header extends Component {
             iconClosed='search'
             align='right'
             />
-          <SearchBar
-            isOpen={isSearchBarOpen}
-            expandHorizontal={true}
-            toggleSearchBar={this.toggleSearchBar}
-            performSearch={this.performSearch}
-            results={results} />
+            <Search
+              isSearchBarOpen={isSearchBarOpen}
+              toggleSearchBar={this.toggleSearchBar}
+              expandHorizontal={true} />
         </div>
         <Route path='/:page?' render={props => <MainMenu {...props} closeMenu={this.closeMenu} items={mainMenuItems} isOpen={isMainMenuOpen} />} />
-        <SearchBar
-          isOpen={isSearchBarOpen}
-          expandHorizontal={false}
+        <Search
+          isSearchBarOpen={isSearchBarOpen}
           toggleSearchBar={this.toggleSearchBar}
-          performSearch={this.performSearch}
-          results={results} />
+          expandHorizontal={false}/>
       </header>
     )
   }

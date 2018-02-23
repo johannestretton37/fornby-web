@@ -2,7 +2,7 @@ import React from 'react'
 import { instanceOf } from 'prop-types'
 import { Link } from 'react-router-dom'
 import CustomError from '../../models/CustomError'
-import SearchBar from '../SearchBar'
+import Search from '../Search'
 import './ErrorPage.css'
 
 ErrorPage.propTypes = {
@@ -17,8 +17,8 @@ function ErrorPage({ error: {title, message, rescueLink, rescueText, showSearch}
       {rescueLink && <Link to={rescueLink}>{rescueText || 'Klicka här'}</Link>}
       {showSearch && <div>
         <p>Du kan söka efter det du letar efter här</p>
-        <SearchBar
-          isOpen={true}
+        <Search
+          isSearchBarOpen={true}
           expandHorizontal={false} />
         <p style={{marginTop: '1em'}}>{'Eller klicka nedan för att komma tillbaka till tryggheten.'}</p>
         <Link to='/'>Till startsidan</Link>

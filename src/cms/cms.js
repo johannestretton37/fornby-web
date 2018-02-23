@@ -40,14 +40,16 @@ class CMS {
     let separator = url.indexOf('#') !== -1 ? '#' : '/'
     let slug = separator + getSlug(title, { lang: 'sv' })
     if (title === 'Start') slug = '/'
-    return {
+    const mainMenuItem = {
       id,
       title,
-      url: slug,
+      url,
+      slug,
       cssClass,
       order,
       children: []
     }
+    return mainMenuItem
   }
 
   /**
@@ -73,6 +75,7 @@ class CMS {
         let mainMenu = rootLinks.map(item => this.createMainMenuItem(item))
         // Populate root links with children
         mainNavigation.items.forEach(item => {
+          item.contentGroup = ContentGroup.MAIN_MENU_ITEMS
           if (item.parentIndex > 0) {
             // This is a sub link, e.g. '/kurser/musikkurs'
             let parent = mainMenu.find(rootItem => rootItem.id === item.parentIndex)
@@ -553,7 +556,7 @@ class CMS {
    */
   search = searchInputValue => {
     if (!searchInputValue) return []
-    if (searchInputValue.length > 3 && !this.searchInited) {
+    if (!this.searchInited) {
       // Search firebase
       // Only do this once
       this.searchInited = true
@@ -578,18 +581,17 @@ class CMS {
           }
         }
       })
-
     }
     this.searchTerm = searchInputValue.toLowerCase()
     let results = this.searchIndex.filter(this.stringMatch)
     if (this.searchTerm !== '') {
       results = results.map(result => {
-        let heading = this.highlightedSearchResult(result.content.name, this.searchTerm)
+        let heading = this.highlightedSearchResult(result.content.name || result.content.title, this.searchTerm)
         let paragraph = this.highlightedSearchResult(result.content[result.field], this.searchTerm)
         return {
           heading,
           paragraph,
-          url: this.baseUrlFor(result.content) + result.content.slug,
+          url: this.baseUrlFor(result.content) + (result.content.slug || ''),
           field: result.field
         }
       })
@@ -665,6 +667,8 @@ class CMS {
         return content.parentUrl + '/'
       case ContentGroup.DETAIL_PAGES:
         return content.parentUrl + '#'
+      case ContentGroup.MAIN_MENU_ITEMS:
+        return content.url
       default:
         console.warn('No baseUrl defined for', content.contentGroup)
       break
