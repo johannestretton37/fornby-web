@@ -30,7 +30,7 @@ class CoursesPage extends Component {
   componentDidMount() {
     // NOTE: - we're extracting vars from this.props.content and renaming
     //         this.props.content.courseCategories to categories
-    const {city, title, content: {name, courseCategories: categories }} = this.props
+    let {city, title, content: {name, courseCategories: categories }} = this.props
     // If this.props.title has been provided, use that. Even if it's an empty string
     let pageTitle
     if (title === '') {
@@ -38,14 +38,15 @@ class CoursesPage extends Component {
     } else {
       pageTitle = title || name
     }
-    // Commented out because it doesn't do anything:
-    //
-    // let category = {};
-    // courseCategories.forEach(cat => {
-    //   category[cat.slug] = (
-    //     <Gallery items={this.state.courseCategories} />
-    //   )
-    // })
+    // Show only courses that matches city. If city is undefined or empty, show all courses
+    if (city && city !== '') {
+      categories = categories.filter(category => {
+        return category.courses.filter(course => {
+          return course.city === city
+        }).length > 0
+      })
+    }
+
     this.setState({
       categories,
       title: pageTitle,
@@ -74,8 +75,7 @@ class CoursesPage extends Component {
       </div>);
   }
   render() {
-    const { categories, city } = this.state;
-    if (city && city !== '') console.warn(`this.props.city provided. We should filter courses here and only show ${city} courses`)
+    const { categories } = this.state;
     const { category, slug } = this.props.match.params
     let title = this.state.title;
 
