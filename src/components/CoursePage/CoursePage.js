@@ -75,6 +75,7 @@ class CoursePage extends Component {
     courseStudyLevel && firstColumn.push(this.createBoxContent('Studiestödsnivå(CSN)', courseStudyLevel, 'info'));
     contactName && firstColumn.push(this.createBoxContent('Kontakt',
       <span>
+        <br />
         {contactName}
         <br />
         {contactPhone}
