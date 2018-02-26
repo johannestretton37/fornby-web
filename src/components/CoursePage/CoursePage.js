@@ -1,24 +1,32 @@
 import React, { Component } from 'react'
 import './CoursePage.css'
-import PropTypes from 'prop-types'
+import {bool, string, instanceOf, element, any, func, object} from 'prop-types'
+import {withRouter} from 'react-router-dom'
 import DateHelper from '../../Helpers'
 import SmoothImage from '../SmoothImage'
 import Gallery from '../Gallery'
 
 class CoursePage extends Component {
   static propTypes = {
-    content: PropTypes.any.isRequired,
-    name: PropTypes.string,
-    shortInfo: PropTypes.string,
-    courseStartDate: PropTypes.instanceOf(Date),
-    applicationDeadline: PropTypes.instanceOf(Date),
-    summary: PropTypes.element,
-    mainBody: PropTypes.element,
-    mainImage: PropTypes.any,
-    mainImageURL: PropTypes.any,
-    onApplyClicked: PropTypes.func,
-    courseIsFull: PropTypes.bool
+    content: any.isRequired,
+    name: string,
+    shortInfo: string,
+    courseStartDate: instanceOf(Date),
+    applicationDeadline: instanceOf(Date),
+    summary: element,
+    mainBody: element,
+    mainImage: any,
+    mainImageURL: any,
+    onApplyClicked: func,
+    courseIsFull: bool,
+    history: object
   }
+
+  handleClick = e => {
+    e.preventDefault()
+    this.props.history.push('/ansok')
+  }
+
   renderColumn(array) {
     if (!array || array.length === 0) return;
     return <div className='course-box-columns-column' >
@@ -30,11 +38,11 @@ class CoursePage extends Component {
     return (
       <p className={'course-box ' + className} key={bold}>
         <strong>{bold}: </strong>
-
         {text}
       </p>
     );
   }
+  
   createBoxContent(bold, text, className) {
     if (!text) return null;
     return { bold: bold, text: text, className: className }
@@ -106,7 +114,7 @@ class CoursePage extends Component {
         {name && <div className='course-image_wrapper'>
           <SmoothImage className='full-width' src={src} preview={preview} height={400}>
             <p className='course-title'>{name}</p>
-            <div className='course-attend_button' >
+            <div className='course-attend_button' onClick={this.handleClick}>
               <span>ANSÖK TILL {name}</span>
             </div>
           </SmoothImage>
@@ -124,4 +132,4 @@ class CoursePage extends Component {
     )
   }
 }
-export default CoursePage;
+export default withRouter(CoursePage);

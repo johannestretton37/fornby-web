@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { object, string } from 'prop-types'
-import { PageSlug } from '../../constants'
+import { PageSlug, cities } from '../../constants'
 import SubPage from '../SubPage'
 import ErrorPage from '../ErrorPage'
 import CoursesPage from '../CoursesPage'
 import ApplyForm from '../ApplyForm'
+import cms from '../../cms'
 import './PagesContainer.css'
 
 /**
@@ -32,7 +33,13 @@ class PagesContainer extends Component {
   }
 
   componentDidMount() {
-    let { content } = this.props
+    let { content, match: { params: { page } } } = this.props
+    switch (page) {
+      case 'falun':
+      case 'ludvika':
+        cms.selectedCity = cities.find(city => city.slug === page)
+      break
+    }
     if (content.subPages) {
       // Map subPages by slug
       let subPages = {}
@@ -85,7 +92,7 @@ class PagesContainer extends Component {
         <p dangerouslySetInnerHTML={{ __html: body }} />
         {page === PageSlug.ANSOK ? <ApplyForm /> : null}
         {subPageSlug && subPages[subPageSlug]}
-        {content.courseCategories && <CoursesPage city={page} title='' content={content} rootUrl={this.props.rootUrl} />}
+        {content.courseCategories && <CoursesPage title='' content={content} rootUrl={this.props.rootUrl} />}
       </div>
     )
   }

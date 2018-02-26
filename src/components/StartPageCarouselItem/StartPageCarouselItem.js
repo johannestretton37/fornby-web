@@ -73,7 +73,7 @@ class StartPageCarouselItem extends Component {
     render() {
       const { item, isActive, isLast } = this.props
       return (
-        <a id={item.id} ref={(link) => { this.link = link }} onClick={this.handleClick} className={`city${isLast ? ' last' : ''}${isActive ? ' active' : ''}`} href={item.url}>{item.title}</a>
+        <a id={item.slug} ref={(link) => { this.link = link }} onClick={this.handleClick} className={`city${isLast ? ' last' : ''}${isActive ? ' active' : ''}`} href={item.url}>{item.title}</a>
       )
     }
   }

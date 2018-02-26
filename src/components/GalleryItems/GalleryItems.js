@@ -53,7 +53,8 @@ function GalleryItems ({ items = [], history, match, rootUrl }) {
                     block
                     outline
                     color="primary"
-                    onClick={() => history.push(`${rootUrl ? rootUrl : match.url}/${item.slug}`)}
+                    // onClick={() => history.push(`${rootUrl ? rootUrl : match.url}/${item.slug}`)}
+                    onClick={() => history.push(`${item.url}`)}
                   >
                     {item.cta || 'BUTTON'}
                   </Button>

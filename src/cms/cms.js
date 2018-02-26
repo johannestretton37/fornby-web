@@ -20,6 +20,7 @@ class CMS {
     this.pending = {}
     this.searchIndex = []
     this.searchInited = false
+    this.selectedCity = undefined
     // this.getBasicInfo()
   }
 
@@ -118,7 +119,7 @@ class CMS {
 
   /**
    * Fetch all courses from flamelink
-   * @returns {Promise} - A Promise that resolves to an array of course objects
+   * @returns {Promise<[{}]} - A Promise that resolves to an array of course objects
    */
   getCourses = () => {
     // Return cached content if present
@@ -297,6 +298,7 @@ class CMS {
             content.courseCategories = []
             // Loop all categories
             Object.values(allCategories).forEach(category => {
+              category.url = '/kurser/' + category.slug
               // Extract courses that should be in this category
               let courses = allCourses.filter(course => {
                 // If courseCategory is undefined, default to `övriga kurser`
@@ -304,7 +306,11 @@ class CMS {
                   otherCourses.add(course)
                   return false
                 }
-                return course.courseCategory.includes(category.id)
+                if (course.courseCategory.includes(category.id)) {
+                  course.url = category.url + '/' + course.slug
+                  return true
+                }
+                return false
               })
               if (courses.length > 0) {
                 // Add courses to categories array
