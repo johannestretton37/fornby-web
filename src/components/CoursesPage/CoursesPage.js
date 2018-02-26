@@ -5,6 +5,7 @@ import Gallery from '../Gallery'
 import './CoursesPage.css'
 import { object, string } from 'prop-types'
 import CoursePage from '../CoursePage';
+import CourseFilterer from '../CourseFilterer';
 // import BackButton from '../BackButton/BackButton';
 
 class CoursesPage extends Component {
@@ -13,7 +14,7 @@ class CoursesPage extends Component {
     match: object.isRequired,
     content: object.isRequired,
     title: string,
-    city: string,
+    city: object,
     rootUrl: string
   }
 
@@ -22,12 +23,30 @@ class CoursesPage extends Component {
   }
 
   state = {
+    // Store all categories (and courses)
     categories: [],
+    // Only these filtered categories will be displayed
+    filteredCategories: [],
     title: '',
-    city: ''
+    city: undefined,
   }
 
   componentDidMount() {
+    // Init hard coded cities
+    this.cities = [
+      {
+        title: 'Falun',
+        slug: 'falun'
+      },
+      {
+        title: 'Borlänge',
+        slug: 'borlange'
+      },
+      {
+        title: 'Ludvika',
+        slug: 'ludvika'
+      }
+    ]
     // NOTE: - we're extracting vars from this.props.content and renaming
     //         this.props.content.courseCategories to categories
     let {city, title, content: {name, courseCategories: categories }} = this.props
@@ -39,19 +58,24 @@ class CoursesPage extends Component {
       pageTitle = title || name
     }
     // Show only courses that matches city. If city is undefined or empty, show all courses
-    if (city && city !== '') {
-      categories = categories.filter(category => {
+    this.setState({
+      categories,
+      filteredCategories: this.filteredCourses(categories, city),
+      title: pageTitle,
+      city
+    })
+  }
+
+  filteredCourses = (categories, city) => {
+    if (city && city.slug !== '') {
+      return categories.filter(category => {
         return category.courses.filter(course => {
           return course.city === city
         }).length > 0
       })
+    } else {
+      return categories
     }
-
-    this.setState({
-      categories,
-      title: pageTitle,
-      city
-    })
   }
 
   componentWillReceiveProps(nextProps) {
@@ -74,14 +98,34 @@ class CoursesPage extends Component {
         <Gallery items={galleryItems} rootUrl={root} />
       </div>);
   }
+
+  /**
+   * Filter items
+   * @param {object} city - An object with two string properties, `title` and `slug`
+   */
+  filter = city => {
+    this.setState(prevState => {
+      let selectedCity
+      if (prevState.city) {
+        selectedCity = prevState.city.slug === city.slug ? undefined : city
+      } else {
+        selectedCity = city
+      }
+      return {
+        city: selectedCity,
+        filteredCategories: this.filteredCourses(prevState.categories, selectedCity)
+      }
+    })
+  }
+
   render() {
-    const { categories } = this.state;
+    const { filteredCategories, city } = this.state;
     const { category, slug } = this.props.match.params
     let title = this.state.title;
 
     let content = null;
     if (slug) {
-      const items = this.findCategory(categories, category)
+      const items = this.findCategory(filteredCategories, category)
       if (items && items.courses) {
         let course = this.findCategory(items.courses, slug);
         if (course) {
@@ -90,15 +134,14 @@ class CoursesPage extends Component {
         }
       }
     } else if (category) {
-      const items = this.findCategory(categories, category)
+      const items = this.findCategory(filteredCategories, category)
       if (items && items.courses) {
         title = items.name;
         content = this.RenderPage(items.courses, items);
       }
     } else if (this.props.content) {
-      content = this.RenderPage(categories, this.props.content);
+      content = this.RenderPage(filteredCategories, this.props.content);
     }
-
     return (
       <div className='courses-page'>
         <Container>
@@ -109,7 +152,16 @@ class CoursesPage extends Component {
           </Row>
           <Row>
             <Col>
-              {content}
+              <CourseFilterer filter={this.filter} items={this.cities || []} selection={city ? city.slug : undefined} />
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              {filteredCategories.length > 0 ?
+                content
+              :
+                <p>Det finns inga kurser att söka{city ? ' i ' + city.title : ''} för tillfället.</p>
+              }
             </Col>
           </Row>
         </Container>
