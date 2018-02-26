@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { object, number, bool, func } from 'prop-types'
 import Icon from '../Icon'
+import cms from '../../cms'
 import './MainMenuItem.css'
 
 class MainMenuItem extends Component {
@@ -56,6 +57,7 @@ class MainMenuItem extends Component {
 
   handleClick = e => {
     e.preventDefault()
+    cms.selectedCity = undefined
     let url = e.currentTarget.href.replace(window.location.origin, '')
     this.moveIndicator()
     this.navigate(url)

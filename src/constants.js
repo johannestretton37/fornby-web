@@ -51,6 +51,7 @@ export const defaultFields = [
   'isPublished',
   'isEditing',
 ]
+
 /** 
  * Defined fields that may contain html that needs to be sanitized
  */
@@ -66,6 +67,31 @@ export const searchableFields = [
   'body'
 ]
 
+/**
+ * Define cities
+ */
+export const cities = [
+  {
+    title: 'Falun',
+    slug: 'falun',
+    url: '/falun'
+  },
+  {
+    title: 'Borlänge',
+    slug: 'borlange',
+    url: '/'
+  },
+  {
+    title: 'Ludvika',
+    slug: 'ludvika',
+    url: '/ludvika'
+  }
+]
+
+
+/** 
+ * Sanitize html settings
+ */
 export const sanitizeSettings = {
   allowedTags: [ 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
   'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',

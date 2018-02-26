@@ -5,6 +5,7 @@ import {Transition} from 'react-transition-group'
 import { Container, Row, Col } from 'reactstrap'
 import SmoothImage from '../SmoothImage'
 import cms from '../../cms'
+import {cities} from '../../constants'
 import './StartPageCarousel.css'
 import StartPageCarouselItem from '../StartPageCarouselItem'
 
@@ -25,23 +26,7 @@ class StartPageCarousel extends Component {
   }
 
   static defaultProps = {
-    items: [
-      {
-        id: 'falun',
-        title: 'FALUN',
-        url: '/falun'
-      },
-      {
-        id: 'borlange',
-        title: 'BORLÄNGE',
-        url: '/'
-      },
-      {
-        id: 'ludvika',
-        title: 'LUDVIKA',
-        url: '/ludvika'
-      },
-    ]
+    items: []
   }
 
   componentDidMount() {
@@ -98,9 +83,9 @@ class StartPageCarousel extends Component {
   }
 
   findActiveItem = (pageSlug) => {
-    const { location, items } = this.props
+    const { location } = this.props
     const mainPath = pageSlug || location.pathname.split('/')[1]
-    let activeItem = items.findIndex(
+    let activeItem = cities.findIndex(
       item => item.url === '/' + mainPath
     )
     // Default to start page if no match is found
@@ -147,7 +132,6 @@ class StartPageCarousel extends Component {
 
   render() {
     // if (!this.state.isVisible) return null
-    const { items: cities } = this.props
     const { isVisible, activeItem, images, imageIndex } = this.state
     return (
       <Transition in={isVisible} timeout={300}>
