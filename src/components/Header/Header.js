@@ -4,8 +4,6 @@ import cms from '../../cms'
 import MainMenu from '../MainMenu'
 import Toggler from '../Toggler'
 import Search from '../Search'
-import SearchBar from '../SearchBar'
-import logo from '../../assets/fornby-logo.svg'
 import './Header.css'
 
 class Header extends Component {
@@ -81,11 +79,9 @@ class Header extends Component {
             align='left'
             />
           <div className="brand-header">
-            <h1>
-              <a href="/">
-                <img src={logo} className="logo" alt="logo" />
-              </a>
-            </h1>
+            <a href="/">
+              <h1>Fornby Folkhögskola</h1>
+            </a>
           </div>
           <Toggler
             id='searchbar-toggler-small-screens'

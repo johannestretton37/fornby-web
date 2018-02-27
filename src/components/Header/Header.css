@@ -23,14 +23,19 @@ header .header-top-container {
   header .header-top-container .brand-header {
     padding: 0.5rem 1rem; }
     header .header-top-container .brand-header h1 {
-      text-align: center; }
-      header .header-top-container .brand-header h1 .logo {
-        width: 8rem; }
-        @media (min-width: 768px) {
-          header .header-top-container .brand-header h1 .logo {
-            /* large */
-            margin: 2rem auto;
-            width: 12rem; } }
+      text-align: center;
+      background-image: url("../../assets/fornby-logo.svg");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      text-indent: -9999px;
+      height: 4rem;
+      width: 8rem; }
+      @media (min-width: 768px) {
+        header .header-top-container .brand-header h1 {
+          /* large */
+          margin: 2rem auto;
+          width: 12rem; } }
   header .header-top-container #searchbar-toggler-small-screens {
     /* small */ }
     @media (min-width: 768px) {
