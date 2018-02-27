@@ -1,5 +1,5 @@
 import React from 'react'
-import {array, string, object} from 'prop-types'
+import { array, string, object } from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import { withRouter } from 'react-router-dom'
 import SmoothImage from '../SmoothImage'
@@ -8,12 +8,13 @@ import {
   Row,
   Col,
   Card,
-  // CardImg,
+  CardImg,
   CardTitle,
   CardText,
   CardBody,
   CardSubtitle,
-  Button
+  Button,
+  CardImgOverlay
 } from 'reactstrap'
 import './GalleryItems.css'
 
@@ -27,9 +28,9 @@ GalleryItems.propTypes = {
 /**
  * Display an overview of an array of items
  */
-function GalleryItems ({ items = [], history, match, rootUrl }) {
+function GalleryItems({ items = [], history, match, rootUrl }) {
   return (
-    <Row>
+    <Row className="galleryItems" >
       {items.map((item, i) => {
         const src = item.images ? item.images[0].url : undefined
         const preview = item.previews ? item.previews[0] : undefined
@@ -42,23 +43,13 @@ function GalleryItems ({ items = [], history, match, rootUrl }) {
               timeout={400}
               component="li"
             >
-              <Card id={item.slug}>
-                {src && <SmoothImage src={src} preview={preview} />}
-                {/* <CardImg top src={item.img || placeholderImg} alt={item.name} /> */}
-                <CardBody>
+              <Card inverse id={item.slug} onClick={() => history.push(`${item.url}`)}>
+                <CardImg top width="100%"src={item.img} alt={item.name} />
+                <CardImgOverlay>
                   <CardTitle>{item.name}</CardTitle>
                   <CardSubtitle>{item.shortInfo}</CardSubtitle>
                   <CardText>{item.role}</CardText>
-                  <Button
-                    block
-                    outline
-                    color="primary"
-                    // onClick={() => history.push(`${rootUrl ? rootUrl : match.url}/${item.slug}`)}
-                    onClick={() => history.push(`${item.url}`)}
-                  >
-                    {item.cta || 'BUTTON'}
-                  </Button>
-                </CardBody>
+                </CardImgOverlay>
               </Card>
             </CSSTransition>
           </Col>

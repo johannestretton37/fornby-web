@@ -10,6 +10,7 @@ import cms from '../../cms'
 import { cities } from '../../constants';
 import SmoothImage from '../SmoothImage';
 // import BackButton from '../BackButton/BackButton';
+import BannerBoxContainer from '../BannerBoxContainer'
 
 class CoursesPage extends Component {
   static propTypes = {
@@ -38,14 +39,14 @@ class CoursesPage extends Component {
   componentDidMount() {
     // NOTE: - we're extracting vars from this.props.content and renaming
     //         this.props.content.courseCategories to categories
-    let {title, content: {name, courseCategories: categories }, match: { params: { page } }} = this.props
+    let { title, content: { name, courseCategories: categories }, match: { params: { page } } } = this.props
     let hideFilterer = false
     switch (page) {
       case 'falun':
       case 'ludvika':
         hideFilterer = true
         cms.selectedCity = cities.find(city => city.slug === page)
-      break
+        break
     }
 
     // If this.props.title has been provided, use that. Even if it's an empty string
@@ -94,13 +95,13 @@ class CoursesPage extends Component {
   }
 
   renderPage(galleryItems, field) {
-    let {match, rootUrl} = this.props
+    let { match, rootUrl } = this.props
     let root = rootUrl || match.url
     const { body } = field;
     return (
       <div>
         {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
-        <Gallery items={galleryItems} rootUrl={root} />
+        <BannerBoxContainer banners={galleryItems} items={galleryItems} rootUrl={root} />
       </div>);
   }
 
@@ -154,9 +155,9 @@ class CoursesPage extends Component {
           <Row>
             <Col>
               {filteredCategories.length > 0 ?
-              content 
-              :
-              <p>Det finns inga kurser att söka{cms.selectedCity ? ' i ' + cms.selectedCity.title : ''} för tillfället.</p>
+                content
+                :
+                <p>Det finns inga kurser att söka{cms.selectedCity ? ' i ' + cms.selectedCity.title : ''} för tillfället.</p>
               }
             </Col>
           </Row>
