@@ -71,7 +71,7 @@ class MainPage extends Component {
     const { subMenu } = this.props
     const { isLoading, pageContent, title, error } = this.state
     return (
-      <Container>
+      <Container fluid={true}>
       {isLoading ?
         <Loading />
         :
