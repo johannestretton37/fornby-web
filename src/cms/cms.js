@@ -244,6 +244,7 @@ class CMS {
         // Index for search
         Object.values(staffPages).forEach(staffPage => {
           staffPage.contentGroup = ContentGroup.STAFF
+          staffPage.url = this.baseUrlFor(staffPage) + staffPage.slug
           this.indexForSearch(staffPage, ['name', 'role', 'phone', 'summary'])
         })
         // Cache staffPages
