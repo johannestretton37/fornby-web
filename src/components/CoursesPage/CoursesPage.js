@@ -101,7 +101,7 @@ class CoursesPage extends Component {
     return (
       <div>
         {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
-        <BannerBoxContainer banners={galleryItems} items={galleryItems} rootUrl={root} />
+        <BannerBoxContainer banners={galleryItems}items={galleryItems} rootUrl={root} />
       </div>);
   }
 
@@ -138,7 +138,7 @@ class CoursesPage extends Component {
     }
     return (
       <div className='courses-page'>
-        <Container>
+        <Container fluid={true}>
           {/* <Row>
             <Col>
               <SmoothImage src={src} preview={preview} height={400}>
@@ -162,6 +162,7 @@ class CoursesPage extends Component {
             </Col>
           </Row>
         </Container>
+        
       </div>
     )
   }

@@ -1,3 +1,5 @@
+@import '../../styles/colors';
+
 .image-container {
   overflow: hidden;
   background: #fff;
@@ -10,6 +12,7 @@
     background-position: center center;
   }
   .final-img {
+    background: $brand-primary;
     display: flex;
     flex-direction: column;
     position: relative;
