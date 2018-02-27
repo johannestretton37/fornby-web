@@ -21,7 +21,7 @@ class BannerBox extends Component {
         <Link to={link || url || '/'}>
           <div className='banner'>
             <SmoothImage src={src} preview={preview} className='hero-image-container'>
-              <h3 style={{ margin: 'auto auto 0.3em 20px', color: '#fff' }}>{title || title || ''}</h3>
+              <h3 style={{ margin: 'auto auto 0.3em 20px', color: '#fff' }}>{title || name || ''}</h3>
             </SmoothImage>
             <div className='banner-body'>
               <p>{shortInfo}</p>
