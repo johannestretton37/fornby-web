@@ -11,6 +11,7 @@ import CustomError from '../../models/CustomError'
 import cms from '../../cms'
 import './MainPage.css'
 import PageContainer from '../PageContainer/PageContainer'
+import SmoothImage from '../SmoothImage';
 
 /**
  * MainPage

@@ -202,7 +202,9 @@ class CMS {
     // Cache pending promise to prevent multiple calls to cms
     this.pending.mainPages = new Promise(async (resolve, reject) => {
       try {
-        let mainPagesData = await this.flamelinkApp.content.get(ContentGroup.MAIN_PAGES)
+        let mainPagesData = await this.flamelinkApp.content.get(ContentGroup.MAIN_PAGES, {
+          populate: ['images']
+        })
         if (!mainPagesData) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Pages')
         let mainPages = this.arrayFromFirebaseData(mainPagesData, ContentGroup.MAIN_PAGES)
         // Cache main pages
@@ -433,6 +435,8 @@ class CMS {
    * }
    */
   getSlides = () => {
+    throw new Error('Hämta main pages images istället så struntar vi i START_PAGE_SLIDES')
+    
     // Return cached content if present
     if (this.cache[ContentGroup.START_PAGE_SLIDES]) return Promise.resolve(this.cache[ContentGroup.START_PAGE_SLIDES])
     // Check if promise is pending

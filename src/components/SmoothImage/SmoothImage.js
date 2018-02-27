@@ -27,6 +27,9 @@ class SmoothImage extends Component {
   }
 
   loadImage = (src) => {
+    this.setState({
+      isLoaded: false
+    })
     const img = new Image()
     img.onload = () => {
       this.setState({ isLoaded: true })
@@ -38,7 +41,7 @@ class SmoothImage extends Component {
     const { src, preview, width, height, className } = this.props
     let { isLoaded } = this.state
     return (
-      <div className={`image-container${className ? ' ' + className : ''}`} style={{width: `${width}px`, height: `${height}px`}}>
+      <div className={`image-container${className ? ' ' + className : ''}${isLoaded ? ' is-loaded' : ''}`} style={{width: `${width}px`, height: `${height}px`}}>
         <div className='final-img' style={{
           backgroundImage: `url(${src})`,
         }}>

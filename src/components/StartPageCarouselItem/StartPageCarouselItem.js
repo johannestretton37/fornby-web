@@ -48,6 +48,7 @@ class StartPageCarouselItem extends Component {
     }
 
     leftPos = () => {
+      if (!this.link) return '0px'
       const rect = this.link.getBoundingClientRect()
       return `${rect.left + (rect.width * 0.5)}px`
     }

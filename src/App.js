@@ -34,7 +34,7 @@ class App extends Component {
           {!cms.isProd && <DebugMessage />}
           <div className="full-width wrapper main-content">
             <Header />
-            <Route path="/:city?" component={StartPageCarousel} />
+            <Route path="/:page?/:subPage?" component={StartPageCarousel} />
             <Route component={Content} />
           </div>
           <Route render={({location}) => <Footer location={location} navLinks={this.state.mainMenuItems} /> } />

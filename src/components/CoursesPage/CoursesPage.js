@@ -8,6 +8,7 @@ import CoursePage from '../CoursePage';
 import CourseFilterer from '../CourseFilterer';
 import cms from '../../cms'
 import { cities } from '../../constants';
+import SmoothImage from '../SmoothImage';
 // import BackButton from '../BackButton/BackButton';
 
 class CoursesPage extends Component {
@@ -109,6 +110,7 @@ class CoursesPage extends Component {
     let title = this.state.title;
     let isCoursePage = false
     let content = null;
+    let src, preview
     if (slug) {
       // This is a course page (e.g. /kurser/musikkurser/skrikkurs-vt-18)
       isCoursePage = true
@@ -130,15 +132,20 @@ class CoursesPage extends Component {
     } else if (this.props.content) {
       // This is a categories page (e.g. /kurser)
       content = this.renderPage(filteredCategories, this.props.content);
+      src = this.props.content.images ? this.props.content.images[0].url : undefined
+      preview = this.props.content.previews ? this.props.content.previews[0] : undefined
     }
     return (
       <div className='courses-page'>
         <Container>
-          <Row>
+          {/* <Row>
             <Col>
-            {title && <h2>{title}</h2>}
-            </Col>
-          </Row>
+              <SmoothImage src={src} preview={preview} height={400}>
+                {title && <h2>{title}</h2>}
+                </SmoothImage>
+                </Col>
+              </Row> */}
+          {title && <h2>{title}</h2>}
           {!hideFilterer && !isCoursePage && <Row>
             <Col>
               <CourseFilterer items={cities} filter={this.filter} />

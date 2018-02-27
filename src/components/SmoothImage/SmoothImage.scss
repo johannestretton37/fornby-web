@@ -14,9 +14,16 @@
     flex-direction: column;
     position: relative;
   }
+  &.is-loaded {
+    .preview-img {
+      &, &-container {
+        transition: all 300ms ease-in-out;
+      }
+    }
+  }
   .preview-img {
     &, &-container {
-      transition: all 400ms ease-out;
+      transition: none;
     }
     &-container {
       position: absolute;

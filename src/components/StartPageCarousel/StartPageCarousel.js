@@ -14,71 +14,85 @@ class StartPageCarousel extends Component {
     isVisible: false,
     left: '50%',
     activeItem: 1,
-    images: [],
-    imageIndex: 0
+    images: {},
+    imageIndex: 0,
+    showCityLinks: false
   }
 
   static propTypes = {
     match: object,
     location: object,
-    history: object,
-    items: array
+    history: object
+    // items: array
   }
 
-  static defaultProps = {
-    items: []
-  }
+  // static defaultProps = {
+  //   items: []
+  // }
 
   componentDidMount() {
-    cms.getSlides().then(startPageSlides => {
-      const images = startPageSlides.map(slide => {
-        if (!slide.images) return null
-        const src = slide.images[0].url
-        const preview = slide.previews ? slide.previews[0] : undefined
-        return {
-          src,
-          preview
-        }
-      })
-      this.setState({
-        images,
-        imageIndex: 0
-      })
-    })
-    this.update()
+    this.update(this.props.match.params.page, this.props.match.params.subPage)
     this.findActiveItem()
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.city !== this.props.match.params.city) {
+    if (nextProps.match.params.page !== this.props.match.params.page) {
       // Default to start page '/' if city is undefined
-      let cityParam = nextProps.match.params.city || '/'
-      this.update(cityParam)
-      this.findActiveItem(cityParam)
+      let pageParam = nextProps.match.params.page || 'borlange'
+      this.update(pageParam, nextProps.match.params.subPage)
+      this.findActiveItem(pageParam)
+    }
+    if (nextProps.match.params.subPage !== this.props.match.params.subPage) {
+      if (nextProps.match.params.subPage) {
+        // This is a subPage, hide startPageCarousel
+        this.setState({
+          isVisible: false
+        })
+      } else {
+        // This is a mainPage
+        let pageParam = nextProps.match.params.page || 'borlange'
+        this.update(pageParam, nextProps.match.params.subPage)
+        this.findActiveItem(pageParam)
+      }
     }
   }
   
-  update = (cityParam) => {
-    const city = cityParam || this.props.match.params.city
-    switch (city) {
-      case 'ludvika':
-      case 'falun':
-        this.getPageContent(city)
-        this.setState({
-          isVisible: true
+  update = (pageParam, subPageParam) => {
+    if (subPageParam) {
+      // This is a subPage, hide startPageCarousel
+      this.setState({
+        isVisible: false,
+        showCityLinks: false
+      })
+      return false
+    }
+    let page = pageParam || 'borlange'
+    const showCityLinks = Object.values(cities).find(city => city.slug === page) !== undefined
+    if (Object.keys(this.state.images).length > 0) {
+      // Images are already fetched
+      this.setState({
+        isVisible: this.state.images[page] !== undefined,
+        showCityLinks
+      })
+    } else {
+      // Fetch images
+      cms.getMainPages().then(mainPages => {
+        let images = {}
+        mainPages.forEach(mainPage => {
+          if (mainPage.images) {
+            let image = {
+              src: mainPage.images[0].url,
+              preview: mainPage.previews[0]
+            }
+            images[mainPage.slug] = image
+          }
         })
-      break
-      case '/': 
-      case 'borlange': 
-      case undefined:
         this.setState({
-          left: '50%',
-          isVisible: true
+          images,
+          isVisible: images[page] !== undefined,
+          showCityLinks
         })
-      break
-      default: 
-        this.setState({ isVisible: false })
-      break
+      })
     }
   }
 
@@ -118,6 +132,18 @@ class StartPageCarousel extends Component {
     }
   }
 
+  getPageImage = page => {
+    return cms.getPageContent(page)
+      .then(pageContent => {
+        let image = {}
+        if (pageContent.images) {
+          image.src = pageContent.images[0].url
+          image.preview = pageContent.previews[0]
+        }
+        return image
+      })
+  }
+
   getPageContent = (page) => {
     cms.getPageContent(page)
       .then(pageContent => {
@@ -132,7 +158,21 @@ class StartPageCarousel extends Component {
 
   render() {
     // if (!this.state.isVisible) return null
-    const { isVisible, activeItem, images, imageIndex } = this.state
+    const { isVisible, activeItem, showCityLinks } = this.state
+    const city = this.props.match.params.page || 'borlange'
+    let src, preview
+    // if (mainPageImages[city]) {
+    //   let image = mainPageImages[city]
+    //   src = image.src
+    //   preview = image.preview
+    // } else {
+    //   src = images[imageIndex] ? images[imageIndex].src : ''
+    //   preview = images[imageIndex] ? images[imageIndex].preview : undefined
+    // }
+    if (this.state.images[city]) {
+      src = this.state.images[city].src
+      preview = this.state.images[city].preview
+    }
     return (
       <Transition in={isVisible} timeout={300}>
         {state => {
@@ -142,8 +182,12 @@ class StartPageCarousel extends Component {
               display: state === 'exited' ? 'none' : 'block',
               maxHeight: state === 'exiting' ? '0px' : '600px',
             }} >
-              <SmoothImage className='full-width' src={images[imageIndex] ? images[imageIndex].src : ''} preview={images[imageIndex] ? images[imageIndex].preview : undefined} height={400} />
-              <div className='city-links full-width'>
+              <SmoothImage
+                className='full-width'
+                src={src}
+                preview={preview}
+                height={400} />
+              {showCityLinks && <div className='city-links full-width'>
                 <Container>
                   <Row>             
                   {cities.map((city, i) => {
@@ -162,7 +206,7 @@ class StartPageCarousel extends Component {
                   </Row>
                   <div id='city-indicator' ref={activeIndicator => { this.activeIndicator = activeIndicator }} style={{ left: this.state.left }} ></div>
                 </Container>
-              </div>
+              </div>}
             </div>
           )
         }}
