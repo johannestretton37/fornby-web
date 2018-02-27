@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { string } from 'prop-types'
 import { Route } from 'react-router-dom'
-import { Container, Row} from 'reactstrap'
-import {ContentGroup, defaultFields} from '../../constants'
+import { Container, Row } from 'reactstrap'
+import { ContentGroup, defaultFields } from '../../constants'
 import MainPage from '../MainPage'
-import BannerBox from '../BannerBox'
 import cms from '../../cms'
 import './StartPage.css'
+import BannerBoxContainer from '../BannerBoxContainer'
 
 class StartPage extends Component {
   state = {
@@ -19,17 +19,17 @@ class StartPage extends Component {
   }
 
   componentDidMount() {
-    const {page} = this.props
+    const { page } = this.props
     switch (page) {
       case 'ludvika':
       case 'falun':
         this.setState({ left: '10px' })
         this.getPageContent(page)
-      break
+        break
       default:
         this.getBanners()
         this.getPageContent('borlange')
-      break
+        break
     }
   }
 
@@ -77,18 +77,9 @@ class StartPage extends Component {
   render() {
     const { banners, pageContent } = this.state
     return (
-      <div style={{position: 'relative'}}>
+      <div style={{ position: 'relative' }}>
         {pageContent && <Route path='/:page?/:subpage?/:slug?' render={props => <MainPage {...props} content={pageContent} subMenu={false} />} />}
-        {banners.length > 0 &&
-        <div className='banner-boxes-container full-width'>
-          <Container className='banner-boxes'>
-            <Row>
-              {banners.map((banner, i) => {
-                return <BannerBox key={i} content={banner} />
-              })}
-            </Row>
-          </Container>
-        </div>}
+        <BannerBoxContainer banners={banners} />
       </div>
     )
   }
