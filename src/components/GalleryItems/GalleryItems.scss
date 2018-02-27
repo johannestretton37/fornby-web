@@ -1,4 +1,29 @@
+@import '../../styles/colors';
+
 .card-img-top {
   height: 100%;
   background: #eee;
+}
+
+.galleryItems{
+  .card{
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  .card-title{
+    color: $brand-third;
+    text-shadow: 0 0 20px #48526e;
+    text-decoration: underline;
+  }
+  .card-text {
+    color: #fff;
+    text-shadow: 0 0 20px #48526e;
+    text-overflow: ellipsis;
+  }
+  .card-subtitle{
+    color: #fff;
+    text-shadow: 0 0 20px #48526e;
+    text-overflow: ellipsis;
+    text-overflow: hidden;
+  }
 }
