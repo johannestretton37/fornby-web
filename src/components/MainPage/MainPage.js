@@ -5,13 +5,11 @@ import CoursesPage from '../CoursesPage'
 import Loading from '../Loading'
 import PagesContainer from '../PagesContainer'
 import { Container, Row, Col } from 'reactstrap'
-import SubMenu from '../SubMenu'
 import ErrorPage from '../ErrorPage'
 import CustomError from '../../models/CustomError'
 import cms from '../../cms'
 import './MainPage.css'
 import PageContainer from '../PageContainer/PageContainer'
-import SmoothImage from '../SmoothImage';
 
 /**
  * MainPage
@@ -30,11 +28,9 @@ class MainPage extends Component {
 
   static propTypes = {
     match: object.isRequired,
-    subMenu: bool
   }
 
   static defaultProps = {
-    subMenu: true
   }
 
   componentDidMount() {
@@ -68,29 +64,27 @@ class MainPage extends Component {
   }
 
   render() {
-    const { subMenu } = this.props
     const { isLoading, pageContent, title, error } = this.state
     return (
       <Container fluid={true}>
-      {isLoading ?
-        <Loading />
-        :
-        <Row>
-          {subMenu && <SubMenu />}
-          <Col>
-          {error ?
-            <ErrorPage error={error} />
-            :
-            <Switch>
-              <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} title={title} content={pageContent} />} />
-              <Route path='/:page/:subpage?' render={props => <PagesContainer {...props } content={pageContent} rootUrl={'/kurser'} />} />
-              <Route path='/:page' component={PageContainer} />
-              <Route path='/' render={props => <PagesContainer {...props } content={pageContent} />} />
-            </Switch>
-          }
-          </Col>
-        </Row>
-      }
+        {isLoading ?
+          <Loading />
+          :
+          <Row>
+            <Col>
+              {error ?
+                <ErrorPage error={error} />
+                :
+                <Switch>
+                  <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} title={title} content={pageContent} />} />
+                  <Route path='/:page/:subpage?' render={props => <PagesContainer {...props} content={pageContent} rootUrl={'/kurser'} />} />
+                  <Route path='/:page' component={PageContainer} />
+                  <Route path='/' render={props => <PagesContainer {...props} content={pageContent} />} />
+                </Switch>
+              }
+            </Col>
+          </Row>
+        }
       </Container>
     )
   }
