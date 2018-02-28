@@ -84,10 +84,11 @@ class PagesContainer extends Component {
       subPages
     } = this.state
     let { page } = this.props.match.params
+    const showSubMenu = page !== 'falun' && page !== 'ludvika'
     return (
       <Container>
         <Row>
-          <SubMenu />
+          {showSubMenu && <SubMenu />}
           <Col>
             {error ?
               <ErrorPage error={error} />
@@ -98,7 +99,7 @@ class PagesContainer extends Component {
                 <p dangerouslySetInnerHTML={{ __html: body }} />
                 {page === PageSlug.ANSOK ? <ApplyForm /> : null}
                 {subPageSlug && subPages[subPageSlug]}
-                {content.courseCategories && <CoursesPage title='' content={content} rootUrl={this.props.rootUrl} />}
+                {content.courseCategories && <CoursesPage title='' showSubMenu={showSubMenu} content={content} rootUrl={this.props.rootUrl} />}
               </div>
             }
           </Col>

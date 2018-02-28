@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Container, Row, Col } from 'reactstrap'
 import { withRouter } from 'react-router-dom'
 import './CoursesPage.css'
-import { object, string } from 'prop-types'
+import { object, bool, string } from 'prop-types'
 import CoursePage from '../CoursePage';
 import CourseFilterer from '../CourseFilterer';
 import cms from '../../cms'
@@ -16,7 +16,8 @@ class CoursesPage extends Component {
     match: object.isRequired,
     content: object.isRequired,
     title: string,
-    rootUrl: string
+    rootUrl: string,
+    showSubMenu: bool
   }
 
   static defaultProps = {
@@ -47,7 +48,7 @@ class CoursesPage extends Component {
         cms.selectedCity = cities.find(city => city.slug === page)
         break
     }
-
+    if (this.props.showSubMenu === false) hideFilterer = true
     // If this.props.title has been provided, use that. Even if it's an empty string
     let pageTitle
     if (title === '') {
@@ -165,12 +166,7 @@ class CoursesPage extends Component {
           <Row>
             {/* <Col xs={category ? "9" : "12"}> */}
             <Col>
-              {filteredCategories.length > 0 ?
-                <BannerBoxContainer banners={galleryItems} items={galleryItems} top={filterer} rootUrl={root} />
-                // content
-                :
-                <p>Det finns inga kurser att söka{cms.selectedCity ? ' i ' + cms.selectedCity.title : ''} för tillfället.</p>
-              }
+              <BannerBoxContainer banners={galleryItems} items={galleryItems} top={filterer} rootUrl={root} />
             </Col>
           </Row>
         </Container>

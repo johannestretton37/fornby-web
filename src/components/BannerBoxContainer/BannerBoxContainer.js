@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './BannerBoxContainer.css'
 import BannerBox from '../BannerBox'
+import cms from '../../cms'
 import { Container, Row, Col } from 'reactstrap'
 import { array, element } from 'prop-types'
 
@@ -16,7 +17,7 @@ class BannerBoxContainer extends Component {
 
   render() {
     const { banners } = this.props;
-    return banners.length > 0 ?
+    return (
       <div className='banner-boxes-container full-width'>
         {this.props.top && <Container>
           <Row>
@@ -27,13 +28,17 @@ class BannerBoxContainer extends Component {
         </Container>}
         <Container className='banner-boxes'>
           <Row>
-            {banners.map((banner, i) => {
-              return <BannerBox key={i} content={banner} />
-            })}
+            {
+              banners.length > 0 ? banners.map((banner, i) => {
+                return <BannerBox key={i} content={banner} />
+              })
+            :
+              <p style={{ paddingLeft: '1em' }}>Det finns inga kurser att söka{cms.selectedCity ? ' i ' + cms.selectedCity.title : ''} för tillfället.</p>
+            }
           </Row>
         </Container>
       </div>
-    : null
+    )
   }
 }
 
