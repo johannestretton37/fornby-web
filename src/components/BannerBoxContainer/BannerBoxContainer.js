@@ -8,7 +8,7 @@ import { array, element } from 'prop-types'
 class BannerBoxContainer extends Component {
   static propTypes = {
     banners: array.isRequired,
-    top: element
+    filterer: element
   }
 
   static defaultProps = {
@@ -19,10 +19,10 @@ class BannerBoxContainer extends Component {
     const { banners } = this.props;
     return (
       <div className='banner-boxes-container full-width'>
-        {this.props.top && <Container>
+        {this.props.filterer && <Container>
           <Row>
             <Col>
-              {this.props.top}
+              {this.props.filterer}
             </Col>
           </Row>
         </Container>}

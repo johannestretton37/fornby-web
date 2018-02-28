@@ -113,8 +113,6 @@ class CoursesPage extends Component {
     let isCoursePage = false
     let content = null;
     let galleryItems, body
-    let filterer = (!hideFilterer && !isCoursePage) ? <CourseFilterer items={cities} filter={this.filter} /> : null
-
     if (slug) {
       // This is a course page (e.g. /kurser/musikkurser/skrikkurs-vt-18)
       isCoursePage = true
@@ -123,7 +121,14 @@ class CoursesPage extends Component {
         let course = this.findCategory(items.courses, slug);
         if (course) {
           title = null;
-          content = <CoursePage content={course} onApplyChanged={() => { }} />
+          content = (
+            <Row>
+              <SubMenu match={this.props.match} />
+              <Col md={8}>
+                <CoursePage content={course} onApplyChanged={() => { }} />
+              </Col>
+            </Row>
+          )
         }
       }
     } else if (category) {
@@ -140,7 +145,8 @@ class CoursesPage extends Component {
       // content = this.renderPage(filteredCategories, this.props.content);
       galleryItems = filteredCategories
       body = this.props.content.body
-  }
+    }
+    let filterer = (!hideFilterer && !isCoursePage) ? <CourseFilterer items={cities} filter={this.filter} /> : null
     return (
       <div className='courses-page'>
         <Container>
@@ -162,14 +168,14 @@ class CoursesPage extends Component {
         </Container>
 
 
-        <Container className='full-width' fluid={true}>
+        {!isCoursePage && <Container className='full-width' fluid={true}>
           <Row>
             {/* <Col xs={category ? "9" : "12"}> */}
             <Col>
-              <BannerBoxContainer banners={galleryItems} items={galleryItems} top={filterer} rootUrl={root} />
+              <BannerBoxContainer banners={galleryItems} items={galleryItems} filterer={filterer} rootUrl={root} />
             </Col>
           </Row>
-        </Container>
+        </Container>}
       </div>
     )
   }
