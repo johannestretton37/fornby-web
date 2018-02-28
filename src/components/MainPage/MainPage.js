@@ -66,24 +66,25 @@ class MainPage extends Component {
   render() {
     const { isLoading, pageContent, title, error } = this.state
     return (
-      <Container fluid={true}>
+      <Container className='full-width' fluid={true}>
         {isLoading ?
           <Loading />
           :
-          <Row>
-            <Col>
-              {error ?
+        error ?
+          <Container>
+            <Row>
+              <Col>
                 <ErrorPage error={error} />
-                :
-                <Switch>
-                  <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} title={title} content={pageContent} />} />
-                  <Route path='/:page/:subpage?' render={props => <PagesContainer {...props} content={pageContent} rootUrl={'/kurser'} />} />
-                  <Route path='/:page' component={PageContainer} />
-                  <Route path='/' render={props => <PagesContainer {...props} content={pageContent} />} />
-                </Switch>
-              }
-            </Col>
-          </Row>
+              </Col>
+            </Row>
+          </Container>
+          :
+          <Switch>
+            <Route path='/kurser/:category?/:slug?' render={props => <CoursesPage {...props} title={title} content={pageContent} />} />
+            <Route path='/:page/:subpage?' render={props => <PagesContainer {...props} content={pageContent} rootUrl={'/kurser'} />} />
+            <Route path='/:page' component={PageContainer} />
+            <Route path='/' render={props => <PagesContainer {...props} content={pageContent} />} />
+          </Switch>
         }
       </Container>
     )

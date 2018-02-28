@@ -45,8 +45,8 @@ class SubMenu extends Component {
     })
     return menuItems;
   }
-  getSubPagesMenuItems(pageContent) {
 
+  getSubPagesMenuItems(pageContent) {
     let menuItems = []
     const page = '/' + this.props.match.params.page
     pageContent.subPages.forEach(subPage => {
@@ -68,6 +68,7 @@ class SubMenu extends Component {
     })
     return menuItems;
   }
+  
   getSubMenu = (page) => {
     if (!page) return
     return new Promise(async resolve => {

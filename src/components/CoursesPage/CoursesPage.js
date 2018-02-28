@@ -108,10 +108,11 @@ class CoursesPage extends Component {
     this.props.match.params.page = 'kurser';
     const { filteredCategories, hideFilterer } = this.state;
     const { category, slug } = this.props.match.params
-
     let title = this.state.title;
     let isCoursePage = false
     let content = null;
+    let galleryItems, body
+    let filterer = (!hideFilterer && !isCoursePage) ? <CourseFilterer items={cities} filter={this.filter} /> : null
 
     if (slug) {
       // This is a course page (e.g. /kurser/musikkurser/skrikkurs-vt-18)
@@ -129,36 +130,50 @@ class CoursesPage extends Component {
       const items = this.findCategory(filteredCategories, category)
       if (items && items.courses) {
         title = items.name;
-        content = this.renderPage(items.courses, items);
+        // content = this.renderPage(items.courses, items);
+        galleryItems = items.courses
+        body = items.body
       }
     } else if (this.props.content) {
       // This is a categories page (e.g. /kurser)
-      content = this.renderPage(filteredCategories, this.props.content);
-    }
+      // content = this.renderPage(filteredCategories, this.props.content);
+      galleryItems = filteredCategories
+      body = this.props.content.body
+  }
     return (
       <div className='courses-page'>
-        <Container fluid={true}>
-          {title && <h2>{title}</h2>}
-          {!hideFilterer &&
-            !isCoursePage &&
-            <Row>
-              <Col >
-                <CourseFilterer items={cities} filter={this.filter} />
-              </Col>
-            </Row>}
+        <Container>
           <Row>
-            {category &&
-              <SubMenu match={this.props.match} />}
-            <Col xs={category ? "9" : "12"}>
+            <Col>
+              {title && <h2>{title}</h2>}
+            </Col>
+          </Row>
+        
+          <Row>
+            <Col>
+              {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
+            </Col>
+          </Row>
+          
+        {/* {category && <SubMenu match={this.props.match} />} */}
+
+          {isCoursePage && content}
+        </Container>
+
+
+        <Container className='full-width' fluid={true}>
+          <Row>
+            {/* <Col xs={category ? "9" : "12"}> */}
+            <Col>
               {filteredCategories.length > 0 ?
-                content
+                <BannerBoxContainer banners={galleryItems} items={galleryItems} top={filterer} rootUrl={root} />
+                // content
                 :
                 <p>Det finns inga kurser att söka{cms.selectedCity ? ' i ' + cms.selectedCity.title : ''} för tillfället.</p>
               }
             </Col>
           </Row>
         </Container>
-
       </div>
     )
   }

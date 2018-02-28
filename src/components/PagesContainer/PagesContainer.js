@@ -85,23 +85,25 @@ class PagesContainer extends Component {
     } = this.state
     let { page } = this.props.match.params
     return (
-      <Row>
-        <SubMenu />
-        <Col>
-          {error ?
-            <ErrorPage error={error} />
-            :
-            <div className={`${page ? page + ' ' : ''}pages-container`}>
-              <h2>{name}</h2>
-              <p className="short-info">{shortInfo}</p>
-              <p dangerouslySetInnerHTML={{ __html: body }} />
-              {page === PageSlug.ANSOK ? <ApplyForm /> : null}
-              {subPageSlug && subPages[subPageSlug]}
-              {content.courseCategories && <CoursesPage title='' content={content} rootUrl={this.props.rootUrl} />}
-            </div>
-          }
-        </Col>
-      </Row>
+      <Container>
+        <Row>
+          <SubMenu />
+          <Col>
+            {error ?
+              <ErrorPage error={error} />
+              :
+              <div className={`${page ? page + ' ' : ''}pages-container`}>
+                <h2>{name}</h2>
+                <p className="short-info">{shortInfo}</p>
+                <p dangerouslySetInnerHTML={{ __html: body }} />
+                {page === PageSlug.ANSOK ? <ApplyForm /> : null}
+                {subPageSlug && subPages[subPageSlug]}
+                {content.courseCategories && <CoursesPage title='' content={content} rootUrl={this.props.rootUrl} />}
+              </div>
+            }
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }

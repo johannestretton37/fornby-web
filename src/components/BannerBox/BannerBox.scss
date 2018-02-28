@@ -4,20 +4,20 @@
 .banner-boxes-container {
   background-color: $brand-fourth;
   @include gradient-darker($brand-fourth);
-  padding: 0;
+  padding: 1em 0;
   .banner-boxes {
     display: flex;
-    margin-top: 3em;
-    padding: 2em 0;
     .banner-box {
       display: flex;
       margin-bottom: 1em;
       a {
         display: flex;
+        flex-grow: 1;
         text-decoration: none;
         .banner {
           display: flex;
           flex-direction: column;
+          flex-grow: 1;
           background: #fff;
           border-radius: 5px;
           overflow: hidden;

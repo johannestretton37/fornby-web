@@ -1,20 +1,30 @@
 import React, { Component } from 'react'
 import './BannerBoxContainer.css'
 import BannerBox from '../BannerBox'
-import { Container, Row } from 'reactstrap'
-import { array } from 'prop-types'
+import { Container, Row, Col } from 'reactstrap'
+import { array, element } from 'prop-types'
 
 class BannerBoxContainer extends Component {
-
   static propTypes = {
-    banners: array.isRequired
+    banners: array.isRequired,
+    top: element
+  }
+
+  static defaultProps = {
+    banners: []
   }
 
   render() {
     const { banners } = this.props;
-    let contentControl = null;
-    if (banners.length > 0)
-      contentControl = <div className='banner-boxes-container full-width'>
+    return banners.length > 0 ?
+      <div className='banner-boxes-container full-width'>
+        {this.props.top && <Container>
+          <Row>
+            <Col>
+              {this.props.top}
+            </Col>
+          </Row>
+        </Container>}
         <Container className='banner-boxes'>
           <Row>
             {banners.map((banner, i) => {
@@ -23,8 +33,7 @@ class BannerBoxContainer extends Component {
           </Row>
         </Container>
       </div>
-
-    return contentControl;
+    : null
   }
 }
 
