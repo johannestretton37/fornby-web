@@ -24,7 +24,7 @@ class SubMenu extends Component {
 
   getCoursesMenuItems(pageContent) {
     let menuItems = []
-    if (this.props.match.params.subpage === undefined || !pageContent.courseCategories) return this.menuItems;
+    if (pageContent === undefined || !pageContent.courseCategories) return this.menuItems;
     const page = '/' + this.props.match.params.page
     pageContent.courseCategories.forEach(subpage => {
       let menuItem = {
@@ -46,6 +46,7 @@ class SubMenu extends Component {
     return menuItems;
   }
   getSubPagesMenuItems(pageContent) {
+
     let menuItems = []
     const page = '/' + this.props.match.params.page
     pageContent.subPages.forEach(subPage => {
@@ -68,6 +69,7 @@ class SubMenu extends Component {
     return menuItems;
   }
   getSubMenu = (page) => {
+    if (!page) return
     return new Promise(async resolve => {
       const pageContent = await cms.getPageContent(page)
       let menuItems = []
@@ -113,7 +115,7 @@ class SubMenu extends Component {
     const { menuItems } = this.state
     return (
       menuItems && menuItems.length > 0 ?
-        <Col md="3" className='sub-menu-container'>
+        <Col xs="3" className='sub-menu-container'>
           <Nav className='sub-menu' vertical>
             {menuItems.map(this.menuItem)}
           </Nav>

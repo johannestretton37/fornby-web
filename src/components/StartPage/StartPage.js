@@ -78,7 +78,7 @@ class StartPage extends Component {
     const { banners, pageContent } = this.state
     return (
       <div style={{ position: 'relative' }}>
-        {pageContent && <Route path='/:page?/:subpage?/:slug?' render={props => <MainPage {...props} content={pageContent} subMenu={false} />} />}
+        {pageContent && <Route path='/:page?/:subpage?/:slug?' render={props => <MainPage {...props} content={pageContent} />} />}
         <BannerBoxContainer banners={banners} />
       </div>
     )

@@ -7,6 +7,8 @@ import CoursesPage from '../CoursesPage'
 import ApplyForm from '../ApplyForm'
 import cms from '../../cms'
 import './PagesContainer.css'
+import SubMenu from '../SubMenu'
+import { Container, Row, Col } from 'reactstrap'
 
 /**
  * PagesContainer
@@ -38,7 +40,7 @@ class PagesContainer extends Component {
       case 'falun':
       case 'ludvika':
         cms.selectedCity = cities.find(city => city.slug === page)
-      break
+        break
     }
     if (content.subPages) {
       // Map subPages by slug
@@ -50,7 +52,7 @@ class PagesContainer extends Component {
           if (subPageSlug) {
             console.error(
               `Multiple SubPages are set to showByDefault. '${subPageSlug}', '${
-                subPageContent.slug
+              subPageContent.slug
               }' found. Please edit this in flamelink cms.`
             )
           }
@@ -60,7 +62,7 @@ class PagesContainer extends Component {
           <SubPage content={subPageContent} url={this.props.match.url} />
         )
       })
-    if (!subPageSlug) subPageSlug = this.props.match.params.subpage
+      if (!subPageSlug) subPageSlug = this.props.match.params.subpage
       this.setState({ content, subPageSlug, subPages })
     }
   }
@@ -83,17 +85,23 @@ class PagesContainer extends Component {
     } = this.state
     let { page } = this.props.match.params
     return (
-      error ?
-      <ErrorPage error={error} />
-      :
-      <div className={`${page ? page + ' ' : ''}pages-container`}>
-        <h2>{name}</h2>
-        <p className="short-info">{shortInfo}</p>
-        <p dangerouslySetInnerHTML={{ __html: body }} />
-        {page === PageSlug.ANSOK ? <ApplyForm /> : null}
-        {subPageSlug && subPages[subPageSlug]}
-        {content.courseCategories && <CoursesPage title='' content={content} rootUrl={this.props.rootUrl} />}
-      </div>
+      <Row>
+        <SubMenu />
+        <Col>
+          {error ?
+            <ErrorPage error={error} />
+            :
+            <div className={`${page ? page + ' ' : ''}pages-container`}>
+              <h2>{name}</h2>
+              <p className="short-info">{shortInfo}</p>
+              <p dangerouslySetInnerHTML={{ __html: body }} />
+              {page === PageSlug.ANSOK ? <ApplyForm /> : null}
+              {subPageSlug && subPages[subPageSlug]}
+              {content.courseCategories && <CoursesPage title='' content={content} rootUrl={this.props.rootUrl} />}
+            </div>
+          }
+        </Col>
+      </Row>
     )
   }
 }

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Container, Row, Col } from 'reactstrap'
 import { withRouter } from 'react-router-dom'
-import Gallery from '../Gallery'
 import './CoursesPage.css'
 import { object, string } from 'prop-types'
 import CoursePage from '../CoursePage';
@@ -9,8 +8,8 @@ import CourseFilterer from '../CourseFilterer';
 import cms from '../../cms'
 import { cities } from '../../constants';
 import SmoothImage from '../SmoothImage';
-// import BackButton from '../BackButton/BackButton';
 import BannerBoxContainer from '../BannerBoxContainer'
+import SubMenu from '../SubMenu'
 
 class CoursesPage extends Component {
   static propTypes = {
@@ -101,17 +100,19 @@ class CoursesPage extends Component {
     return (
       <div>
         {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
-        <BannerBoxContainer banners={galleryItems}items={galleryItems} rootUrl={root} />
+        <BannerBoxContainer banners={galleryItems} items={galleryItems} rootUrl={root} />
       </div>);
   }
 
   render() {
+    this.props.match.params.page = 'kurser';
     const { filteredCategories, hideFilterer } = this.state;
     const { category, slug } = this.props.match.params
+
     let title = this.state.title;
     let isCoursePage = false
     let content = null;
-    let src, preview
+
     if (slug) {
       // This is a course page (e.g. /kurser/musikkurser/skrikkurs-vt-18)
       isCoursePage = true
@@ -133,27 +134,22 @@ class CoursesPage extends Component {
     } else if (this.props.content) {
       // This is a categories page (e.g. /kurser)
       content = this.renderPage(filteredCategories, this.props.content);
-      src = this.props.content.images ? this.props.content.images[0].url : undefined
-      preview = this.props.content.previews ? this.props.content.previews[0] : undefined
     }
     return (
       <div className='courses-page'>
         <Container fluid={true}>
-          {/* <Row>
-            <Col>
-              <SmoothImage src={src} preview={preview} height={400}>
-                {title && <h2>{title}</h2>}
-                </SmoothImage>
-                </Col>
-              </Row> */}
           {title && <h2>{title}</h2>}
-          {!hideFilterer && !isCoursePage && <Row>
-            <Col>
-              <CourseFilterer items={cities} filter={this.filter} />
-            </Col>
-          </Row>}
+          {!hideFilterer &&
+            !isCoursePage &&
+            <Row>
+              <Col >
+                <CourseFilterer items={cities} filter={this.filter} />
+              </Col>
+            </Row>}
           <Row>
-            <Col>
+            {category &&
+              <SubMenu match={this.props.match} />}
+            <Col xs={category ? "9" : "12"}>
               {filteredCategories.length > 0 ?
                 content
                 :
@@ -162,7 +158,7 @@ class CoursesPage extends Component {
             </Col>
           </Row>
         </Container>
-        
+
       </div>
     )
   }
