@@ -25,9 +25,9 @@ class BannerBox extends Component {
             </SmoothImage>
             <div className='banner-body'>
               <p>{shortInfo}</p>
-              <div className='read-more'>
-                <span>LÄS MER</span>
-              </div>
+            </div>
+            <div className='read-more'>
+              <span>LÄS MER</span>
             </div>
           </div>
         </Link>

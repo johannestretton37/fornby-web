@@ -2,7 +2,7 @@
 
 .image-container {
   overflow: hidden;
-  background: #fff;
+  background: $brand-primary;
   height: 200px;
   .final-img, .preview-img, .preview-img-container {
     margin: 0;
@@ -12,7 +12,6 @@
     background-position: center center;
   }
   .final-img {
-    background: $brand-primary;
     display: flex;
     flex-direction: column;
     position: relative;

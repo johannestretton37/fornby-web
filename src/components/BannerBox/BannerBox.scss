@@ -6,13 +6,18 @@
   @include gradient-darker($brand-fourth);
   padding: 0;
   .banner-boxes {
+    display: flex;
     margin-top: 3em;
     padding: 2em 0;
     .banner-box {
+      display: flex;
+      margin-bottom: 1em;
       a {
-        display: block;
+        display: flex;
         text-decoration: none;
         .banner {
+          display: flex;
+          flex-direction: column;
           background: #fff;
           border-radius: 5px;
           overflow: hidden;
@@ -40,21 +45,23 @@
           }
           .banner-body {
             padding: 20px;
-            .read-more {
-              display: flex;
-              flex-direction: column;
-              span {
-                display: block;
-                margin: auto;
-                text-align: center;
-                padding: 0.5em 2.2em;
-                border: 1px solid $brand-secondary;
-                color: $brand-secondary;
-                transition: all 300ms ease-out;
-                &:hover {
-                  background-color: $brand-secondary;
-                  color: #fff;
-                }
+            flex-grow: 1;
+          }
+          .read-more {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.3em;
+            span {
+              display: block;
+              margin: auto;
+              text-align: center;
+              padding: 0.5em 2.2em;
+              border: 1px solid $brand-secondary;
+              color: $brand-secondary;
+              transition: all 300ms ease-out;
+              &:hover {
+                background-color: $brand-secondary;
+                color: #fff;
               }
             }
           }
