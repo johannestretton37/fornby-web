@@ -18,3 +18,13 @@
   background: linear-gradient(135deg, $color 0%, darken($color, 20%) 100%);
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$color}', endColorstr='#{darken($color, 20%)}', GradientType=1 );
 }
+
+@mixin gradient-center($color) {
+  background: $color;
+  background: -moz-linear-gradient(90deg, rgba($color, 0) 0%, $color 20%, $color 80%, rgba($color, 0) 100%);
+  background: -webkit-linear-gradient(90deg, rgba($color, 0) 0%, $color 20%, $color 80%, rgba($color, 0) 100%);
+  background: -o-linear-gradient(90deg, rgba($color, 0) 0%, $color 20%, $color 80%, rgba($color, 0) 100%);
+  background: -ms-linear-gradient(90deg, rgba($color, 0) 0%, $color 20%, $color 80%, rgba($color, 0) 100%);
+  background: linear-gradient(90deg, rgba($color, 0) 0%, $color 20%, $color 80%, rgba($color, 0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#{$color}', endColorstr='#{$color}', GradientType=1 );
+}

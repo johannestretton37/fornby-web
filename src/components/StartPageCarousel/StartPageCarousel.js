@@ -82,7 +82,8 @@ class StartPageCarousel extends Component {
           if (mainPage.images) {
             let image = {
               src: mainPage.images[0].url,
-              preview: mainPage.previews[0]
+              preview: mainPage.previews[0],
+              title: mainPage.name
             }
             images[mainPage.slug] = image
           }
@@ -139,6 +140,7 @@ class StartPageCarousel extends Component {
         if (pageContent.images) {
           image.src = pageContent.images[0].url
           image.preview = pageContent.previews[0]
+          image.title = pageContent.name
         }
         return image
       })
@@ -160,7 +162,7 @@ class StartPageCarousel extends Component {
     // if (!this.state.isVisible) return null
     const { isVisible, activeItem, showCityLinks } = this.state
     const city = this.props.match.params.page || 'borlange'
-    let src, preview
+    let src, preview, title
     // if (mainPageImages[city]) {
     //   let image = mainPageImages[city]
     //   src = image.src
@@ -172,6 +174,7 @@ class StartPageCarousel extends Component {
     if (this.state.images[city]) {
       src = this.state.images[city].src
       preview = this.state.images[city].preview
+      title = this.state.images[city].title
     }
     return (
       <Transition in={isVisible} timeout={300}>
@@ -186,13 +189,17 @@ class StartPageCarousel extends Component {
                 className='full-width'
                 src={src}
                 preview={preview}
-                height={400} />
+                height={400}>
+                {!showCityLinks && <Container>
+                  <h2 className='smooth-image-title'>{title}</h2>
+                </Container>}
+              </SmoothImage>
               {showCityLinks && <div className='city-links full-width'>
                 <Container>
                   <Row>             
                   {cities.map((city, i) => {
                     return (
-                      <Col xs='12' md='4' key={i}>
+                      <Col xs='12' md='4' key={i} className='carousel-item-container'>
                         <StartPageCarouselItem
                           item={city}
                           order={i}

@@ -112,7 +112,7 @@ class CoursesPage extends Component {
     let title = this.state.title;
     let isCoursePage = false
     let content = null;
-    let galleryItems, body
+    let galleryItems, body, shortInfo
     if (slug) {
       // This is a course page (e.g. /kurser/musikkurser/skrikkurs-vt-18)
       isCoursePage = true
@@ -145,19 +145,21 @@ class CoursesPage extends Component {
       // content = this.renderPage(filteredCategories, this.props.content);
       galleryItems = filteredCategories
       body = this.props.content.body
+      shortInfo = !hideFilterer ? this.props.content.shortInfo : null
     }
     let filterer = (!hideFilterer && !isCoursePage) ? <CourseFilterer items={cities} filter={this.filter} /> : null
     return (
-      <div className='courses-page'>
+      <div className={`courses-page${hideFilterer ? ' no-bg' : ''}`}>
         <Container>
-          <Row>
+          {/* <Row>
             <Col>
               {title && <h2>{title}</h2>}
             </Col>
-          </Row>
+          </Row> */}
         
           <Row>
-            <Col>
+            <Col className='pages-container'>
+              {shortInfo && <p className='short-info' dangerouslySetInnerHTML={{ __html: shortInfo }} />}
               {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
             </Col>
           </Row>
@@ -172,7 +174,12 @@ class CoursesPage extends Component {
           <Row>
             {/* <Col xs={category ? "9" : "12"}> */}
             <Col>
-              <BannerBoxContainer banners={galleryItems} items={galleryItems} filterer={filterer} rootUrl={root} />
+              <BannerBoxContainer
+                title={title}
+                banners={galleryItems}
+                items={galleryItems}
+                filterer={filterer}
+                rootUrl={root} />
             </Col>
           </Row>
         </Container>}

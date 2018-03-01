@@ -4,7 +4,11 @@
 .banner-boxes-container {
   background-color: $brand-fourth;
   @include gradient-darker($brand-fourth);
+  .no-bg & {
+    background: none;
+  }
   padding: 1em 0;
+  min-height: 600px;
   .banner-boxes {
     display: flex;
     .banner-box {

@@ -1,4 +1,5 @@
 @import 'styles/_colors.scss';
+@import 'styles/_mixins.scss';
 @import 'bootstrap/scss/_functions';
 @import 'bootstrap/scss/_variables';
 @import 'bootstrap/scss/mixins/_breakpoints';
@@ -11,6 +12,12 @@
   .row {
     margin-bottom: 3rem;
     .col {
+      padding: 0;
+    }
+  }
+  .carousel-item-container {
+    @include media-breakpoint-down(sm) {
+      /* small only */
       padding: 0;
     }
   }
@@ -54,20 +61,31 @@
       display: none;
     }
     &:hover,
-    &:active {
+    &:active,
+    &.active {
       color: #fff;
+      @include media-breakpoint-down(sm) {
+        /* small only */
+        background: darken($brand-primary, 10%);
+        @include gradient-center(darken($brand-primary, 10%))
+      }
     }
   }
   #city-indicator {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    font-size: 12px;
-    width: 2em;
-    height: 2em;
-    margin-left: -1em;
-    border: 1em solid transparent;
-    border-bottom: 1em solid white;
-    transition: left 400ms ease-in-out;
+    display: none;
+    @include media-breakpoint-up(md) {
+      /* large */
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      font-size: 12px;
+      width: 2em;
+      height: 2em;
+      margin-left: -1em;
+      border: 1em solid transparent;
+      border-bottom: 1em solid white;
+      transition: left 400ms ease-in-out;
+      display: block;
+    }
   }
 }
