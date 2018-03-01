@@ -16,6 +16,8 @@
         /* small only */
         border-top: 1px solid transparent;
         border-bottom: 1px solid transparent;
+        // Closing of menu
+        transition: max-height 500ms ease-in-out, margin 500ms ease-in-out, border 500ms ease-in-out;
       }
     }
     &.open {
@@ -23,10 +25,9 @@
         /* small only */
         border-top: 1px solid #eee;
         border-bottom: 1px solid #eee;
-        // margin-bottom: 30px;
+        transition: max-height 500ms ease-out, margin 500ms ease-out, border 500ms ease-out;
       }
     }
-    transition: max-height 500ms ease-in-out, margin 500ms ease-in-out, border 500ms ease-in-out;
     @include media-breakpoint-up(md) {
       /* large */
       flex-direction: row;
@@ -50,7 +51,7 @@
         @include media-breakpoint-down(sm) {
           /* small only */
           &.first {
-            margin-top: 1rem;
+            padding-top: 1rem;
           }
           &.last {
             margin-bottom: 1rem;
@@ -76,19 +77,20 @@
   }
   #main-menu-indicator {
     /* small */
-    display:block;
+    display:none;
     position: absolute;
     height: 2em;
     width: 2px;
     left: 0;
     @include media-breakpoint-up(md) {
       /* large */
+      display:block;
       width: 80px;
       height: 2px;
       bottom: 0;
     }
+    transition: left 250ms ease-out, top 250ms ease-out, width 250ms ease-out, height 250ms ease-out, opacity 500ms ease-out;
     opacity: 0;
     background-color: $brand-primary;
-    transition: left 250ms ease-out, top 250ms ease-out, width 250ms ease-out, height 250ms ease-out, opacity 500ms 250ms ease-out;
   }
 }

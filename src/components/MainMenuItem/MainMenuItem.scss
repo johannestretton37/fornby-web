@@ -8,6 +8,18 @@
   position: relative;
   .nav-link {
     flex-grow: 1;
+    @include media-breakpoint-down(sm) {
+      padding-left: 0;
+      span {
+        padding-left: 1rem;
+        border-left: 2px solid transparent;
+      }
+      &.active span {
+        padding-left: 1rem;
+        border-left: 2px solid $brand-primary;
+        transition: border-color 400ms ease-in-out;
+      }
+    }
   }
   .sub-items-toggler {
     display: block;

@@ -86,10 +86,20 @@ class MainMenu extends Component {
         this.activeIndicator.style.transition = this.indicatorTransition
       }, 100)
     }
-    this.setState({
-      activeItem,
-      ...indicatorPosition
-    })
+    // If activeItem is undefined, activeItem shouldn't change
+    if (activeItem === undefined) {
+      activeItem = this.state.activeItem
+      const titleSpan = document.querySelector('.nav-link.active span')
+      this.setState({
+        activeItem,
+        top: titleSpan.parentElement.parentElement.offsetTop + titleSpan.parentElement.offsetTop + titleSpan.offsetTop + 'px'
+      })
+    } else {
+      this.setState({
+        activeItem,
+        ...indicatorPosition
+      })
+    }
   }
 
   render() {
