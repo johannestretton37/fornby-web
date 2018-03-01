@@ -27,7 +27,6 @@ class PagesContainer extends Component {
   static propTypes = {
     content: object.isRequired,
     match: object.isRequired,
-    rootUrl: string
   }
 
   static defaultProps = {
@@ -99,7 +98,7 @@ class PagesContainer extends Component {
                 <p dangerouslySetInnerHTML={{ __html: body }} />
                 {page === PageSlug.ANSOK ? <ApplyForm /> : null}
                 {subPageSlug && subPages[subPageSlug]}
-                {content.courseCategories && <CoursesPage title='' showSubMenu={showSubMenu} content={content} rootUrl={this.props.rootUrl} />}
+                {content.courseCategories && <CoursesPage title='' showSubMenu={showSubMenu} content={content} />}
               </div>
             }
           </Col>

@@ -16,7 +16,8 @@ class CoursesPage extends Component {
     match: object.isRequired,
     content: object.isRequired,
     title: string,
-    rootUrl: string,
+    city: string,
+    xrootUrl: string,
     showSubMenu: bool
   }
 
@@ -35,7 +36,6 @@ class CoursesPage extends Component {
     }
   }
 
-
   componentDidMount() {
     // NOTE: - we're extracting vars from this.props.content and renaming
     //         this.props.content.courseCategories to categories
@@ -46,7 +46,7 @@ class CoursesPage extends Component {
       case 'ludvika':
         hideFilterer = true
         cms.selectedCity = cities.find(city => city.slug === page)
-        break
+      break
     }
     if (this.props.showSubMenu === false) hideFilterer = true
     // If this.props.title has been provided, use that. Even if it's an empty string
@@ -95,18 +95,17 @@ class CoursesPage extends Component {
   }
 
   renderPage(galleryItems, field) {
-    let { match, rootUrl } = this.props
-    let root = rootUrl || match.url
+    let { match, xrootUrl } = this.props
+    let root = xrootUrl || match.url
     const { body } = field;
     return (
       <div>
         {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
-        <BannerBoxContainer banners={galleryItems} items={galleryItems} rootUrl={root} />
+        <BannerBoxContainer banners={galleryItems} items={galleryItems} xrootUrl={root} />
       </div>);
   }
 
   render() {
-    this.props.match.params.page = 'kurser';
     const { filteredCategories, hideFilterer } = this.state;
     const { category, slug } = this.props.match.params
     let title = this.state.title;
@@ -179,7 +178,7 @@ class CoursesPage extends Component {
                 banners={galleryItems}
                 items={galleryItems}
                 filterer={filterer}
-                rootUrl={root} />
+                xrootUrl={root} />
             </Col>
           </Row>
         </Container>}
