@@ -297,6 +297,7 @@ class CMS {
             const allCategories = await this.getCourseCategories()
             // Temp container for unspecified courses
             let otherCourses = new Set()
+            const otherCoursesUrl = '/kurser/ovriga-kurser'
             // Init array to hold categories
             content.courseCategories = []
             // Loop all categories
@@ -306,6 +307,7 @@ class CMS {
               let courses = allCourses.filter(course => {
                 // If courseCategory is undefined, default to `övriga kurser`
                 if (!course.courseCategory) {
+                  course.url = otherCoursesUrl + '/' + course.slug
                   otherCourses.add(course)
                   return false
                 }
@@ -331,6 +333,7 @@ class CMS {
                 isEditing: false,
                 isPublished: true,
                 slug: 'ovriga-kurser',
+                url: otherCoursesUrl,
                 shortInfo: 'Beskrivning här...',
                 courses: Array.from(otherCourses.values())
               }
