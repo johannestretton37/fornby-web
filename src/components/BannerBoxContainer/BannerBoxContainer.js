@@ -28,11 +28,7 @@ class BannerBoxContainer extends Component {
           </Row>
         </Container>}
         {this.props.filterer && <Container>
-          <Row>
-            <Col>
-              {this.props.filterer}
-            </Col>
-          </Row>
+          {this.props.filterer}
         </Container>}
         <Container className='banner-boxes'>
           <Row style={{ flexGrow: '1' }}>

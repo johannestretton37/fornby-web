@@ -1,7 +1,14 @@
 @import 'styles/_colors.scss';
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .filterer-container {
-  display: flex;
+  display: none;
+  @include media-breakpoint-up(md) {
+    /* large */
+    display: flex;
+  }
   flex-direction: row;
   justify-content: space-between;
   padding: 1em;
