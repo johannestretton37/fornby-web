@@ -75,3 +75,8 @@ ul, li {
 
 .full-width {
   padding: 0; }
+  .full-width .row {
+    margin-left: 0;
+    margin-right: 0; }
+  .full-width .col {
+    padding: 0; }

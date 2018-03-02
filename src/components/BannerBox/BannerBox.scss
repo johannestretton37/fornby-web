@@ -1,5 +1,8 @@
 @import 'styles/_colors.scss';
 @import 'styles/_mixins.scss';
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .banner-boxes-container {
   background-color: $brand-fourth;
@@ -11,9 +14,13 @@
   min-height: 400px;
   .banner-boxes {
     display: flex;
+    padding: 0;
     .banner-box {
       display: flex;
-      margin-bottom: 1em;
+      padding: 0 15px 15px;
+      @include media-breakpoint-up(md) {
+        padding: 5px;
+      }
       a {
         display: flex;
         flex-grow: 1;

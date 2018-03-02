@@ -49,4 +49,11 @@ ul, li {
 
 .full-width {
   padding: 0;
+  & .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  & .col {
+    padding: 0;
+  }
 }

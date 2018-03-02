@@ -27,11 +27,11 @@ class BannerBoxContainer extends Component {
             </Col>
           </Row>
         </Container>}
-        {this.props.filterer && <Container>
+        {this.props.filterer && <Container style={{padding: '0'}}>
           {this.props.filterer}
         </Container>}
         <Container className='banner-boxes'>
-          <Row style={{ flexGrow: '1' }}>
+          <Row style={{flexGrow: '1'}}>
             {
               banners.length > 0 ? banners.map((banner, i) => {
                 return <BannerBox key={i} content={banner} />
