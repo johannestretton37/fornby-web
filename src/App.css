@@ -55,6 +55,13 @@ h1, h2, h3, h4, h5, h6 {
 i, .short-info {
   font-family: 'Libre Baskerville'; }
 
+a {
+  color: #4f6791;
+  transition: all 250ms ease-in-out; }
+  a:hover, a:active {
+    color: #ac285c;
+    text-decoration: none; }
+
 .display-font {
   font-family: 'Barlow Condensed', 'Open Sans', sans-serif; }
 

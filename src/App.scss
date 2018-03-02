@@ -24,6 +24,16 @@ i, .short-info {
   font-family: 'Libre Baskerville';
 }
 
+a {
+  color: $brand-secondary;
+  transition: all 250ms ease-in-out;
+  &:hover,
+  &:active {
+    color: $brand-primary;
+    text-decoration: none;
+  }
+}
+
 .display-font {
   font-family: 'Barlow Condensed', 'Open Sans', sans-serif;
 }
