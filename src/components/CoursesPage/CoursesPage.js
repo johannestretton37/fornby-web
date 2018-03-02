@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Container, Row, Col } from 'reactstrap'
 import { withRouter } from 'react-router-dom'
 import './CoursesPage.css'
-import { object, bool, string } from 'prop-types'
+import { object, bool, string, array } from 'prop-types'
 import CoursePage from '../CoursePage';
 import CourseFilterer from '../CourseFilterer';
 import cms from '../../cms'
@@ -17,8 +17,7 @@ class CoursesPage extends Component {
     content: object.isRequired,
     title: string,
     city: string,
-    xrootUrl: string,
-    showSubMenu: bool
+    subMenuItems: array
   }
 
   static defaultProps = {
@@ -32,6 +31,7 @@ class CoursesPage extends Component {
       categories: [],
       // Only these filtered categories will be displayed
       filteredCategories: [],
+      subMenuItems: [],
       title: ''
     }
   }
@@ -39,7 +39,7 @@ class CoursesPage extends Component {
   componentDidMount() {
     // NOTE: - we're extracting vars from this.props.content and renaming
     //         this.props.content.courseCategories to categories
-    let { title, content: { name, courseCategories: categories }, match: { params: { page } } } = this.props
+    let { title, content: { name, courseCategories: categories }, subMenuItems, match: { params: { page } } } = this.props
     let hideFilterer = false
     switch (page) {
       case 'falun':
@@ -48,7 +48,7 @@ class CoursesPage extends Component {
         cms.selectedCity = cities.find(city => city.slug === page)
       break
     }
-    if (this.props.showSubMenu === false) hideFilterer = true
+    // if (this.props.subMenuItems.length > 0) hideFilterer = true
     // If this.props.title has been provided, use that. Even if it's an empty string
     let pageTitle
     if (title === '') {
@@ -61,7 +61,8 @@ class CoursesPage extends Component {
       categories,
       filteredCategories: this.filteredCategories(categories),
       title: pageTitle,
-      hideFilterer
+      hideFilterer,
+      subMenuItems
     })
   }
 
@@ -106,7 +107,7 @@ class CoursesPage extends Component {
   }
 
   render() {
-    const { filteredCategories, hideFilterer } = this.state;
+    const { filteredCategories, hideFilterer, subMenuItems } = this.state;
     const { category, slug } = this.props.match.params
     let title = this.state.title;
     let isCoursePage = false
@@ -122,8 +123,12 @@ class CoursesPage extends Component {
           title = null;
           content = (
             <Row>
-              <SubMenu match={this.props.match} />
-              <Col md={8}>
+            {subMenuItems.length > 0 && 
+              <Col md={4} className='sub-menu-container'>
+                <SubMenu items={subMenuItems} />
+              </Col>
+            }
+              <Col md={subMenuItems.length > 0 ? 8 : 12}>
                 <CoursePage content={course} onApplyChanged={() => { }} />
               </Col>
             </Row>
@@ -163,8 +168,6 @@ class CoursesPage extends Component {
             </Col>
           </Row>
           
-        {/* {category && <SubMenu match={this.props.match} />} */}
-
           {isCoursePage && content}
         </Container>
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { array, string, object } from 'prop-types'
+import { array, object } from 'prop-types'
 import { CSSTransition } from 'react-transition-group'
 import { withRouter } from 'react-router-dom'
 import SmoothImage from '../SmoothImage'
@@ -11,9 +11,7 @@ import {
   CardImg,
   CardTitle,
   CardText,
-  CardBody,
   CardSubtitle,
-  Button,
   CardImgOverlay
 } from 'reactstrap'
 import './GalleryItems.css'
@@ -21,14 +19,13 @@ import './GalleryItems.css'
 
 GalleryItems.propTypes = {
   items: array.isRequired,
-  rootUrl: string,
   match: object.isRequired,
   history: object.isRequired
 }
 /**
  * Display an overview of an array of items
  */
-function GalleryItems({ items = [], history, match, rootUrl }) {
+function GalleryItems({ items = [], history }) {
   return (
     <Row className="galleryItems" >
       {items.map((item, i) => {

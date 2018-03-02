@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { object, string } from 'prop-types'
+import { object, array } from 'prop-types'
 import { PageSlug, cities } from '../../constants'
 import SubPage from '../SubPage'
 import ErrorPage from '../ErrorPage'
@@ -27,10 +27,12 @@ class PagesContainer extends Component {
   static propTypes = {
     content: object.isRequired,
     match: object.isRequired,
+    subMenuItems: array
   }
 
   static defaultProps = {
-    content: {}
+    content: {},
+    subMenuItems: []
   }
 
   componentDidMount() {
@@ -82,13 +84,16 @@ class PagesContainer extends Component {
       subPageSlug,
       subPages
     } = this.state
-    let { page } = this.props.match.params
-    const showSubMenu = page !== 'falun' && page !== 'ludvika'
+    let { subMenuItems, match: { params: { page } } } = this.props
     return (
       <Container>
         <Row>
-          {showSubMenu && <SubMenu />}
-          <Col>
+        {subMenuItems.length > 0 && 
+          <Col md={4} className='sub-menu-container'>
+            <SubMenu items={subMenuItems} />
+          </Col>
+        }
+          <Col md={subMenuItems.length > 0 ? 8 : 12}>
             {error ?
               <ErrorPage error={error} />
               :
@@ -98,7 +103,7 @@ class PagesContainer extends Component {
                 <p dangerouslySetInnerHTML={{ __html: body }} />
                 {page === PageSlug.ANSOK ? <ApplyForm /> : null}
                 {subPageSlug && subPages[subPageSlug]}
-                {content.courseCategories && <CoursesPage title='' showSubMenu={showSubMenu} content={content} />}
+                {content.courseCategories && <CoursesPage title='' subMenuItems={subMenuItems} content={content} />}
               </div>
             }
           </Col>
