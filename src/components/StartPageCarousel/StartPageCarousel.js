@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {object, array} from 'prop-types'
+import {object} from 'prop-types'
 // import {withRouter} from 'react-router-dom'
 import {Transition} from 'react-transition-group'
 import { Container, Row, Col } from 'reactstrap'
@@ -186,13 +186,14 @@ class StartPageCarousel extends Component {
               maxHeight: state === 'exiting' ? '0px' : '600px',
             }} >
               <SmoothImage
+                id={city}
                 className='full-width'
                 src={src}
                 preview={preview}
                 height={400}>
-                {!showCityLinks && <Container>
+                {!showCityLinks ? <Container>
                   <h2 className='smooth-image-title'>{title}</h2>
-                </Container>}
+                </Container> : null}
               </SmoothImage>
               {showCityLinks && <div className='city-links full-width'>
                 <Container>

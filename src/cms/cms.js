@@ -429,43 +429,6 @@ class CMS {
   }
 
   /**
-   * Fetch images for the start page carousel
-   * @returns - A Promise that resolves to an array of objects, e.g.
-   * {
-   *   title: 'Image Headline',
-   *   alt: 'Image caption text',
-   *   subtitle: 'A short text',
-   *   image: 'http://www.example.com/path/to/image/file.jpg'
-   * }
-   */
-  getSlides = () => {
-    throw new Error('Hämta main pages images istället så struntar vi i START_PAGE_SLIDES')
-    
-    // Return cached content if present
-    if (this.cache[ContentGroup.START_PAGE_SLIDES]) return Promise.resolve(this.cache[ContentGroup.START_PAGE_SLIDES])
-    // Check if promise is pending
-    if (this.pending[ContentGroup.START_PAGE_SLIDES]) return this.pending[ContentGroup.START_PAGE_SLIDES]
-    // Cache pending promise to prevent multiple calls to cms
-    this.pending[ContentGroup.START_PAGE_SLIDES] = new Promise(async (resolve, reject) => {
-      try {
-        const slides = await this.getContentGroup(
-          ContentGroup.START_PAGE_SLIDES,
-          {
-            fields: ['title', 'alt', 'subtitle', ...defaultFields],
-            populate: ['images']
-          }
-        )
-        if (!slides) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta slides')
-        this.cache[ContentGroup.START_PAGE_SLIDES] = slides
-        return resolve(slides)
-      } catch (error) {
-        return reject(error)
-      }
-    })
-    return this.pending[ContentGroup.START_PAGE_SLIDES]
-  }
-
-  /**
    * Helper function to transform a firebase object into an array
    * @param {object} data - The data returned from a flamelink operation, such as `get`
    * @param {string} contentGroup - A string corresponding to a flamelink Collection
@@ -592,6 +555,8 @@ class CMS {
               Promise.all([
                 this.getPageContent(PageSlug.PRAKTISK_INFO)
               ])
+            break
+            default: break
           }
         }
       })

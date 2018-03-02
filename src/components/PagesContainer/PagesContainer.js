@@ -41,7 +41,8 @@ class PagesContainer extends Component {
       case 'falun':
       case 'ludvika':
         cms.selectedCity = cities.find(city => city.slug === page)
-        break
+      break
+      default: break
     }
     if (content.subPages) {
       // Map subPages by slug

@@ -71,7 +71,8 @@ class SearchBar extends Component {
           isSelected: index
         }
       })
-    break
+      break
+      default: break
     }
   }
 

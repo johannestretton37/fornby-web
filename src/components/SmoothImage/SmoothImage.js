@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {string, number, element, object, oneOfType, arrayOf } from 'prop-types'
+import {string, number, element, object, oneOfType, arrayOf} from 'prop-types'
 import './SmoothImage.css'
   
 class SmoothImage extends Component {
@@ -8,6 +8,7 @@ class SmoothImage extends Component {
   }
 
   static propTypes = {
+    id: string,
     src: string,
     preview: object,
     width: number,
@@ -38,10 +39,10 @@ class SmoothImage extends Component {
   }
 
   render() {
-    const { src, preview, width, height, className } = this.props
+    const { id, src, preview, width, height, className } = this.props
     let { isLoaded } = this.state
     return (
-      <div className={`image-container${className ? ' ' + className : ''}${isLoaded ? ' is-loaded' : ''}`} style={{width: `${width}px`, height: `${height}px`}}>
+      <div id={id} className={`image-container${className ? ' ' + className : ''}${isLoaded ? ' is-loaded' : ''}`} style={{width: `${width}px`, height: `${height}px`}}>
         <div className='final-img' style={{
           backgroundImage: `url(${src})`,
         }}>

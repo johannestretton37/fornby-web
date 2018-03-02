@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { string } from 'prop-types'
 import { Route } from 'react-router-dom'
-import { Container, Row } from 'reactstrap'
 import { ContentGroup, defaultFields } from '../../constants'
 import MainPage from '../MainPage'
 import cms from '../../cms'

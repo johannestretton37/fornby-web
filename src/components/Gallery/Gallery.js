@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {string, array, object} from 'prop-types'
+import {array, object} from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import GalleryItems from '../GalleryItems'
 import './Gallery.css'

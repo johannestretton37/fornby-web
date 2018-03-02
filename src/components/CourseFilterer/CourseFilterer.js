@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {func, string, array, object} from 'prop-types'
+import {func, string, array} from 'prop-types'
 import { Row, Col } from 'reactstrap'
 import cms from '../../cms'
 import './CourseFilterer.css'

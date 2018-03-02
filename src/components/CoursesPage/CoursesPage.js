@@ -2,14 +2,14 @@ import React, { Component } from 'react'
 import { Container, Row, Col } from 'reactstrap'
 import { withRouter } from 'react-router-dom'
 import './CoursesPage.css'
-import { object, bool, string, array } from 'prop-types'
+import { object, string, array } from 'prop-types'
 import CoursePage from '../CoursePage';
 import CourseFilterer from '../CourseFilterer';
 import cms from '../../cms'
 import { cities } from '../../constants';
-import SmoothImage from '../SmoothImage';
 import BannerBoxContainer from '../BannerBoxContainer'
 import SubMenu from '../SubMenu'
+import ScrollToContent from '../ScrollToContent/ScrollToContent';
 
 class CoursesPage extends Component {
   static propTypes = {
@@ -47,6 +47,7 @@ class CoursesPage extends Component {
         hideFilterer = true
         cms.selectedCity = cities.find(city => city.slug === page)
       break
+      default: break
     }
     // if (this.props.subMenuItems.length > 0) hideFilterer = true
     // If this.props.title has been provided, use that. Even if it's an empty string
@@ -96,8 +97,8 @@ class CoursesPage extends Component {
   }
 
   renderPage(galleryItems, field) {
-    let { match, xrootUrl } = this.props
-    let root = xrootUrl || match.url
+    let { match } = this.props
+    let root = match.url
     const { body } = field;
     return (
       <div>
@@ -112,9 +113,11 @@ class CoursesPage extends Component {
     let title = this.state.title;
     let isCoursePage = false
     let content = null;
-    let galleryItems, body, shortInfo
+    let galleryItems, body, shortInfo, id, scrollTarget
     if (slug) {
       // This is a course page (e.g. /kurser/musikkurser/skrikkurs-vt-18)
+      id = slug
+      scrollTarget = slug
       isCoursePage = true
       const items = this.findCategory(filteredCategories, category)
       if (items && items.courses) {
@@ -137,6 +140,8 @@ class CoursesPage extends Component {
       }
     } else if (category) {
       // This is a category page (e.g. /kurser/musikkurser)
+      id = category
+      scrollTarget = category
       const items = this.findCategory(filteredCategories, category)
       if (items && items.courses) {
         title = items.name;
@@ -146,6 +151,8 @@ class CoursesPage extends Component {
       }
     } else if (this.props.content) {
       // This is a categories page (e.g. /kurser)
+      id = this.props.content.slug + '-content'
+      scrollTarget = this.props.content.slug
       // content = this.renderPage(filteredCategories, this.props.content);
       galleryItems = filteredCategories
       body = this.props.content.body
@@ -153,7 +160,8 @@ class CoursesPage extends Component {
     }
     let filterer = (!hideFilterer && !isCoursePage) ? <CourseFilterer items={cities} filter={this.filter} /> : null
     return (
-      <div className={`courses-page${hideFilterer ? ' no-bg' : ''}`}>
+      <div id={id} className={`courses-page${hideFilterer ? ' no-bg' : ''}`}>
+        <ScrollToContent id={scrollTarget} />
         <Container>
           {/* <Row>
             <Col>

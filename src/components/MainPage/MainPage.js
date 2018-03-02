@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { object, bool } from 'prop-types'
+import { object } from 'prop-types'
 import { PageSlug } from '../../constants'
 import CoursesPage from '../CoursesPage'
 import Loading from '../Loading'
