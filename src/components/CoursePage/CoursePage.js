@@ -115,7 +115,7 @@ class CoursePage extends Component {
           <SmoothImage className='full-width' src={src} preview={preview} height={400}>
             <p className='course-title'>{name}</p>
             <div className='course-attend_button' onClick={this.handleClick}>
-              <span>ANSÖK TILL {name}</span>
+              <span>ANSÖK NU</span>
             </div>
           </SmoothImage>
         </div>}

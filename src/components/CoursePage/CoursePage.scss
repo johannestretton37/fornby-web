@@ -24,13 +24,10 @@
       text-shadow: 2px 2px #212121;
       text-shadow: 0 0 20px #48526e;
     }
-    .course-attend_button{
-      // position: absolute;
-      // left:50%;
-      // bottom: 25%;
-      // transform: translate(-50%, 25%);
+    .course-attend_button {
       margin: auto auto 40px auto;
-      padding: 20px;
+      font-size: 1.1em;
+      padding: 0.8em 1.8em;
       display: flex;
       flex-direction: column;
       background-color: $brand-secondary;
