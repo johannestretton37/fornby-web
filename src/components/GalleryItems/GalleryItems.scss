@@ -1,29 +1,74 @@
 @import '../../styles/colors';
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
-.card-img-top {
-  height: 100%;
-  background: #eee;
+.galleryItems {
+  margin-left: -15px;
+  .galleryItem-container {
+    width:33.333%;
+    float: left;
+    display: flex;
+    position: relative;
+      
+    .image-container {
+        height: 320px;
+        width: 100%;
+        flex: 40%;
+    }
+    .itemInfoWrap {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      transition: opacity 0.3s ease-in-out;
+      top:0;
+      padding: 20px;
+      left:0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255,255,255,0.5)        
+    }
+    .itemInfoWrap:hover {
+      opacity: 1;
+    }
+  }
+}
+@include media-breakpoint-down(lg) {
+  .galleryItems {
+    .galleryItem-container {      
+      .image-container {
+        height: 290px;
+      }
+    }
+  }
+}
+@include media-breakpoint-down(md) {
+  .galleryItems {
+    .galleryItem-container {
+      
+      .image-container {
+        height: 230px;
+      }
+    }
+  }
 }
 
-.galleryItems{
-  .card{
-    transition: transform 0.3s ease-in-out;
-    cursor: pointer;
+@include media-breakpoint-down(sm) {
+  .galleryItems {
+    .galleryItem-container {
+      width:100%;     
+      float: left;
+    
+      .image-container {
+        height: 190px;
+      }
+      .itemInfoWrap {
+        position: static;
+        opacity: 1;
+        flex: 60%;
+      }
+    }
   }
-  .card-title{
-    color: $brand-third;
-    text-shadow: 0 0 20px #48526e;
-    text-decoration: underline;
-  }
-  .card-text {
-    color: #fff;
-    text-shadow: 0 0 20px #48526e;
-    text-overflow: ellipsis;
-  }
-  .card-subtitle{
-    color: #fff;
-    text-shadow: 0 0 20px #48526e;
-    text-overflow: ellipsis;
-    text-overflow: hidden;
-  }
+  
 }
+

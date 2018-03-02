@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import {string, array, object} from 'prop-types'
+import { string, array, object } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import GalleryItems from '../GalleryItems'
 import './Gallery.css'
-
+import { Col, Row } from 'reactstrap'
 
 /**
  * Display a Gallery with an overview of an array of items
@@ -28,7 +28,9 @@ class Gallery extends Component {
       return item
     })
     return (
-      <GalleryItems items={galleryItems} />
+      <Col xs="12">
+        <GalleryItems items={galleryItems} />
+      </Col>
     )
   }
 }
