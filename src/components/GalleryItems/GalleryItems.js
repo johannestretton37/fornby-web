@@ -17,7 +17,6 @@ GalleryItems.propTypes = {
 function GalleryItems({ items = [] }) {
   return (
     <div className="galleryItems" >
-
       {items.map((item, i) => {
         const src = item.images ? item.images[0].url : undefined
         const preview = item.previews ? item.previews[0] : undefined
@@ -32,9 +31,9 @@ function GalleryItems({ items = [] }) {
             <div className="galleryItem-container">
               <SmoothImage className='full-width' src={src} preview={preview} />
               <div className="itemInfoWrap">
-                <h3>
+                <h4>
                   {item.name}
-                </h3>
+                </h4>
                 <div>
                   {item.role}
                   <br />
@@ -48,7 +47,4 @@ function GalleryItems({ items = [] }) {
     </div>
   )
 }
-
-
-
 export default withRouter(GalleryItems)
