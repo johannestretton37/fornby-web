@@ -6,15 +6,15 @@
     font-weight: normal;
     color: $default-text-color;
   }
-  a{
+  a {
     color: $link-text-color;
   }
-  &-image_wrapper{
+  &-image_wrapper {
     position: relative;
     background-color: #f0f;
     margin-bottom: inherit;
     
-    .course-title{
+    .course-title {
       margin: 30px auto auto 40px;
       font-family: 'Barlow Condensed';
       text-transform: uppercase;
@@ -49,6 +49,9 @@
     }
     &.contact{
       background-color: $brand-fourth;
+      a:hover {
+        color: $brand-primary;
+      }
     }
   }
 

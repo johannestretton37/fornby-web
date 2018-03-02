@@ -4,14 +4,8 @@ import './ApplyForm.css'
   
 class ApplyForm extends Component {
   state = {
-    iframeSrc: '',
+    iframeSrc: 'https://sms.schoolsoft.se/fhsk/jsp/LoginApplicant.jsp#/',
     isLoaded: false
-  }
-
-  componentDidMount() {
-    this.setState({
-      iframeSrc: 'https://sms.schoolsoft.se/fhsk/jsp/LoginApplicant.jsp#/'
-    })
   }
 
   handleLoad = () => {
@@ -28,6 +22,7 @@ class ApplyForm extends Component {
           <div className='iframe-container'>
             <iframe id='schoolsoft' style={{ opacity: isLoaded ? 1 : 0 }} onLoad={this.handleLoad} title='Ansökan SchoolSoft' src={iframeSrc}></iframe>
           </div>
+          <p style={{textAlign: 'center', marginBottom: '2em'}}>Du kan också <a style={{fontWeight: 'bold'}}href={iframeSrc} target='_blank'>klicka här</a> för att öppna ansökningen i ett nytt fönster.</p>
         </Col>
       </Row>
     )
