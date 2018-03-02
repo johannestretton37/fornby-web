@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "bootstrap": "4.0.0-beta.3",
-    "firebase": "^4.8.1",
-    "firebaseui": "^2.5.1",
+    "firebase": "^4.10.1",
+    "firebaseui": "^2.6.2",
     "flamelink": "^0.13.4",
     "node-sass-chokidar": "^0.0.3",
     "npm-run-all": "^4.1.2",
