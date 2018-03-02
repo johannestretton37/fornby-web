@@ -31,6 +31,9 @@
     .itemInfoWrap:hover {
       opacity: 1;
     }
+    h4{
+      color: $brand-secondary;
+    }
   }
 }
 @include media-breakpoint-down(lg) {
