@@ -123,7 +123,7 @@ class MainPage extends Component {
   render() {
     const { isLoading, pageContent, subMenuItems, title, error } = this.state
     return (
-      <Container className='full-width' fluid={true}>
+      <Container className='full-width main-page' fluid={true}>
         {isLoading ?
           <Loading />
           :
