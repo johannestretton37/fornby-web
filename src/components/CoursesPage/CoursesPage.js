@@ -96,17 +96,6 @@ class CoursesPage extends Component {
     }
   }
 
-  renderPage(galleryItems, field) {
-    let { match } = this.props
-    let root = match.url
-    const { body } = field;
-    return (
-      <div>
-        {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
-        <BannerBoxContainer banners={galleryItems} items={galleryItems} xrootUrl={root} />
-      </div>);
-  }
-
   render() {
     const { filteredCategories, hideFilterer, subMenuItems } = this.state;
     const { category, slug } = this.props.match.params
