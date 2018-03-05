@@ -10,6 +10,7 @@ import { cities } from '../../constants';
 import BannerBoxContainer from '../BannerBoxContainer'
 import SubMenu from '../SubMenu'
 import ScrollToContent from '../ScrollToContent/ScrollToContent';
+import BackButton from '../BackButton'
 
 class CoursesPage extends Component {
   static propTypes = {
@@ -46,7 +47,7 @@ class CoursesPage extends Component {
       case 'ludvika':
         hideFilterer = true
         cms.selectedCity = cities.find(city => city.slug === page)
-      break
+        break
       default: break
     }
     // if (this.props.subMenuItems.length > 0) hideFilterer = true
@@ -115,11 +116,11 @@ class CoursesPage extends Component {
           title = null;
           content = (
             <Row>
-            {subMenuItems.length > 0 && 
-              <Col md={4} className='sub-menu-container'>
-                <SubMenu items={subMenuItems} />
-              </Col>
-            }
+              {subMenuItems.length > 0 &&
+                <Col md={4} className='sub-menu-container'>
+                  <SubMenu items={subMenuItems} />
+                </Col>
+              }
               <Col md={subMenuItems.length > 0 ? 8 : 12}>
                 <CoursePage content={course} onApplyChanged={() => { }} />
               </Col>
@@ -152,26 +153,20 @@ class CoursesPage extends Component {
       <div id={id} className={`courses-page${hideFilterer ? ' no-bg' : ''}`}>
         <ScrollToContent id={scrollTarget} />
         <Container>
-          {/* <Row>
-            <Col>
-              {title && <h2>{title}</h2>}
-            </Col>
-          </Row> */}
-        
           <Row>
             <Col className='pages-container'>
               {shortInfo && <p className='short-info' dangerouslySetInnerHTML={{ __html: shortInfo }} />}
               {body && <p dangerouslySetInnerHTML={{ __html: body }} />}
+              {!isCoursePage && category &&
+                <BackButton prevPage="kurser" overridePage={"/kurser"} />
+              }
             </Col>
           </Row>
-          
           {isCoursePage && content}
         </Container>
 
-
         {!isCoursePage && <Container className='full-width' fluid={true}>
           <Row>
-            {/* <Col xs={category ? "9" : "12"}> */}
             <Col>
               <BannerBoxContainer
                 title={title}
