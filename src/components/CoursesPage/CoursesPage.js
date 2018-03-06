@@ -150,6 +150,9 @@ class CoursesPage extends Component {
         // content = this.renderPage(items.courses, items);
         galleryItems = items.courses
         body = items.body
+      } else {
+        let categoryPage = this.state.categories.find(cat => cat.slug === category)
+        if (categoryPage) title = categoryPage.name
       }
     } else if (this.props.content) {
       // This is a categories page (e.g. /kurser)
