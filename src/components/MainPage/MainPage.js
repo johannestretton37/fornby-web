@@ -77,8 +77,8 @@ class MainPage extends Component {
     let menuItems = []
     if (pageContent === undefined || !pageContent.courseCategories) return this.menuItems;
     const page = '/' + this.props.match.params.page
-    // let selectedCity
-    // if (cms.selectedCity) selectedCity = cms.selectedCity.slug
+    let selectedCity
+    if (cms.selectedCity) selectedCity = cms.selectedCity.slug
     pageContent.courseCategories.forEach(subpage => {
       let menuItem = {
         title: subpage.name,
@@ -87,7 +87,7 @@ class MainPage extends Component {
       if (subpage.courses) {
         subpage.courses.forEach(course => {
           let { name, slug, city } = course
-          // if (city !== selectedCity) return false
+          if (city !== selectedCity) return false
           if (!menuItem.subItems) menuItem.subItems = []
           menuItem.subItems.push({
             title: name,
@@ -96,8 +96,7 @@ class MainPage extends Component {
           })
         })
       }
-      // if (menuItem.subItems) menuItems.push(menuItem)
-      menuItems.push(menuItem)
+      if (menuItem.subItems) menuItems.push(menuItem)
     })
     return menuItems;
   }
