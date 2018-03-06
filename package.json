@@ -45,7 +45,8 @@
     "parser": "babel-eslint",
     "plugins": [
       "react",
-      "prettier"
+      "prettier",
+      "jest"
     ],
     "parserOptions": {
       "sourceType": "module"
