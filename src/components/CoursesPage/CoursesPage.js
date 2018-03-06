@@ -79,6 +79,7 @@ class CoursesPage extends Component {
   }
 
   filter = () => {
+    console.log('Filtering on', cms.selectedCity)
     this.setState({
       filteredCategories: this.filteredCategories(this.state.categories)
     })
@@ -87,11 +88,22 @@ class CoursesPage extends Component {
   filteredCategories = (categories) => {
     const city = cms.selectedCity
     if (city && city.slug !== '') {
-      return categories.filter(category => {
+      // Find all categories that has at least one course match
+      let matchedCategories = categories.filter(category => {
         return category.courses.filter(course => {
           return course.city === city.slug
         }).length > 0
       })
+      let filteredCategories = []
+      // Add all courses that does match
+      matchedCategories.forEach(category => {
+        let filteredCategory = Object.assign({}, category)
+        filteredCategory.courses = category.courses.filter(course => {
+          return course.city === city.slug
+        })
+        filteredCategories.push(filteredCategory)
+      })
+      return filteredCategories
     } else {
       return categories
     }

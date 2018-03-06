@@ -77,6 +77,8 @@ class MainPage extends Component {
     let menuItems = []
     if (pageContent === undefined || !pageContent.courseCategories) return this.menuItems;
     const page = '/' + this.props.match.params.page
+    // let selectedCity
+    // if (cms.selectedCity) selectedCity = cms.selectedCity.slug
     pageContent.courseCategories.forEach(subpage => {
       let menuItem = {
         title: subpage.name,
@@ -84,14 +86,17 @@ class MainPage extends Component {
       }
       if (subpage.courses) {
         subpage.courses.forEach(course => {
-          let { name, slug } = course
+          let { name, slug, city } = course
+          // if (city !== selectedCity) return false
           if (!menuItem.subItems) menuItem.subItems = []
           menuItem.subItems.push({
             title: name,
-            url: page + '/' + subpage.slug + '/' + slug
+            url: page + '/' + subpage.slug + '/' + slug,
+            city: city
           })
         })
       }
+      // if (menuItem.subItems) menuItems.push(menuItem)
       menuItems.push(menuItem)
     })
     return menuItems;
