@@ -13,13 +13,14 @@ class BannerBoxContainer extends Component {
   }
 
   static defaultProps = {
-    banners: []
+    banners: [],
+    title: ''
   }
 
   render() {
-    const { banners } = this.props;
+    const { banners, title } = this.props;
     // A somewhat hacky solution to pluralize course name
-    let pluralizedCourses = this.props.title.toLowerCase() || 'kurser'
+    let pluralizedCourses = title.toLowerCase() || 'kurser'
     if (!pluralizedCourses.endsWith('kurser')) pluralizedCourses += '-kurser'
     return (
       <div className='banner-boxes-container full-width'>
@@ -40,7 +41,7 @@ class BannerBoxContainer extends Component {
                 return <BannerBox key={i} content={banner} />
               })
             :
-              this.props.filterer && <p style={{ textAlign: 'center', flexGrow: '1' }}>Det finns inga {pluralizedCourses} att söka{cms.selectedCity ? ' i ' + cms.selectedCity.title : ''} för tillfället.</p>
+              this.props.filterer && <p style={{ marginTop: '2em', textAlign: 'center', flexGrow: '1' }}>Det finns inga {pluralizedCourses} att söka{cms.selectedCity ? ' i ' + cms.selectedCity.title : ''} för tillfället.</p>
             }
           </Row>
         </Container>
