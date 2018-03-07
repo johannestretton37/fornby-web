@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { object, number, bool, func } from 'prop-types'
 import Icon from '../Icon'
 import cms from '../../cms'
+import throttle from 'lodash/throttle'
 import './MainMenuItem.css'
 
 class MainMenuItem extends Component {
@@ -28,6 +29,11 @@ class MainMenuItem extends Component {
     isVertical: false
   }
 
+  constructor(props) {
+    super(props)
+    this.throttler = throttle(this.handleResize, 100)
+  }
+
   componentDidMount() {
     if (this.props.isActive) {
       this.updateIsVertical(window.innerWidth < 768)
@@ -50,7 +56,6 @@ class MainMenuItem extends Component {
   }
 
   handleResize = e => {
-    // TODO: Throttle this!
     this.updateIsVertical(e.target.innerWidth < 768)
     this.moveIndicator(true)
   }

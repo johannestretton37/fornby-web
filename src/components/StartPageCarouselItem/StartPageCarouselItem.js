@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './StartPageCarouselItem.css'
 import {object, number, bool, func} from 'prop-types'
+import throttle from 'lodash/throttle'
   
 class StartPageCarouselItem extends Component {
     static propTypes = {
@@ -17,27 +18,31 @@ class StartPageCarouselItem extends Component {
       isLast: false
     }
   
+    constructor(props) {
+      super(props)
+      this.throttler = throttle(this.handleResize, 100)
+    }
+
     componentDidMount() {
       if (this.props.isActive) {
         this.moveIndicator(true)
-        window.addEventListener('resize', this.handleResize)
+        window.addEventListener('resize', this.throttler)
       }
     }
   
     componentWillReceiveProps(nextProps) {
       if (!nextProps.isActive && this.props.isActive) {
         // This item toggled to inactive, remove listener
-        window.removeEventListener('resize', this.handleResize)
+        window.removeEventListener('resize', this.throttler)
       }
       if (nextProps.isActive && !this.props.isActive) {
         // This item toggled to active, add listener
-        window.addEventListener('resize', this.handleResize)
+        window.addEventListener('resize', this.throttler)
         this.moveIndicator()
       }
     }
   
     handleResize = () => {
-      // TODO: Throttle this!
       this.moveIndicator(true)
     }
   

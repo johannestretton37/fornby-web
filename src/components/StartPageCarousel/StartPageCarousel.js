@@ -8,6 +8,7 @@ import cms from '../../cms'
 import {cities} from '../../constants'
 import './StartPageCarousel.css'
 import StartPageCarouselItem from '../StartPageCarouselItem'
+import throttle from 'lodash/throttle'
 
 class StartPageCarousel extends Component {
   state = {
@@ -16,25 +17,31 @@ class StartPageCarousel extends Component {
     activeItem: 1,
     images: {},
     imageIndex: 0,
-    showCityLinks: false
+    showCityLinks: false,
+    height: 400
   }
 
   static propTypes = {
     match: object,
     location: object,
     history: object
-    // items: array
   }
 
-  // static defaultProps = {
-  //   items: []
-  // }
+  constructor(props) {
+    super(props)
+    this.throttler = throttle(this.updateImageDimensions, 1000)
+  }
 
   componentDidMount() {
     this.update(this.props.match.params.page, this.props.match.params.subPage)
     this.findActiveItem()
+    window.addEventListener('resize', this.throttler)
   }
 
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.throttler)
+  }
+  
   componentWillReceiveProps(nextProps) {
     if (nextProps.match.params.page !== this.props.match.params.page) {
       // Default to start page '/' if city is undefined
@@ -67,6 +74,7 @@ class StartPageCarousel extends Component {
       return false
     }
     let page = pageParam || 'borlange'
+    this.updateImageDimensions()
     const showCityLinks = Object.values(cities).find(city => city.slug === page) !== undefined
     if (Object.keys(this.state.images).length > 0) {
       // Images are already fetched
@@ -95,6 +103,14 @@ class StartPageCarousel extends Component {
         })
       })
     }
+  }
+
+  imageHeight = () => {
+    return window.innerWidth > 600 ? 400 : 280
+  }
+
+  updateImageDimensions = () => {
+    this.setState({ height: this.imageHeight() })
   }
 
   findActiveItem = (pageSlug) => {
@@ -159,18 +175,9 @@ class StartPageCarousel extends Component {
   }
 
   render() {
-    // if (!this.state.isVisible) return null
-    const { isVisible, activeItem, showCityLinks } = this.state
+    const { isVisible, activeItem, showCityLinks, height } = this.state
     const city = this.props.match.params.page || 'borlange'
     let src, preview, title
-    // if (mainPageImages[city]) {
-    //   let image = mainPageImages[city]
-    //   src = image.src
-    //   preview = image.preview
-    // } else {
-    //   src = images[imageIndex] ? images[imageIndex].src : ''
-    //   preview = images[imageIndex] ? images[imageIndex].preview : undefined
-    // }
     if (this.state.images[city]) {
       src = this.state.images[city].src
       preview = this.state.images[city].preview
@@ -190,7 +197,7 @@ class StartPageCarousel extends Component {
                 className='full-width'
                 src={src}
                 preview={preview}
-                height={400}>
+                height={height}>
                 {!showCityLinks ? <Container>
                   <h2 className='smooth-image-title'>{title}</h2>
                 </Container> : null}

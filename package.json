@@ -7,6 +7,7 @@
     "firebase": "^4.10.1",
     "firebaseui": "^2.6.2",
     "flamelink": "^0.13.4",
+    "lodash": "^4.17.5",
     "node-sass-chokidar": "^0.0.3",
     "npm-run-all": "^4.1.2",
     "react": "^16.2.0",
