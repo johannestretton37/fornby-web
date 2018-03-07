@@ -79,7 +79,6 @@ class CoursesPage extends Component {
   }
 
   filter = () => {
-    console.log('Filtering on', cms.selectedCity)
     this.setState({
       filteredCategories: this.filteredCategories(this.state.categories)
     })

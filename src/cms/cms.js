@@ -138,6 +138,7 @@ class CMS {
         const staffPages = await this.getStaffPages()
         courses.forEach((course, i) => {
           courses[i].staff = []
+          if (!course.city) course.city = 'borlange'
           if (course.courseContactStaff) {
             course.courseContactStaff.forEach(person => {
               courses[i].staff.push(staffPages[person.id])

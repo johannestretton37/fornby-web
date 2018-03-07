@@ -87,12 +87,14 @@ class MainPage extends Component {
       if (subpage.courses) {
         subpage.courses.forEach(course => {
           let { name, slug, city } = course
-          if (city !== selectedCity) return false
+          // If a city has been selected and course.city !== selected,
+          // we should not show the course in subMenu
+          if (selectedCity && city !== selectedCity) return false
           if (!menuItem.subItems) menuItem.subItems = []
           menuItem.subItems.push({
             title: name,
             url: page + '/' + subpage.slug + '/' + slug,
-            city: city
+            city
           })
         })
       }
