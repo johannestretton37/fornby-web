@@ -23,7 +23,10 @@ class BannerBoxContainer extends Component {
     let pluralizedCourses = title.toLowerCase() || 'kurser'
     if (!pluralizedCourses.endsWith('kurser')) pluralizedCourses += '-kurser'
     return (
-      <div className='banner-boxes-container full-width'>
+      <div className='banner-boxes-container full-width' style={banners.length > 0 ? {
+        padding: '1em 0',
+        minHeight: '400px'
+      } : {}}>
         {this.props.title && <Container>
           <Row>
             <Col>

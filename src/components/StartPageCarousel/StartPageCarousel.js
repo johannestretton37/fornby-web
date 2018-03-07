@@ -190,7 +190,7 @@ class StartPageCarousel extends Component {
             <div className='carousel-container' style={{
               opacity: state === 'exiting' || state === 'entering' ? 0 : 1,
               display: state === 'exited' ? 'none' : 'block',
-              maxHeight: state === 'exiting' ? '0px' : '600px',
+              maxHeight: state === 'exiting' || state === 'entering' ? '0px' : '600px',
             }} >
               <SmoothImage
                 id={city}
