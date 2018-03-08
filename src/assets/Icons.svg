@@ -31,4 +31,10 @@
     <line class="b" x1="512" y1="133" x2="512" y2="891"/>
   </symbol>
 
+  <symbol id="icon-arrow" viewBox="0 0 1024 1024">
+    <line class="b" x1="133" y1="512" x2="891" y2="512"/>
+    <line class="b" x1="133.01" y1="511.99" x2="388" y2="257"/>
+    <line class="b" x1="133.01" y1="512" x2="388" y2="766.99"/>
+  </symbol>
+
 </svg>

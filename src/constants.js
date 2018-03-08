@@ -108,3 +108,11 @@ export const sanitizeSettings = {
   allowedSchemes: [ 'http', 'https', 'ftp', 'mailto' ],
   allowedSchemesByTag: {}
 }
+
+/**
+ * Brand colors
+ */
+export const Colors = {
+  primary: '#ac285c',
+  secondary: '#4f6791'
+}

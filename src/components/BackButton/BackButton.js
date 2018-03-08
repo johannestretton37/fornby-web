@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
+import Icon from '../Icon'
 import './BackButton.css'
+import { Colors } from '../../constants';
 
 class BackButton extends Component {
   static propTypes = {
@@ -22,7 +24,15 @@ class BackButton extends Component {
 
   render() {
     return (
-      <a href={this.props.location.pathname} onClick={this.handleClick}>{this.props.prevPage ? `Tillbaka till ${this.props.prevPage}` : 'Tillbaka'}</a>
+      <a className='back-button' href={this.props.location.pathname} onClick={this.handleClick}>
+        <Icon
+        name='arrow__left'
+        size={24}
+        strokeColor={Colors.secondary}
+        strokeWidth='58px'
+        hoverColor='primary' />
+        {this.props.prevPage ? `Tillbaka till ${this.props.prevPage}` : 'Tillbaka'}
+      </a>
     )
   }
 }

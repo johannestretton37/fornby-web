@@ -16,6 +16,14 @@
     stroke: #333;
     stroke-linecap: round;
     stroke-miterlimit: 10;
-    stroke-width: 46px;
+    transition: all 250ms ease-in-out;
+    a:hover & {
+      &.hover-primary {
+        stroke: $brand-primary !important;
+      }
+      &.hover-secondary {
+        stroke: $brand-secondary !important;
+      }
+    }
   }
 }
