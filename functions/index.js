@@ -9,7 +9,7 @@ const os = require('os')
 const fs = require('fs')
 const imageDataURI = require('image-data-uri')
 
-admin.initializeApp(functions.config().firebase)
+admin.initializeApp()
 
 /**
  * Monitor edits to content
@@ -20,14 +20,17 @@ admin.initializeApp(functions.config().firebase)
  */
 exports.contentChangeDetected = functions.database
   .ref('/flamelink/environments/production/content/{page}/en-US/{contentId}')
-  .onWrite(event => {
-    const deltaSnapshot = event.data
-    if (!deltaSnapshot.exists()) {
+  .onWrite((change, context) => {
+    // The item that was stored previously
+    const previousItem = change.before.val()
+    // The item that was written now
+    const editedItem = change.after.val()
+
+    if (!editedItem.exists()) {
       // This is a delete action, do nothing
       return null
     }
-    // The item that was written
-    const editedItem = deltaSnapshot.val()
+
     // If no isEditing switch exists, do nothing
     if (editedItem.isEditing === undefined) {
       return null
@@ -38,48 +41,47 @@ exports.contentChangeDetected = functions.database
     }
     // Store all edit promises
     let edits = []
+
     // Update or creation?
-    if (deltaSnapshot.previous.exists()) {
+    if (change.before.exists()) {
       // This is an update
-      // The previous item (before write took place)
-      const prevItem = deltaSnapshot.previous.val()
       /**
        * Slug
        * Every entry that has a name property needs a slug property,
        * a friendly url.
        */
-      if (prevItem.slug) {
-        if (prevItem.name !== editedItem.name) {
+      if (previousItem.slug) {
+        if (previousItem.name !== editedItem.name) {
           const slug = getSlug(editedItem.name, { lang: 'sv' })
-          console.log('update slug', prevItem.slug, '=>', slug)
-          edits.push(deltaSnapshot.ref.child('slug').set(slug))
+          console.log('update slug', previousItem.slug, '=>', slug)
+          edits.push(change.after.ref.child('slug').set(slug))
         } else {
           console.log('preserve slug')
-          edits.push(deltaSnapshot.ref.child('slug').set(prevItem.slug))
+          edits.push(change.after.ref.child('slug').set(previousItem.slug))
         }
       } else if (editedItem.name) {
         // Create slug
         const slug = getSlug(editedItem.name, { lang: 'sv' })
         console.log('create slug:', slug)
-        edits.push(deltaSnapshot.ref.child('slug').set(slug))
+        edits.push(change.after.ref.child('slug').set(slug))
       }
       /**
        * Previews
        * If entry has an images array, we need to add a preview array,
        * containing dataURI thumbnails
        */
-      if (prevItem.previews) {
+      if (previousItem.previews) {
         // Check if there are images, otherwise there's no need for previews
         if (editedItem.images) {
           // Images exist, check for changes
           if (
-            prevItem.images.length === editedItem.images.length &&
-            prevItem.images.every((val, i) => val === editedItem.images[i])
+            previousItem.images.length === editedItem.images.length &&
+            previousItem.images.every((val, i) => val === editedItem.images[i])
           ) {
             // No change to images, preserve previews
-            console.log('preserve previews', prevItem.previews)
+            console.log('preserve previews', previousItem.previews)
             edits.push(
-              deltaSnapshot.ref.child('previews').set(prevItem.previews)
+              change.after.ref.child('previews').set(previousItem.previews)
             )
           } else {
             console.log(`[TODO:] WE SHOULD CREATE PREVIEWS FOR ${editedItem}`)
@@ -99,24 +101,24 @@ exports.contentChangeDetected = functions.database
        * and the content being edited will be shown on staging site (and in dev environment)
        */
       // Check if isEditing was switched
-      if (prevItem.isEditing === true && editedItem.isEditing === true) {
+      if (previousItem.isEditing === true && editedItem.isEditing === true) {
         // Still in edit mode, update _prodContent
         edits.push(
-          deltaSnapshot.ref.child('_prodContent').set(prevItem._prodContent)
+          change.after.ref.child('_prodContent').set(previousItem._prodContent)
         )
         return Promise.all(edits)
       }
-      if (prevItem.isEditing === false && editedItem.isEditing === true) {
+      if (previousItem.isEditing === false && editedItem.isEditing === true) {
         // Switched from false to true, go into edit mode
         console.log('Switched from false to true, go into edit mode')
         // Store all variables in editingObject
-        edits.push(deltaSnapshot.ref.child('_prodContent').set(prevItem))
+        edits.push(change.after.ref.child('_prodContent').set(previousItem))
         return Promise.all(edits)
       }
-      if (prevItem.isEditing === true && editedItem.isEditing === false) {
+      if (previousItem.isEditing === true && editedItem.isEditing === false) {
         // Switched from true to false, publish and clean up
         console.log('Switched from true to false, publish and clean up')
-        edits.push(deltaSnapshot.ref.child('_prodContent').remove())
+        edits.push(change.after.ref.child('_prodContent').remove())
         return Promise.all(edits)
       }
       if (editedItem.isEditing === false) {
@@ -124,14 +126,14 @@ exports.contentChangeDetected = functions.database
         console.log(
           'Item saved with isEditing set to false, clean up any leftovers'
         )
-        edits.push(deltaSnapshot.ref.child('_prodContent').remove())
+        edits.push(change.after.ref.child('_prodContent').remove())
         return Promise.all(edits)
       }
     } else {
       // This is a creation
       if (editedItem.isEditing === true) {
         console.log('Init item with _prodContent')
-        edits.push(deltaSnapshot.ref.child('_prodContent').set(editedItem))
+        edits.push(change.after.ref.child('_prodContent').set(editedItem))
         return Promise.all(edits)
       } else {
         console.log(
@@ -140,7 +142,11 @@ exports.contentChangeDetected = functions.database
         return Promise.all(edits)
       }
     }
-    console.log('Did nothing, should I have? edits array has', edits.length, 'entries.')
+    console.log(
+      'Did nothing, should I have? edits array has',
+      edits.length,
+      'entries.'
+    )
     return null
   })
 
@@ -148,40 +154,41 @@ exports.addPreview = functions.database
   .ref(
     '/flamelink/environments/production/content/{page}/en-US/{contentId}/images/{imageIndex}'
   )
-  .onWrite(event => {
-    const deltaSnapshot = event.data
-    if (!deltaSnapshot.exists()) {
+  .onWrite((change, context) => {
+    if (!change.after.exists()) {
       // This is a delete action, do nothing
-      console.log('Image[' + event.params.imageIndex + '] deleted - do nothing')
+      console.log(
+        'Image[' + context.params.imageIndex + '] deleted - do nothing'
+      )
       return null
     }
     // The item that was written
-    const imageId = deltaSnapshot.val()
-    if (!deltaSnapshot.previous.exists()) {
+    const imageId = change.after.val()
+    if (!change.before.exists()) {
       // This is a creation, add preview
       console.log('Add preview to imageId:', imageId)
       // Get preview
-      return deltaSnapshot.ref.root
+      return change.after.ref.root
         .child(`/previews/${imageId}`)
         .once('value')
         .then(snapshot => {
           let preview = snapshot.val()
-          return deltaSnapshot.ref.parent.parent.child('previews').set({
-            [event.params.imageIndex]: preview
+          return change.after.ref.parent.parent.child('previews').set({
+            [context.params.imageIndex]: preview
           })
         })
     } else {
       // This is an update, update preview if it changed
       // The previous item (before write took place)
       console.log('[TODO:] This is an update to images!')
-      const prevItem = deltaSnapshot.previous.val()
-      console.log('[TODO:] check if image changed', prevItem)
+      const previousItem = change.before.val()
+      console.log('[TODO:] check if image changed', previousItem)
       return null
-      // if (editedItem.name !== prevItem.name) {
+      // if (editedItem.name !== previousItem.name) {
       //   // `name` property changed, update slug
       //   console.log('name property changed, update slug')
-      //   const id = event.params.contentId
-      //   return updateSlug(id, deltaSnapshot)
+      //   const id = context.params.contentId
+      //   return updateSlug(id, change.after)
       // } else {
       //   // No change detected
       //   console.log('No change to name property detected, return null')
@@ -221,9 +228,9 @@ exports.imageChangeDetected = functions.storage.object().onChange(event => {
     console.log(fileName, 'deleted. Remove previews/' + fileId)
     // Delete previews
     return admin
-    .database()
-    .ref(`/previews/${fileId}`)
-    .remove()
+      .database()
+      .ref(`/previews/${fileId}`)
+      .remove()
   }
 
   // Exit if file exists but is not new and is only being triggered
@@ -257,7 +264,9 @@ exports.imageChangeDetected = functions.storage.object().onChange(event => {
         dataURI,
         color: '#fff'
       }
-      return spawn('convert', [tempFilePath, '-resize', '1x1', 'txt:'], {capture: ['stdout']}).then(result => {
+      return spawn('convert', [tempFilePath, '-resize', '1x1', 'txt:'], {
+        capture: ['stdout']
+      }).then(result => {
         let regex = /#([A-F0-9]){6}/gi
         let matches = regex.exec(result.stdout)
         if (matches != null) {
