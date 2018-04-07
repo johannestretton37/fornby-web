@@ -26,7 +26,7 @@ exports.contentChangeDetected = functions.database
     // The item that was written now
     const editedItem = change.after.val()
 
-    if (!editedItem.exists()) {
+    if (!change.after.exists()) {
       // This is a delete action, do nothing
       return null
     }
@@ -41,7 +41,6 @@ exports.contentChangeDetected = functions.database
     }
     // Store all edit promises
     let edits = []
-
     // Update or creation?
     if (change.before.exists()) {
       // This is an update
@@ -51,6 +50,7 @@ exports.contentChangeDetected = functions.database
        * a friendly url.
        */
       if (previousItem.slug) {
+        console.log('Slug exists:', previousItem.slug)
         if (previousItem.name !== editedItem.name) {
           const slug = getSlug(editedItem.name, { lang: 'sv' })
           console.log('update slug', previousItem.slug, '=>', slug)
@@ -103,6 +103,10 @@ exports.contentChangeDetected = functions.database
       // Check if isEditing was switched
       if (previousItem.isEditing === true && editedItem.isEditing === true) {
         // Still in edit mode, update _prodContent
+        console.log(
+          'Still in edit mode, update _prodContent',
+          previousItem._prodContent
+        )
         edits.push(
           change.after.ref.child('_prodContent').set(previousItem._prodContent)
         )
@@ -132,8 +136,9 @@ exports.contentChangeDetected = functions.database
     } else {
       // This is a creation
       if (editedItem.isEditing === true) {
-        console.log('Init item with _prodContent')
+        console.log('Init item with _prodContent', editedItem)
         edits.push(change.after.ref.child('_prodContent').set(editedItem))
+        console.log('Object created, promises:', edits)
         return Promise.all(edits)
       } else {
         console.log(
@@ -197,93 +202,102 @@ exports.addPreview = functions.database
     }
   })
 
-exports.imageChangeDetected = functions.storage.object().onChange(event => {
-  const object = event.data // The Storage object.
-  const fileBucket = object.bucket // The Storage bucket that contains the file.
-  const filePath = object.name // File path in the bucket.
-  const contentType = object.contentType // File content type.
-  const resourceState = object.resourceState // The resourceState is 'exists' or 'not_exists' (for file/folder deletions).
-  const metageneration = object.metageneration // Number of times metadata has been generated. New objects have a value of 1.
-  // [END eventAttributes]
+exports.imageChangeDetected = functions.storage
+  .object()
+  .onFinalize((object, context) => {
+    const fileBucket = object.bucket // The Storage bucket that contains the file.
+    const filePath = object.name // File path in the bucket.
+    const contentType = object.contentType // File content type.
+    const resourceState = object.resourceState // The resourceState is 'exists' or 'not_exists' (for file/folder deletions).
+    const metageneration = object.metageneration // Number of times metadata has been generated. New objects have a value of 1.
+    // [END eventAttributes]
 
-  // [START stopConditions]
-  // Exit if this is triggered on a file that is not an image.
-  if (!contentType.startsWith('image/')) {
-    console.log('This is not an image.')
-    return null
-  }
+    // [START stopConditions]
+    // Exit if this is triggered on a file that is not an image.
+    if (!contentType.startsWith('image/')) {
+      console.log('This is not an image.')
+      return null
+    }
 
-  // Get the file name and flamelink id.
-  const fileName = path.basename(filePath)
-  const match = /^([0-9]*)_/.exec(fileName)
-  const fileId = match !== null ? match[1] : 0
+    // Get the file name and flamelink id.
+    const fileName = path.basename(filePath)
+    const fileId = getFileId(fileName)
 
-  if (filePath.includes('/sized/')) {
-    console.log('Ignore resized image')
-    return null
-  }
+    if (filePath.includes('/sized/')) {
+      console.log('Ignore resized image')
+      return null
+    }
+    // [END stopConditions]
 
-  // Exit if this is a move or deletion event.
-  if (resourceState === 'not_exists') {
+    // [START thumbnailGeneration]
+    // Download file from bucket.
+    const bucket = gcs.bucket(fileBucket)
+    const tempFilePath = path.join(os.tmpdir(), fileName)
+    return bucket
+      .file(filePath)
+      .download({
+        destination: tempFilePath
+      })
+      .then(() => {
+        // Generate a thumbnail using ImageMagick.
+        return spawn('convert', [
+          tempFilePath,
+          '-resize',
+          '20x20>',
+          tempFilePath
+        ])
+      })
+      .then(() => {
+        console.log('Thumbnail created')
+        return imageDataURI.encodeFromFile(tempFilePath)
+      })
+      .then(dataURI => {
+        console.log('dataURI created')
+        let preview = {
+          dataURI,
+          color: '#fff'
+        }
+        return spawn('convert', [tempFilePath, '-resize', '1x1', 'txt:'], {
+          capture: ['stdout']
+        }).then(result => {
+          let regex = /#([A-F0-9]){6}/gi
+          let matches = regex.exec(result.stdout)
+          if (matches != null) {
+            preview.color = matches[0]
+          }
+          return preview
+        })
+      })
+      .then(preview => {
+        return admin
+          .database()
+          .ref(`/previews/${fileId}`)
+          .set(preview)
+      })
+      .then(() => {
+        fs.unlinkSync(tempFilePath)
+      })
+    // [END thumbnailGeneration]
+  })
+
+exports.imageDeleted = functions.storage
+  .object()
+  .onDelete((object, context) => {
+    const filePath = object.name // File path in the bucket.
+    // Get the file name and flamelink id.
+    const fileName = path.basename(filePath)
+    const fileId = getFileId(fileName)
+
     console.log(fileName, 'deleted. Remove previews/' + fileId)
     // Delete previews
     return admin
       .database()
       .ref(`/previews/${fileId}`)
       .remove()
-  }
+  })
 
-  // Exit if file exists but is not new and is only being triggered
-  // because of a metadata change.
-  if (resourceState === 'exists' && metageneration > 1) {
-    console.log('This is a metadata change event.')
-    return null
-  }
-  // [END stopConditions]
-
-  // [START thumbnailGeneration]
-  // Download file from bucket.
-  const bucket = gcs.bucket(fileBucket)
-  const tempFilePath = path.join(os.tmpdir(), fileName)
-  return bucket
-    .file(filePath)
-    .download({
-      destination: tempFilePath
-    })
-    .then(() => {
-      // Generate a thumbnail using ImageMagick.
-      return spawn('convert', [tempFilePath, '-resize', '20x20>', tempFilePath])
-    })
-    .then(() => {
-      console.log('Thumbnail created')
-      return imageDataURI.encodeFromFile(tempFilePath)
-    })
-    .then(dataURI => {
-      console.log('dataURI created')
-      let preview = {
-        dataURI,
-        color: '#fff'
-      }
-      return spawn('convert', [tempFilePath, '-resize', '1x1', 'txt:'], {
-        capture: ['stdout']
-      }).then(result => {
-        let regex = /#([A-F0-9]){6}/gi
-        let matches = regex.exec(result.stdout)
-        if (matches != null) {
-          preview.color = matches[0]
-        }
-        console.log('STDOUT:', result.stdout.toString())
-        return preview
-      })
-    })
-    .then(preview => {
-      return admin
-        .database()
-        .ref(`/previews/${fileId}`)
-        .set(preview)
-    })
-    .then(() => {
-      fs.unlinkSync(tempFilePath)
-    })
-  // [END thumbnailGeneration]
-})
+function getFileId(fileName) {
+  const match = /^([0-9]*)_/.exec(fileName)
+  const fileId = match !== null ? match[1] : 0
+  return fileId
+}
