@@ -53,17 +53,19 @@ exports.contentChangeDetected = functions.database
         console.log('Slug exists:', previousItem.slug)
         if (previousItem.name !== editedItem.name) {
           const slug = getSlug(editedItem.name, { lang: 'sv' })
-          console.log('update slug', previousItem.slug, '=>', slug)
           edits.push(change.after.ref.child('slug').set(slug))
+          console.log(
+            `[EDIT PUSHED]: Update slug from ${previousItem.slug} => ${slug}`
+          )
         } else {
-          console.log('preserve slug')
           edits.push(change.after.ref.child('slug').set(previousItem.slug))
+          console.log(`[EDIT PUSHED]: Preserved slug ${previousItem.slug}`)
         }
       } else if (editedItem.name) {
         // Create slug
         const slug = getSlug(editedItem.name, { lang: 'sv' })
-        console.log('create slug:', slug)
         edits.push(change.after.ref.child('slug').set(slug))
+        console.log(`[EDIT PUSHED]: Create slug ${slug}`)
       }
       /**
        * Previews
@@ -79,12 +81,14 @@ exports.contentChangeDetected = functions.database
             previousItem.images.every((val, i) => val === editedItem.images[i])
           ) {
             // No change to images, preserve previews
-            console.log('preserve previews', previousItem.previews)
             edits.push(
               change.after.ref.child('previews').set(previousItem.previews)
             )
+            console.log(
+              `[EDIT PUSHED]: Preserve previews ${previousItem.previews}`
+            )
           } else {
-            console.log(`[TODO:] WE SHOULD CREATE PREVIEWS FOR ${editedItem}`)
+            console.warn(`[TODO]: WE SHOULD CREATE PREVIEWS FOR ${editedItem}`)
             // let previewPromises = []
             // editedItem.images.forEach(imageId => {
             //   previewPromises
@@ -110,6 +114,10 @@ exports.contentChangeDetected = functions.database
         edits.push(
           change.after.ref.child('_prodContent').set(previousItem._prodContent)
         )
+        console.log(
+          `[EDIT PUSHED]: Update _prodContent ${previousItem._prodContent}`
+        )
+        console.log('[RETURN EDIT PROMISES]: length:', edits.length)
         return Promise.all(edits)
       }
       if (previousItem.isEditing === false && editedItem.isEditing === true) {
@@ -117,20 +125,26 @@ exports.contentChangeDetected = functions.database
         console.log('Switched from false to true, go into edit mode')
         // Store all variables in editingObject
         edits.push(change.after.ref.child('_prodContent').set(previousItem))
+        console.log(`[EDIT PUSHED]: Create _prodContent from: ${previousItem}`)
+        console.log('[RETURN EDIT PROMISES]: length:', edits.length)
         return Promise.all(edits)
       }
-      if (previousItem.isEditing === true && editedItem.isEditing === false) {
-        // Switched from true to false, publish and clean up
-        console.log('Switched from true to false, publish and clean up')
-        edits.push(change.after.ref.child('_prodContent').remove())
-        return Promise.all(edits)
-      }
+      // if (previousItem.isEditing === true && editedItem.isEditing === false) {
+      //   // Switched from true to false, publish and clean up
+      //   console.log('Switched from true to false, publish and clean up')
+      //   edits.push(change.after.ref.child('_prodContent').remove())
+      //   console.log(`[EDIT PUSHED]: Remove _prodContent`)
+      //   console.log('[RETURN EDIT PROMISES]: length:', edits.length)
+      //   return Promise.all(edits)
+      // }
       if (editedItem.isEditing === false) {
         // Remove any trash
         console.log(
           'Item saved with isEditing set to false, clean up any leftovers'
         )
         edits.push(change.after.ref.child('_prodContent').remove())
+        console.log(`[EDIT PUSHED]: Remove _prodContent`)
+        console.log('[RETURN EDIT PROMISES]: length:', edits.length)
         return Promise.all(edits)
       }
     } else {
@@ -138,12 +152,14 @@ exports.contentChangeDetected = functions.database
       if (editedItem.isEditing === true) {
         console.log('Init item with _prodContent', editedItem)
         edits.push(change.after.ref.child('_prodContent').set(editedItem))
-        console.log('Object created, promises:', edits)
+        console.log(`[EDIT PUSHED]: Create object and set _prodContent`)
+        console.log('[RETURN EDIT PROMISES]: length:', edits.length)
         return Promise.all(edits)
       } else {
         console.log(
           'Created item was released straight to prod, ignore _prodContent'
         )
+        console.log('[RETURN EDIT PROMISES]: length:', edits.length)
         return Promise.all(edits)
       }
     }

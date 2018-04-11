@@ -30,6 +30,7 @@ describe('Fornby Cloud Functions', () => {
   after(() => {
     // Restore admin.initializeApp() to its original method.
     adminInitStub.restore()
+    fornbyFunctions = undefined
     // Do other cleanup tasks.
     test.cleanup()
   })
@@ -63,17 +64,21 @@ describe('Fornby Cloud Functions', () => {
     }
     let childStub, setStub
 
-    before(() => {
+    beforeEach(() => {
       // Stubs
       childStub = sinon.stub()
       setStub = sinon.stub()
+      removeStub = sinon.stub()
     })
 
-    after(() => {
+    afterEach(() => {
       childStub = undefined
       setStub = undefined
+      removeStub = undefined
     })
-
+    /**
+     * Slug tests
+     */
     describe('should create a slug', () => {
       it('when given new data', async () => {
         childStub.withArgs('_prodContent').returns({ set: setStub })
@@ -164,6 +169,331 @@ describe('Fornby Cloud Functions', () => {
         // promises that resolves to true
         assert.lengthOf(result, 2)
         assert.equal(result[0], true)
+      })
+    })
+
+    /**
+     * Preview dataURI tests
+     *
+     * When an update is made (via flamelink), every property is cleared
+     * and then written again. That means that we need to preserve our
+     * custom properties (slug, previews) somehow.
+     * The way we do this is by copying those values from the already
+     * stored data before it is cleared
+     */
+    describe('should preserve array of previews', () => {
+      it('when edits are made but images has not changed', async () => {
+        const data_withPreviews_withImages = {
+          isEditing: false,
+          isPublished: true,
+          previews: [
+            {
+              dataURI: 'aPreviewDataURI',
+              color: '#FF0000'
+            }
+          ],
+          images: ['123456789']
+        }
+        childStub.withArgs('previews').returns({ set: setStub })
+        childStub.withArgs('_prodContent').returns({ remove: removeStub })
+        setStub.withArgs(data_withPreviews_withImages.previews).returns(true)
+        // Technically the .remove() method returns nothing but for easier
+        // assertion we just assumes it returns true
+        removeStub.returns(true)
+
+        const changeData = test.makeChange(
+          {
+            val: () => data_withPreviews_withImages,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          },
+          {
+            val: () => data_withPreviews_withImages,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
+    })
+
+    /**
+     * Edit mode/Published tests
+     *
+     *
+     */
+    describe('should create, update or delete _prodContent', () => {
+      const data_NotEdit_NotPub = {
+        isEditing: false,
+        isPublished: false,
+        name: 'Not Edit and Not Pub'
+      }
+      const data_IsEdit_NotPub = {
+        isEditing: true,
+        isPublished: false,
+        name: 'Is Edit and Not Pub'
+      }
+      const data_NotEdit_IsPub = {
+        isEditing: false,
+        isPublished: true,
+        name: 'Not Edit and Is Pub'
+      }
+      const data_IsEdit_IsPub = {
+        isEditing: true,
+        isPublished: true,
+        name: 'Is Edit and Is Pub'
+      }
+      /**
+       * isEditing switch
+       */
+      it('when isEditing switches from false to true', async () => {
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('is-edit-and-not-pub').returns(true)
+        childStub.withArgs('_prodContent').returns({ set: setStub })
+        setStub.withArgs(data_NotEdit_NotPub).returns(true)
+
+        const changeData = test.makeChange(
+          {
+            val: () => data_NotEdit_NotPub,
+            exists: () => true
+          },
+          {
+            val: () => data_IsEdit_NotPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
+      it('when isEditing switches from true to false', async () => {
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('not-edit-and-not-pub').returns(true)
+        childStub.withArgs('_prodContent').returns({ remove: removeStub })
+        removeStub.returns(true)
+
+        const changeData = test.makeChange(
+          {
+            val: () => data_IsEdit_NotPub,
+            exists: () => true
+          },
+          {
+            val: () => data_NotEdit_NotPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
+      it('when isEditing is false', async () => {
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('not-edit-and-not-pub').returns(true)
+        childStub.withArgs('_prodContent').returns({ remove: removeStub })
+        removeStub.returns(true)
+
+        const data_WithSlug = Object.assign({}, data_NotEdit_NotPub, {
+          slug: 'not-edit-and-not-pub'
+        })
+        const changeData = test.makeChange(
+          {
+            val: () => data_WithSlug,
+            exists: () => true
+          },
+          {
+            val: () => data_NotEdit_NotPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
+      it('when isEditing is true', async () => {
+        const fakeProdContent = {
+          name: 'Fake Prod Content',
+          slug: 'fake-prod-content'
+        }
+
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('is-edit-and-not-pub').returns(true)
+        childStub.withArgs('_prodContent').returns({ set: setStub })
+        setStub.withArgs(fakeProdContent).returns(true)
+
+        const data_IsEdit_NotPub_WithProd = Object.assign(
+          {},
+          data_IsEdit_NotPub,
+          {
+            slug: 'is-edit-and-not-pub',
+            _prodContent: fakeProdContent
+          }
+        )
+        const changeData = test.makeChange(
+          {
+            val: () => data_IsEdit_NotPub_WithProd,
+            exists: () => true
+          },
+          {
+            val: () => data_IsEdit_NotPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
+      it('when isEditing switches from false to true', async () => {
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('is-edit-and-not-pub').returns(true)
+        childStub.withArgs('_prodContent').returns({ set: setStub })
+        setStub.withArgs(data_NotEdit_NotPub).returns(true)
+
+        const changeData = test.makeChange(
+          {
+            val: () => data_NotEdit_NotPub,
+            exists: () => true
+          },
+          {
+            val: () => data_IsEdit_NotPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
+      it('when isEditing switches from true to false', async () => {
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('not-edit-and-not-pub').returns(true)
+        childStub.withArgs('_prodContent').returns({ remove: removeStub })
+        removeStub.returns(true)
+
+        const changeData = test.makeChange(
+          {
+            val: () => data_IsEdit_NotPub,
+            exists: () => true
+          },
+          {
+            val: () => data_NotEdit_NotPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
+      it('when isEditing is false', async () => {
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('not-edit-and-not-pub').returns(true)
+        childStub.withArgs('_prodContent').returns({ remove: removeStub })
+        removeStub.returns(true)
+
+        const data_WithSlug = Object.assign({}, data_NotEdit_NotPub, {
+          slug: 'not-edit-and-not-pub'
+        })
+        const changeData = test.makeChange(
+          {
+            val: () => data_WithSlug,
+            exists: () => true
+          },
+          {
+            val: () => data_NotEdit_NotPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
+      it('when isEditing is true', async () => {
+        const fakeProdContent = {
+          name: 'Fake Prod Content',
+          slug: 'fake-prod-content'
+        }
+
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('is-edit-and-not-pub').returns(true)
+        childStub.withArgs('_prodContent').returns({ set: setStub })
+        setStub.withArgs(fakeProdContent).returns(true)
+
+        const data_IsEdit_NotPub_WithProd = Object.assign(
+          {},
+          data_IsEdit_NotPub,
+          {
+            slug: 'is-edit-and-not-pub',
+            _prodContent: fakeProdContent
+          }
+        )
+        const changeData = test.makeChange(
+          {
+            val: () => data_IsEdit_NotPub_WithProd,
+            exists: () => true
+          },
+          {
+            val: () => data_IsEdit_NotPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
       })
     })
   })
