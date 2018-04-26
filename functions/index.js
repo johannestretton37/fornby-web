@@ -265,7 +265,7 @@ exports.imageChangeDetected = functions.storage
         preview.dataURI = dataURI
         return helpers.findAverageColor(tempFilePath)
       })
-      .then(helpers.findHexColorCode(result.stdout))
+      .then(result => helpers.findHexColorCode(result.stdout))
       .then(hexColor => {
         preview.color = hexColor
         return admin
