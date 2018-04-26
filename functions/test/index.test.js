@@ -83,9 +83,9 @@ describe('Fornby Cloud Functions', () => {
      * Slug tests
      */
     describe('should create a slug', () => {
-      it('when given new data', async () => {
-        childStub.withArgs('_prodContent').returns({ set: setStub })
-        setStub.withArgs(data_WithoutSlug_IsEdit_NotPub).returns(true)
+      it('when given new unpublished data', async () => {
+        childStub.withArgs('slug').returns({ set: setStub })
+        setStub.withArgs('saker-som-ar-bra-att-veta').returns(true)
 
         const changeData = test.makeChange(emptyData, {
           val: () => data_WithoutSlug_IsEdit_NotPub,

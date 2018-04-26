@@ -155,6 +155,16 @@ exports.contentChangeDetected = functions.database
     } else {
       // This is a creation
       if (editedItem.isEditing === true) {
+        if (editedItem.isPublished === false) {
+          // Create no _prodContent since this should only be visible on staging
+          console.log(
+            'Init item without _prodContent, since isPublished === false',
+            editedItem
+          )
+          const slug = getSlug(editedItem.name, { lang: 'sv' })
+          edits.push(change.after.ref.child('slug').set(slug))
+          return Promise.all(edits)
+        }
         console.log('Init item with _prodContent', editedItem)
         edits.push(change.after.ref.child('_prodContent').set(editedItem))
         console.log(`[EDIT PUSHED]: Create object and set _prodContent`)
