@@ -8,6 +8,7 @@ const path = require('path')
 const os = require('os')
 const fs = require('fs')
 const imageDataURI = require('image-data-uri')
+const helpers = require('./helpers')
 
 admin.initializeApp()
 
@@ -201,20 +202,23 @@ exports.addPreview = functions.database
     } else {
       // This is an update, update preview if it changed
       // The previous item (before write took place)
-      console.log('[TODO:] This is an update to images!')
-      const previousItem = change.before.val()
-      console.log('[TODO:] check if image changed', previousItem)
-      return null
-      // if (editedItem.name !== previousItem.name) {
-      //   // `name` property changed, update slug
-      //   console.log('name property changed, update slug')
-      //   const id = context.params.contentId
-      //   return updateSlug(id, change.after)
-      // } else {
-      //   // No change detected
-      //   console.log('No change to name property detected, return null')
-      //   return null
-      // }
+      const previousImageId = change.before.val()
+      // Check if preview needs to be updated
+      if (previousImageId !== imageId) {
+        // Get preview
+        return change.after.ref.root
+          .child(`/previews/${imageId}`)
+          .once('value')
+          .then(snapshot => {
+            let preview = snapshot.val()
+            return change.after.ref.parent.parent.child('previews').set({
+              [context.params.imageIndex]: preview
+            })
+          })
+      } else {
+        // No change needed
+        return null
+      }
     }
   })
 
@@ -230,14 +234,14 @@ exports.imageChangeDetected = functions.storage
 
     // [START stopConditions]
     // Exit if this is triggered on a file that is not an image.
-    if (!contentType.startsWith('image/')) {
+    if (contentType && !contentType.startsWith('image/')) {
       console.log('This is not an image.')
       return null
     }
 
     // Get the file name and flamelink id.
     const fileName = path.basename(filePath)
-    const fileId = getFileId(fileName)
+    const fileId = helpers.getFileId(fileName)
 
     if (filePath.includes('/sized/')) {
       console.log('Ignore resized image')
@@ -249,42 +253,21 @@ exports.imageChangeDetected = functions.storage
     // Download file from bucket.
     const bucket = gcs.bucket(fileBucket)
     const tempFilePath = path.join(os.tmpdir(), fileName)
+    let preview = {}
     return bucket
       .file(filePath)
       .download({
         destination: tempFilePath
       })
-      .then(() => {
-        // Generate a thumbnail using ImageMagick.
-        return spawn('convert', [
-          tempFilePath,
-          '-resize',
-          '20x20>',
-          tempFilePath
-        ])
-      })
-      .then(() => {
-        console.log('Thumbnail created')
-        return imageDataURI.encodeFromFile(tempFilePath)
-      })
+      .then(helpers.generateThumbnail(tempFilePath))
+      .then(helpers.createDataURI(tempFilePath))
       .then(dataURI => {
-        console.log('dataURI created')
-        let preview = {
-          dataURI,
-          color: '#fff'
-        }
-        return spawn('convert', [tempFilePath, '-resize', '1x1', 'txt:'], {
-          capture: ['stdout']
-        }).then(result => {
-          let regex = /#([A-F0-9]){6}/gi
-          let matches = regex.exec(result.stdout)
-          if (matches != null) {
-            preview.color = matches[0]
-          }
-          return preview
-        })
+        preview.dataURI = dataURI
+        return helpers.findAverageColor(tempFilePath)
       })
-      .then(preview => {
+      .then(helpers.findHexColorCode(result.stdout))
+      .then(hexColor => {
+        preview.color = hexColor
         return admin
           .database()
           .ref(`/previews/${fileId}`)
@@ -302,7 +285,7 @@ exports.imageDeleted = functions.storage
     const filePath = object.name // File path in the bucket.
     // Get the file name and flamelink id.
     const fileName = path.basename(filePath)
-    const fileId = getFileId(fileName)
+    const fileId = helpers.getFileId(fileName)
 
     console.log(fileName, 'deleted. Remove previews/' + fileId)
     // Delete previews
@@ -311,9 +294,3 @@ exports.imageDeleted = functions.storage
       .ref(`/previews/${fileId}`)
       .remove()
   })
-
-function getFileId(fileName) {
-  const match = /^([0-9]*)_/.exec(fileName)
-  const fileId = match !== null ? match[1] : 0
-  return fileId
-}

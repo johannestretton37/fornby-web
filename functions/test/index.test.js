@@ -1,15 +1,18 @@
 /**
  * Offline unit test
  */
-
+const fs = require('fs')
+const path = require('path')
 const chai = require('chai')
 const assert = chai.assert
 const sinon = require('sinon')
 const admin = require('firebase-admin')
+const imageDataURI = require('image-data-uri')
 // Require and initialize firebase-functions-test. Since we are not passing in any parameters, it will
 // be initialized in an "offline mode", which means we have to stub out all the methods that interact
 // with Firebase services.
 const test = require('firebase-functions-test')()
+const helpers = require('../helpers')
 
 describe('Fornby Cloud Functions', () => {
   let adminInitStub
@@ -495,6 +498,257 @@ describe('Fornby Cloud Functions', () => {
         assert.lengthOf(result, 2)
         assert.equal(result.every(promise => promise === true), true)
       })
+    })
+  })
+
+  describe('addPreview', () => {
+    /**
+     * Whenever a change is detected to the images property of a content object,
+     * a preview needs to be added to the object's preview array
+     */
+    // Define mock data
+    const emptyData = {
+      val: () => null,
+      exists: () => false
+    }
+
+    // Declare stubbed function vars
+    let childStub, setStub, onceStub, removeStub
+
+    beforeEach(() => {
+      // Stubs
+      childStub = sinon.stub()
+      setStub = sinon.stub()
+      onceStub = sinon.stub()
+      removeStub = sinon.stub()
+    })
+
+    afterEach(() => {
+      childStub = undefined
+      setStub = undefined
+      onceStub = undefined
+      removeStub = undefined
+    })
+    /**
+     * Slug tests
+     */
+    describe('should return null', () => {
+      it('when images property is deleted', () => {
+        const changeData = test.makeChange(
+          {
+            val: () => '1234_an_image_id_5678',
+            exists: () => true
+          },
+          emptyData
+        )
+        const wrapped = test.wrap(fornbyFunctions.addPreview)
+        const result = wrapped(changeData)
+        // addPreview should return null
+        assert.equal(result, null)
+      })
+      it('when no change occurred', () => {
+        const changeData = test.makeChange(
+          {
+            val: () => '1234_same_image_id_5678',
+            exists: () => true
+          },
+          {
+            val: () => '1234_same_image_id_5678',
+            exists: () => true
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.addPreview)
+        const result = wrapped(changeData)
+        assert.isNull(result)
+      })
+    })
+
+    describe('should add a preview', () => {
+      it('when an image is added to an entry', async () => {
+        const preview = {
+          dataURL: 'dataURLFor_12345678',
+          color: '#FF00DD'
+        }
+        const snapshot = {
+          val: () => preview
+        }
+        const onceStub = sinon.stub()
+        childStub
+          .withArgs('/previews/1234_an_image_id_5678')
+          .returns({ once: onceStub })
+        onceStub.withArgs('value').resolves(snapshot)
+        childStub.withArgs('previews').returns({ set: setStub })
+        setStub.withArgs({ imageIndex: preview }).returns(true)
+
+        const changeData = test.makeChange(emptyData, {
+          val: () => '1234_an_image_id_5678',
+          exists: () => true,
+          ref: {
+            root: {
+              child: childStub
+            },
+            parent: {
+              parent: {
+                child: childStub
+              }
+            }
+          }
+        })
+
+        const wrapped = test.wrap(fornbyFunctions.addPreview)
+        const result = await wrapped(changeData, {
+          params: {
+            imageIndex: 'imageIndex'
+          }
+        })
+        // addPreview should resolve to true
+        assert.equal(result, true)
+      })
+
+      it('when an image is updated', async () => {
+        const newImgId = '9999_new_image_id_9999'
+        const preview = {
+          dataURI: 'aDataURI',
+          color: '#FF0000'
+        }
+        const snapshot = {
+          val: () => preview
+        }
+        childStub.withArgs(`/previews/${newImgId}`).returns({ once: onceStub })
+        onceStub.withArgs('value').resolves(snapshot)
+        const childStub2 = sinon.stub()
+        const setStub2 = sinon.stub()
+        childStub2.withArgs('previews').returns({ set: setStub2 })
+        setStub2.withArgs({ imageIndex: preview }).returns(true)
+        const changeData = test.makeChange(
+          {
+            val: () => '1234_old_image_id_5678',
+            exists: () => true
+          },
+          {
+            val: () => newImgId,
+            exists: () => true,
+            ref: {
+              root: {
+                child: childStub
+              },
+              parent: {
+                parent: {
+                  child: childStub2
+                }
+              }
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.addPreview)
+        const result = await wrapped(changeData, {
+          params: {
+            imageIndex: 'imageIndex'
+          }
+        })
+        // Result should be true.
+        assert.equal(result, true)
+      })
+    })
+  })
+
+  describe('imageChangeDetected', () => {
+    /**
+     * Whenever a change is detected in the image storage,
+     * a preview dataURI and a background color needs to be
+     * created and added to database/previews
+     */
+    it('should only process images', () => {
+      const wrapped = test.wrap(fornbyFunctions.imageChangeDetected)
+      const imageObject = test.storage.makeObjectMetadata({
+        contentType: 'application/octet-stream'
+      })
+      const result = wrapped(imageObject)
+      assert.isNull(result)
+    })
+
+    it('should only process high res images', async () => {
+      const wrapped = test.wrap(fornbyFunctions.imageChangeDetected)
+      const imageObject = test.storage.makeObjectMetadata({
+        contentType: 'image/jpg',
+        name: '/path/to/this/sized/lores/fileName.jpg'
+      })
+      const result = await wrapped(imageObject)
+      assert.isNull(result)
+    })
+
+    // it('should create a preview object and save to database', async () => {
+    //   const wrapped = test.wrap(fornbyFunctions.imageChangeDetected)
+    //   console.log(test.storage.exampleObjectMetadata())
+    //   const imageObject = test.storage.makeObjectMetadata({
+    //     bucket: 'bucket',
+    //     contentType: 'image/jpg',
+    //     name: '/path/to/this/hires/12345678_fileName.jpg'
+    //   })
+    //   const result = await wrapped(imageObject)
+    //   assert.isNull(result)
+    // })
+  })
+})
+
+describe('Helper functions', () => {
+  describe('getFileId', () => {
+    it('should return a file id when given a flamelink file name', () => {
+      const fileName = '123424232_something.jpg'
+      const result = helpers.getFileId(fileName)
+      assert.strictEqual(result, '123424232')
+    })
+    it('should return zero when given an invalid file name', () => {
+      const fileName = 'invalid_123424232_something.jpg'
+      const result = helpers.getFileId(fileName)
+      assert.strictEqual(result, 0)
+    })
+  })
+  describe('generateThumbnail', () => {
+    it('should create a 20px thumbnail', async () => {
+      const targetPath = path.resolve(__dirname, './fileToThumbnail.jpg')
+      // Remove (possibly) existing file
+      if (fs.existsSync(targetPath)) {
+        fs.unlinkSync(targetPath)
+      }
+      // Make sure no file exists
+      assert(!fs.existsSync(targetPath))
+      // Duplicate source file
+      fs.copyFileSync(
+        path.resolve(__dirname, './testOriginalImg.jpg'),
+        targetPath
+      )
+      const result = await helpers.generateThumbnail(targetPath)
+      // Check that a file was created
+      assert(fs.existsSync(targetPath))
+    })
+  })
+  describe('createDataURI', () => {
+    it('should return a dataURI', async () => {
+      const targetPath = path.resolve(__dirname, './fileToThumbnail.jpg')
+      const result = await helpers.createDataURI(targetPath)
+      assert.equal(
+        result.startsWith('data:image/jpg;base64,/9j/4AAQSkZJRg'),
+        true
+      )
+    })
+  })
+  describe('findAverageColor', () => {
+    it('should return a result.stdout, containing color info', async () => {
+      const targetPath = path.resolve(__dirname, './fileToThumbnail.jpg')
+      const result = await helpers.findAverageColor(targetPath)
+      assert.equal(
+        result.stdout,
+        '# ImageMagick pixel enumeration: 1,1,65535,srgb\n0,0: (39650,40627.6,33201.9)  #9A9E81  srgb(154,158,129)\n'
+      )
+    })
+  })
+  describe('findHexColorCode', () => {
+    it('should return a hex color code', async () => {
+      const result = await helpers.findHexColorCode(
+        '# ImageMagick pixel enumeration: 1,1,65535,srgb\n0,0: (39650,40627.6,33201.9)  #9A9E81  srgb(154,158,129)\n'
+      )
+      assert.equal(result, '#9A9E81')
     })
   })
 })
