@@ -9,11 +9,15 @@ exports.getFileId = fileName => {
 
 exports.generateThumbnail = tempFilePath => {
   // Generate a thumbnail using ImageMagick.
+  console.log(
+    'Generating a thumbnail using ImageMagick. tempFilePath:',
+    tempFilePath
+  )
   return spawn('convert', [tempFilePath, '-resize', '20x20>', tempFilePath])
 }
 
 exports.createDataURI = tempFilePath => {
-  console.log('Thumbnail created')
+  console.log('Create dataURI from', tempFilePath)
   return imageDataURI.encodeFromFile(tempFilePath)
 }
 

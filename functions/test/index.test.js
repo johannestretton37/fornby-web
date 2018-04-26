@@ -234,27 +234,27 @@ describe('Fornby Cloud Functions', () => {
      *
      *
      */
+    const data_NotEdit_NotPub = {
+      isEditing: false,
+      isPublished: false,
+      name: 'Not Edit and Not Pub'
+    }
+    const data_IsEdit_NotPub = {
+      isEditing: true,
+      isPublished: false,
+      name: 'Is Edit and Not Pub'
+    }
+    const data_NotEdit_IsPub = {
+      isEditing: false,
+      isPublished: true,
+      name: 'Not Edit and Is Pub'
+    }
+    const data_IsEdit_IsPub = {
+      isEditing: true,
+      isPublished: true,
+      name: 'Is Edit and Is Pub'
+    }
     describe('should create, update or delete _prodContent', () => {
-      const data_NotEdit_NotPub = {
-        isEditing: false,
-        isPublished: false,
-        name: 'Not Edit and Not Pub'
-      }
-      const data_IsEdit_NotPub = {
-        isEditing: true,
-        isPublished: false,
-        name: 'Is Edit and Not Pub'
-      }
-      const data_NotEdit_IsPub = {
-        isEditing: false,
-        isPublished: true,
-        name: 'Not Edit and Is Pub'
-      }
-      const data_IsEdit_IsPub = {
-        isEditing: true,
-        isPublished: true,
-        name: 'Is Edit and Is Pub'
-      }
       /**
        * isEditing switch
        */
@@ -459,28 +459,27 @@ describe('Fornby Cloud Functions', () => {
         assert.lengthOf(result, 2)
         assert.equal(result.every(promise => promise === true), true)
       })
-      it('when isEditing is true', async () => {
+    })
+    describe('should ignore _prodContent', () => {
+      it('when isEditing is true and no _prodContent exists', async () => {
         const fakeProdContent = {
           name: 'Fake Prod Content',
           slug: 'fake-prod-content'
         }
 
         childStub.withArgs('slug').returns({ set: setStub })
-        setStub.withArgs('is-edit-and-not-pub').returns(true)
-        childStub.withArgs('_prodContent').returns({ set: setStub })
-        setStub.withArgs(fakeProdContent).returns(true)
+        setStub.withArgs('is-edit-and-never-pub').returns(true)
 
-        const data_IsEdit_NotPub_WithProd = Object.assign(
+        const data_IsEdit_NotPub_WithoutProd = Object.assign(
           {},
           data_IsEdit_NotPub,
           {
-            slug: 'is-edit-and-not-pub',
-            _prodContent: fakeProdContent
+            slug: 'is-edit-and-never-pub'
           }
         )
         const changeData = test.makeChange(
           {
-            val: () => data_IsEdit_NotPub_WithProd,
+            val: () => data_IsEdit_NotPub_WithoutProd,
             exists: () => true
           },
           {
@@ -495,7 +494,7 @@ describe('Fornby Cloud Functions', () => {
         const result = await wrapped(changeData)
         // Result should contain an array with two promises that both resolves
         // to true.
-        assert.lengthOf(result, 2)
+        assert.lengthOf(result, 1)
         assert.equal(result.every(promise => promise === true), true)
       })
     })

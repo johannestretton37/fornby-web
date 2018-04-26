@@ -107,18 +107,22 @@ exports.contentChangeDetected = functions.database
        */
       // Check if isEditing was switched
       if (previousItem.isEditing === true && editedItem.isEditing === true) {
-        // Still in edit mode, update _prodContent
-        console.log(
-          'Still in edit mode, update _prodContent',
-          previousItem._prodContent
-        )
-        edits.push(
-          change.after.ref.child('_prodContent').set(previousItem._prodContent)
-        )
-        console.log(
-          `[EDIT PUSHED]: Update _prodContent ${previousItem._prodContent}`
-        )
-        console.log('[RETURN EDIT PROMISES]: length:', edits.length)
+        // Still in edit mode, update _prodContent if it exists
+        if (previousItem._prodContent) {
+          console.log(
+            'Still in edit mode, update _prodContent',
+            previousItem._prodContent
+          )
+          edits.push(
+            change.after.ref
+              .child('_prodContent')
+              .set(previousItem._prodContent)
+          )
+          console.log(
+            `[EDIT PUSHED]: Update _prodContent ${previousItem._prodContent}`
+          )
+          console.log('[RETURN EDIT PROMISES]: length:', edits.length)
+        }
         return Promise.all(edits)
       }
       if (previousItem.isEditing === false && editedItem.isEditing === true) {
@@ -259,8 +263,8 @@ exports.imageChangeDetected = functions.storage
       .download({
         destination: tempFilePath
       })
-      .then(helpers.generateThumbnail(tempFilePath))
-      .then(helpers.createDataURI(tempFilePath))
+      .then(() => helpers.generateThumbnail(tempFilePath))
+      .then(() => helpers.createDataURI(tempFilePath))
       .then(dataURI => {
         preview.dataURI = dataURI
         return helpers.findAverageColor(tempFilePath)
