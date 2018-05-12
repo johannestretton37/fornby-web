@@ -3,7 +3,15 @@ import firebaseApp from '../config/firebase.app'
 import flamelink from 'flamelink'
 import sanitizeHtml from 'sanitize-html-react'
 import CustomError from '../models/CustomError'
-import { ContentGroup, PageSlug, defaultFields, htmlFields, searchableFields, sanitizeSettings } from '../constants'
+import {
+  ContentGroup,
+  ColumnName,
+  PageSlug,
+  defaultFields,
+  htmlFields,
+  searchableFields,
+  sanitizeSettings
+} from '../constants'
 import { camelCase } from '../Helpers'
 
 /**
@@ -28,7 +36,11 @@ class CMS {
    * Get basic info, such as navigation, page headlines and such
    */
   getBasicInfo = () => {
-    return Promise.all([this.mainMenuItems(), this.getSlides(), this.getCourses()])
+    return Promise.all([
+      this.mainMenuItems(),
+      this.getSlides(),
+      this.getCourses()
+    ])
   }
 
   /**
@@ -36,7 +48,7 @@ class CMS {
    * @param {object} item - object fetched from flamelink mainNavigation collection
    * @returns {object} - A main menu item object
    */
-  createMainMenuItem = (item) => {
+  createMainMenuItem = item => {
     let { id, title, url, cssClass, order } = item
     let separator = url.indexOf('#') !== -1 ? '#' : '/'
     let slug = separator + getSlug(title, { lang: 'sv' })
@@ -64,14 +76,27 @@ class CMS {
     // Cache pending promise to prevent multiple calls to cms
     this.pending.mainMenu = new Promise(async (resolve, reject) => {
       try {
-        const mainNavigation = await this.flamelinkApp.nav.get('mainNavigation', {
-          fields: ['items']
-        })
-        if (!mainNavigation) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Navigation')
-        if (!mainNavigation.items) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Navigation items')
+        const mainNavigation = await this.flamelinkApp.nav.get(
+          ContentGroup.MAIN_NAVIGATION,
+          {
+            fields: [ColumnName.ITEMS]
+          }
+        )
+        if (!mainNavigation)
+          throw new CustomError(
+            'Ett fel uppstod',
+            'Kunde inte hitta Main Navigation'
+          )
+        if (!mainNavigation.items)
+          throw new CustomError(
+            'Ett fel uppstod',
+            'Kunde inte hitta Main Navigation items'
+          )
         // Structure menu
         // This is all the root links, e.g. '/kurser'
-        let rootLinks = mainNavigation.items.filter(item => item.parentIndex === 0)
+        let rootLinks = mainNavigation.items.filter(
+          item => item.parentIndex === 0
+        )
         // Convert root links to mainMenuItems
         let mainMenu = rootLinks.map(item => this.createMainMenuItem(item))
         // Populate root links with children
@@ -79,14 +104,16 @@ class CMS {
           item.contentGroup = ContentGroup.MAIN_MENU_ITEMS
           if (item.parentIndex > 0) {
             // This is a sub link, e.g. '/kurser/musikkurs'
-            let parent = mainMenu.find(rootItem => rootItem.id === item.parentIndex)
+            let parent = mainMenu.find(
+              rootItem => rootItem.id === item.parentIndex
+            )
             if (parent) {
               item.url = parent.url + item.url
               parent.children.push(item)
             }
           }
           // Index for search
-          this.indexForSearch(item, ['title'])
+          this.indexForSearch(item, [ColumnName.TITLE])
         })
         this.cache.mainMenu = mainMenu
         return resolve(mainMenu)
@@ -99,15 +126,24 @@ class CMS {
 
   getCourseCategories = () => {
     // Return cached content if present
-    if (this.cache.courseCategories) return Promise.resolve(this.cache.courseCategories)
+    if (this.cache.courseCategories)
+      return Promise.resolve(this.cache.courseCategories)
     // Check if promise is pending
     if (this.pending.courseCategories) return this.pending.courseCategories
     // Cache pending promise to prevent multiple calls to cms
     this.pending.courseCategories = new Promise(async (resolve, reject) => {
       try {
-        const options = { populate: ['images'] };
-        const courseCategories = await this.flamelinkApp.content.get(ContentGroup.COURSE_CATEGORIES, options)
-        if (!courseCategories) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta några kurskategorier. Försök igen senare', true)
+        const options = { populate: [ColumnName.IMAGES] }
+        const courseCategories = await this.flamelinkApp.content.get(
+          ContentGroup.COURSE_CATEGORIES,
+          options
+        )
+        if (!courseCategories)
+          throw new CustomError(
+            'Ett fel uppstod',
+            'Kunde inte hitta några kurskategorier. Försök igen senare',
+            true
+          )
         this.cache.courseCategories = courseCategories
         return resolve(courseCategories)
       } catch (error) {
@@ -130,23 +166,36 @@ class CMS {
     this.pending.courses = new Promise(async (resolve, reject) => {
       try {
         const options = {
-          populate: ['images', 'courseContactStaff']
-        };
-        const coursesData = await this.flamelinkApp.content.get(ContentGroup.COURSES, options)
-        if (!coursesData) throw new CustomError('Här var det tomt.', 'Vi kunde inte hitta några kurser för de valda alternativen.', true, '/kurser', 'Klicka här för att se alla våra kurser.')
-        const courses = this.arrayFromFirebaseData(coursesData, ContentGroup.COURSES)
+          populate: [ColumnName.IMAGES, ColumnName.COURSE_CONTACT_STAFF]
+        }
+        const coursesData = await this.flamelinkApp.content.get(
+          ContentGroup.COURSES,
+          options
+        )
+        if (!coursesData)
+          throw new CustomError(
+            'Här var det tomt.',
+            'Vi kunde inte hitta några kurser för de valda alternativen.',
+            true,
+            '/kurser',
+            'Klicka här för att se alla våra kurser.'
+          )
+        const courses = this.arrayFromFirebaseData(
+          coursesData,
+          ContentGroup.COURSES
+        )
         const staffPages = await this.getStaffPages()
         courses.forEach((course, i) => {
           courses[i].staff = []
           if (!course.city) course.city = 'borlange'
-          if (course.courseContactStaff) {
-            course.courseContactStaff.forEach(person => {
+          if (course[ColumnName.COURSE_CONTACT_STAFF]) {
+            course[ColumnName.COURSE_CONTACT_STAFF].forEach(person => {
               courses[i].staff.push(staffPages[person.id])
             })
           }
         })
-        this.cache.courses = courses;
-        return resolve(courses);
+        this.cache.courses = courses
+        return resolve(courses)
       } catch (error) {
         console.error('getCourses()')
         return reject(error)
@@ -159,11 +208,11 @@ class CMS {
    * Return an array of content objects
    *
    * @param {string} groupName - The name of the group to get. Example `ContentGroup.COURSES` ('kurser')
-   * @param {object} options - The property fields to get. Example `{ fields: ['id', 'name', 'shortInfo'] }`
+   * @param {object} options - The property fields to get. Example `{ fields: ['id', 'name', ColumnName.SHORT_INFO] }`
    * @returns - A Promise that resolves to an array of objects
    */
   getContentGroup = (groupName, options = {}) => {
-    console.log('getContentGroup ' + groupName + ',', options);
+    console.log('getContentGroup ' + groupName + ',', options)
     // Convert group name from friendly URL to camelCase
     let group = camelCase(groupName)
     // Return cached content if present
@@ -174,7 +223,8 @@ class CMS {
     this.pending[group] = new Promise(async (resolve, reject) => {
       try {
         const contentData = await this.flamelinkApp.content.get(group, options)
-        if (!contentData) throw new Error(`Could not find content group: ${groupName}`)
+        if (!contentData)
+          throw new Error(`Could not find content group: ${groupName}`)
         let content = this.arrayFromFirebaseData(contentData, groupName)
         this.cache[group] = content
         console.log(`[${group}] CMS Cache\n`, this.cache)
@@ -188,86 +238,111 @@ class CMS {
 
   /**
    * Fetch Main Pages from CMS
-   * 
+   *
    * Use this method to get an array of main page objects. Each object
    * will correspond to a collection item fetched from flamelink.
    * https://app.flamelink.io/edit/collection/mainPages
-   * 
+   *
    * @returns {Promise} - Returns Promise that resolves to an array of Main Page objects
    */
   getMainPages = () => {
     // Return cached content if present
-    if (this.cache.mainPages) return Promise.resolve(this.cache.mainPages)
+    if (this.cache[ContentGroup.MAIN_PAGES])
+      return Promise.resolve(this.cache[ContentGroup.MAIN_PAGES])
     // Check if promise is pending
-    if (this.pending.mainPages) return this.pending.mainPages
+    if (this.pending[ContentGroup.MAIN_PAGES])
+      return this.pending[ContentGroup.MAIN_PAGES]
     // Cache pending promise to prevent multiple calls to cms
-    this.pending.mainPages = new Promise(async (resolve, reject) => {
-      try {
-        let mainPagesData = await this.flamelinkApp.content.get(ContentGroup.MAIN_PAGES, {
-          populate: ['images']
-        })
-        if (!mainPagesData) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Pages')
-        let mainPages = this.arrayFromFirebaseData(mainPagesData, ContentGroup.MAIN_PAGES)
-        // Cache main pages
-        this.cache.mainPages = mainPages
-        console.log('getMainPages() cached:', this.cache)
-        return resolve(mainPages)
-      } catch (error) {
-        return reject(error)
+    this.pending[ContentGroup.MAIN_PAGES] = new Promise(
+      async (resolve, reject) => {
+        try {
+          let mainPagesData = await this.flamelinkApp.content.get(
+            ContentGroup.MAIN_PAGES,
+            {
+              populate: [ColumnName.IMAGES]
+            }
+          )
+          if (!mainPagesData)
+            throw new CustomError(
+              'Ett fel uppstod',
+              'Kunde inte hitta Main Pages'
+            )
+          let mainPages = this.arrayFromFirebaseData(
+            mainPagesData,
+            ContentGroup.MAIN_PAGES
+          )
+          // Cache main pages
+          this.cache[ContentGroup.MAIN_PAGES] = mainPages
+          console.log('getMainPages() cached:', this.cache)
+          return resolve(mainPages)
+        } catch (error) {
+          return reject(error)
+        }
       }
-    })
-    return this.pending.mainPages
+    )
+    return this.pending[ContentGroup.MAIN_PAGES]
   }
 
   /**
    * Fetch Staff info from CMS
-   * 
+   *
    * Use this method to get an object of staff page objects. Each object
    * will correspond to a collection item fetched from flamelink.
    * https://app.flamelink.io/edit/collection/staff
-   * 
+   *
    * @returns {Promise} - Returns Promise that resolves to an object of Staff objects
    */
   getStaffPages = () => {
     // Return cached content if present
-    if (this.cache.staffPages) return Promise.resolve(this.cache.staffPages)
+    if (this.cache[ContentGroup.STAFF_PAGES])
+      return Promise.resolve(this.cache[ContentGroup.STAFF_PAGES])
     // Check if promise is pending
-    if (this.pending.staffPages) return this.pending.staffPages
+    if (this.pending[ContentGroup.STAFF_PAGES])
+      return this.pending[ContentGroup.STAFF_PAGES]
     // Cache pending promise to prevent multiple calls to cms
-    this.pending.staffPages = new Promise(async (resolve, reject) => {
-      // If staffPages is cached, return cache
-      try {
-        const staffPages = await this.flamelinkApp.content.get(ContentGroup.STAFF, {
-          // fields: ['name', 'phone', 'email', 'images', 'role', 'slug'],
-          populate: ['images']
-        })
-        if (!staffPages) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Staff Pages')
-        // Index for search
-        Object.values(staffPages).forEach(staffPage => {
-          staffPage.contentGroup = ContentGroup.STAFF
-          staffPage.url = this.baseUrlFor(staffPage) + staffPage.slug
-          this.indexForSearch(staffPage, ['name', 'role', 'phone', 'summary'])
-        })
-        // Cache staffPages
-        this.cache.staffPages = staffPages
-        console.log('getStaffPages() cached:', this.cache)
-        return resolve(staffPages)
-      } catch (error) {
-        return reject(error)
+    this.pending[ContentGroup.STAFF_PAGES] = new Promise(
+      async (resolve, reject) => {
+        // If staffPages is cached, return cache
+        try {
+          const staffPages = await this.flamelinkApp.content.get(
+            ContentGroup.STAFF,
+            {
+              // fields: ['name', 'phone', 'email', 'images', 'role', 'slug'],
+              populate: [ColumnName.IMAGES]
+            }
+          )
+          if (!staffPages)
+            throw new CustomError(
+              'Ett fel uppstod',
+              'Kunde inte hitta Staff Pages'
+            )
+          // Index for search
+          Object.values(staffPages).forEach(staffPage => {
+            staffPage.contentGroup = ContentGroup.STAFF
+            staffPage.url = this.baseUrlFor(staffPage) + staffPage.slug
+            this.indexForSearch(staffPage, [ColumnName.NAME, ColumnName.ROLE, ColumnName.PHONE, ColumnName.SUMMARY])
+          })
+          // Cache staffPages
+          this.cache[ContentGroup.STAFF_PAGES] = staffPages
+          console.log('getStaffPages() cached:', this.cache)
+          return resolve(staffPages)
+        } catch (error) {
+          return reject(error)
+        }
       }
-    })
-    return this.pending.staffPages
+    )
+    return this.pending[ContentGroup.STAFF_PAGES]
   }
 
   /**
    * Fetch content from CMS
-   * 
+   *
    * Use this method to get an array of objects corresponding to
    * a collection in flamelink
    * @param {string} pageName - The name of the pages to fetch. Can be camelCased or kebab-cased.
    * @returns {Promise} - A Promise that resolves to an array of objects on success
    */
-  getPageContent = (pageName) => {
+  getPageContent = pageName => {
     // Convert page name from friendly URL to camelCase
     let page = camelCase(pageName)
     // Return cached content if present
@@ -280,7 +355,11 @@ class CMS {
         let content = {}
         // Get array of main pages
         let mainPages = await this.getMainPages()
-        if (!mainPages) throw new CustomError('Ett fel uppstod', 'Kunde inte hitta Main Pages found (in cms.getPageContent())')
+        if (!mainPages)
+          throw new CustomError(
+            'Ett fel uppstod',
+            'Kunde inte hitta Main Pages found (in cms.getPageContent())'
+          )
         // Find the page we're looking for
         let mainPage = mainPages.find(mainPage => {
           return mainPage.slug === pageName
@@ -298,12 +377,12 @@ class CMS {
             const allCategories = await this.getCourseCategories()
             // Temp container for unspecified courses
             let otherCourses = new Set()
-            const otherCoursesUrl = '/kurser/ovriga-kurser'
+            const otherCoursesUrl = `/${PageSlug.COURSES}/ovriga-kurser`
             // Init array to hold categories
             content.courseCategories = []
             // Loop all categories
             Object.values(allCategories).forEach(category => {
-              category.url = '/kurser/' + category.slug
+              category.url = `/${PageSlug.COURSES}/${category.slug}`
               // Extract courses that should be in this category
               let courses = allCourses.filter(course => {
                 // If courseCategory is undefined, default to `övriga kurser`
@@ -339,7 +418,7 @@ class CMS {
                 courses: Array.from(otherCourses.values())
               }
               content.courseCategories.push(otherCoursesCategory)
-              this.indexForSearch(otherCoursesCategory, ['name', 'shortInfo'])
+              this.indexForSearch(otherCoursesCategory, [ColumnName.NAME, ColumnName.SHORT_INFO])
             }
           }
           // If the mainPage has subPages
@@ -347,41 +426,54 @@ class CMS {
             /**
              * `subPages` is an array of objects.
              * Each object has a `subPage` array
-             * 
+             *
              * Since flamelink doesn't allow us to query which subPages we want,
              * we need to fetch all subPages and cache them
-             * 
+             *
              * NOTE: - We need to specify every field we want to get!
              */
             const subPageIds = mainPage.subPages.map(item => {
               return item.subPage
             })
             if (this.cache.subPages) {
-              content.subPages = this.cache.subPages.filter(subPage => subPageIds.includes(subPage.id))
+              content.subPages = this.cache.subPages.filter(subPage =>
+                subPageIds.includes(subPage.id)
+              )
             } else {
-              let subPages = await this.flamelinkApp.content.get(ContentGroup.SUB_PAGES, {
-                fields: [
-                  'showByDefault', ...defaultFields, ContentGroup.DETAIL_PAGES, ContentGroup.STAFF
-                ],
-                populate: [
-                  {
-                    field: ContentGroup.DETAIL_PAGES,
-                    subFields: ['detailPage']
-                  }
-                ]
-              })
+              let subPages = await this.flamelinkApp.content.get(
+                ContentGroup.SUB_PAGES,
+                {
+                  fields: [
+                    'showByDefault',
+                    ...defaultFields,
+                    ContentGroup.DETAIL_PAGES,
+                    ContentGroup.STAFF
+                  ],
+                  populate: [
+                    {
+                      field: ContentGroup.DETAIL_PAGES,
+                      subFields: ['detailPage']
+                    }
+                  ]
+                }
+              )
               if (subPages) {
                 // Convert subPages to array
-                const allSubPages = this.arrayFromFirebaseData(subPages, ContentGroup.SUB_PAGES)
+                const allSubPages = this.arrayFromFirebaseData(
+                  subPages,
+                  ContentGroup.SUB_PAGES
+                )
                 // Index detailPages for search
                 allSubPages.forEach(subPage => {
                   // Find subPage's mainPage
-                  let subPageParent = this.cache.mainPages.find(mainPage => {
-                    if (!mainPage.subPages) return false
-                    return mainPage.subPages.find(mainPageSubPage => {
-                      return subPage.id === mainPageSubPage.subPage
-                    })
-                  })
+                  let subPageParent = this.cache[ContentGroup.MAIN_PAGES].find(
+                    mainPage => {
+                      if (!mainPage.subPages) return false
+                      return mainPage.subPages.find(mainPageSubPage => {
+                        return subPage.id === mainPageSubPage.subPage
+                      })
+                    }
+                  )
                   if (subPageParent) {
                     subPage.parentUrl = '/' + subPageParent.slug
                   } else {
@@ -412,7 +504,9 @@ class CMS {
                 // Cache subPages
                 this.cache.subPages = allSubPages
                 // Add page's subPages to content object
-                content.subPages = allSubPages.filter(subPage => subPageIds.includes(subPage.id))
+                content.subPages = allSubPages.filter(subPage =>
+                  subPageIds.includes(subPage.id)
+                )
               }
             }
           }
@@ -441,8 +535,8 @@ class CMS {
     Object.values(data).forEach(value => {
       if (this.isProd && !value.isPublished) {
         // Don't show unpublished content
-        console.log('Don\'t show unpublished content', value)
-        return;
+        console.log("Don't show unpublished content", value)
+        return
       }
       let result = {
         contentGroup
@@ -486,7 +580,7 @@ class CMS {
       }
     })
   }
-  
+
   checkEditMode = value => {
     let dataObject = value
     if (value.isEditing) {
@@ -504,14 +598,18 @@ class CMS {
 
   getURL = (id, size) => {
     // Return cached content if present
-    if (this.cache.imageUrls[id]) return Promise.resolve(this.cache.imageUrls[id])
+    if (this.cache.imageUrls[id])
+      return Promise.resolve(this.cache.imageUrls[id])
     // Check if promise is pending
     if (this.pending.imageUrls[id]) return this.pending.imageUrls[id]
     // Cache pending promise to prevent multiple calls to cms
     this.pending.imageUrls[id] = new Promise(async (resolve, reject) => {
       try {
-        const url = await this.flamelinkApp.storage.getURL(id, { size: size || 'device' })
-        if (!url) throw new CustomError('Ett fel uppstod', `No URL found for ${id}`)
+        const url = await this.flamelinkApp.storage.getURL(id, {
+          size: size || 'device'
+        })
+        if (!url)
+          throw new CustomError('Ett fel uppstod', `No URL found for ${id}`)
         this.cache.imageUrls[id] = url
         return resolve(url)
       } catch (error) {
@@ -540,24 +638,23 @@ class CMS {
       this.searchInited = true
       // Check for content groups that has not been cached yet
       Object.values(ContentGroup).forEach(group => {
-        if (this.cache[group] === undefined && this.pending[group] === undefined) {
+        if (
+          this.cache[group] === undefined &&
+          this.pending[group] === undefined
+        ) {
           // Search content that we have not cached yet
           switch (group) {
             case ContentGroup.COURSES:
               // Kurser is not cached, fetch courses, courseCategories.
               // This will also cache staffPages
-              Promise.all([
-                this.getCourseCategories(),
-                this.getCourses()
-              ])
-            break
+              Promise.all([this.getCourseCategories(), this.getCourses()])
+              break
             case ContentGroup.SUB_PAGES:
               // Fetch Sub pages
-              Promise.all([
-                this.getPageContent(PageSlug.PRAKTISK_INFO)
-              ])
-            break
-            default: break
+              Promise.all([this.getPageContent(PageSlug.PRAKTISK_INFO)])
+              break
+            default:
+              break
           }
         }
       })
@@ -566,8 +663,14 @@ class CMS {
     let results = this.searchIndex.filter(this.stringMatch)
     if (this.searchTerm !== '') {
       results = results.map(result => {
-        let heading = this.highlightedSearchResult(result.content.name || result.content.title, this.searchTerm)
-        let paragraph = this.highlightedSearchResult(result.content[result.field], this.searchTerm)
+        let heading = this.highlightedSearchResult(
+          result.content.name || result.content.title,
+          this.searchTerm
+        )
+        let paragraph = this.highlightedSearchResult(
+          result.content[result.field],
+          this.searchTerm
+        )
         return {
           heading,
           paragraph,
@@ -579,8 +682,8 @@ class CMS {
     // Sort results according to match priority
     return results.sort((resultA, resultB) => {
       if (resultA.field === resultB.field) return 0
-      if (resultA.field === 'name') return -1
-      if (resultA.field === 'shortInfo' && resultB.field === 'body') return -1
+      if (resultA.field === ColumnName.NAME) return -1
+      if (resultA.field === ColumnName.SHORT_INFO && resultB.field === 'body') return -1
       if (resultA.field === 'body') return 1
       return 1
     })
@@ -600,7 +703,10 @@ class CMS {
     // Limit the search result to `maxCharacters` characters
     const maxCharacters = 200
     const charsBeforeFirstMatch = 20
-    if (parts[0].toLowerCase() !== searchTerm && parts[0].length > charsBeforeFirstMatch) {
+    if (
+      parts[0].toLowerCase() !== searchTerm &&
+      parts[0].length > charsBeforeFirstMatch
+    ) {
       // Limit the text before the first match to approx. `charsBeforeFirstMatch` characters
       // We don't want to break up words, so find the nearest space character
       let firstWordBreak = parts[0].indexOf(' ', charsBeforeFirstMatch)
@@ -608,10 +714,13 @@ class CMS {
         parts[0] = '...' + parts[0].substr(firstWordBreak)
       }
     }
-    let highlighted = parts.map(part => {
-      if (part.toLowerCase() === searchTerm) return `<span class="highlighted">${part}</span>`
-      return part
-    }).join('')
+    let highlighted = parts
+      .map(part => {
+        if (part.toLowerCase() === searchTerm)
+          return `<span class="highlighted">${part}</span>`
+        return part
+      })
+      .join('')
     if (highlighted.length > maxCharacters) {
       // Limit the text to approx. `maxCharacters` characters
       // We still don't want to break up words, so find the nearest space character
@@ -630,19 +739,21 @@ class CMS {
   }
 
   baseUrlFor = content => {
-    let baseUrl = '/', categoryId, categorySlug
+    let baseUrl = '/',
+      categoryId,
+      categorySlug
     switch (content.contentGroup) {
       case ContentGroup.COURSES:
         if (content.courseCategory) {
           categoryId = content.courseCategory[0]
           categorySlug = this.cache.courseCategories[categoryId].slug
-          return '/kurser/' + categorySlug + '/'
+          return `/${PageSlug.COURSES}/${categorySlug}/`
         } else {
           // Course has no category
-          return '/kurser/ovriga-kurser/'
+          return `/${PageSlug.COURSES}/ovriga-kurser/`
         }
       case ContentGroup.STAFF:
-        return '/om-fornby/personal#'
+        return `/${PageSlug.OM_FORNBY}/personal#`
       case ContentGroup.SUB_PAGES:
         return content.parentUrl + '/'
       case ContentGroup.DETAIL_PAGES:
@@ -651,7 +762,7 @@ class CMS {
         return content.url
       default:
         console.warn('No baseUrl defined for', content.contentGroup)
-      break
+        break
     }
     return baseUrl
   }

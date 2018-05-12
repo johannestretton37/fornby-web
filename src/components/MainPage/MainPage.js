@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { object } from 'prop-types'
-import { PageSlug } from '../../constants'
+import { PageSlug, ContentGroup } from '../../constants'
 import CoursesPage from '../CoursesPage'
 import Loading from '../Loading'
 import PagesContainer from '../PagesContainer'
@@ -75,11 +75,11 @@ class MainPage extends Component {
 
   getCoursesSubMenuItems(pageContent) {
     let menuItems = []
-    if (pageContent === undefined || !pageContent.courseCategories) return this.menuItems;
+    if (pageContent === undefined || !pageContent[ContentGroup.COURSE_CATEGORIES]) return this.menuItems;
     const page = '/' + this.props.match.params.page
     let selectedCity
     if (cms.selectedCity) selectedCity = cms.selectedCity.slug
-    pageContent.courseCategories.forEach(subpage => {
+    pageContent[ContentGroup.COURSE_CATEGORIES].forEach(subpage => {
       let menuItem = {
         title: subpage.name,
         url: page + '/' + subpage.slug

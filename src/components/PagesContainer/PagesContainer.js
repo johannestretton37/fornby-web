@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { object, array } from 'prop-types'
-import { PageSlug, cities } from '../../constants'
+import { PageSlug, cities, ContentGroup } from '../../constants'
 import SubPage from '../SubPage'
 import ErrorPage from '../ErrorPage'
 import CoursesPage from '../CoursesPage'
@@ -36,13 +36,19 @@ class PagesContainer extends Component {
   }
 
   componentDidMount() {
-    let { content, match: { params: { page } } } = this.props
+    let {
+      content,
+      match: {
+        params: { page }
+      }
+    } = this.props
     switch (page) {
       case 'falun':
       case 'ludvika':
         cms.selectedCity = cities.find(city => city.slug === page)
-      break
-      default: break
+        break
+      default:
+        break
     }
     if (content.subPages) {
       // Map subPages by slug
@@ -54,7 +60,7 @@ class PagesContainer extends Component {
           if (subPageSlug) {
             console.error(
               `Multiple SubPages are set to showByDefault. '${subPageSlug}', '${
-              subPageContent.slug
+                subPageContent.slug
               }' found. Please edit this in flamelink cms.`
             )
           }
@@ -85,28 +91,39 @@ class PagesContainer extends Component {
       subPageSlug,
       subPages
     } = this.state
-    let { subMenuItems, match: { params: { page } } } = this.props
+    let {
+      subMenuItems,
+      match: {
+        params: { page }
+      }
+    } = this.props
     return (
       <Container>
         <Row>
-        {subMenuItems.length > 0 && 
-          <Col md={4} className='sub-menu-container'>
-            <SubMenu items={subMenuItems} />
-          </Col>
-        }
+          {subMenuItems.length > 0 && (
+            <Col md={4} className="sub-menu-container">
+              <SubMenu items={subMenuItems} />
+            </Col>
+          )}
           <Col md={subMenuItems.length > 0 ? 8 : 12}>
-            {error ?
+            {error ? (
               <ErrorPage error={error} />
-              :
+            ) : (
               <div className={`${page ? page + ' ' : ''}pages-container`}>
                 <h2>{name}</h2>
                 <p className="short-info">{shortInfo}</p>
                 <p dangerouslySetInnerHTML={{ __html: body }} />
                 {page === PageSlug.ANSOK ? <ApplyForm /> : null}
                 {subPageSlug && subPages[subPageSlug]}
-                {content.courseCategories && <CoursesPage title='' subMenuItems={subMenuItems} content={content} />}
+                {content[ContentGroup.COURSE_CATEGORIES] && (
+                  <CoursesPage
+                    title=""
+                    subMenuItems={subMenuItems}
+                    content={content}
+                  />
+                )}
               </div>
-            }
+            )}
           </Col>
         </Row>
       </Container>
