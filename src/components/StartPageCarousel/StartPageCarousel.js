@@ -88,9 +88,10 @@ class StartPageCarousel extends Component {
         let images = {}
         mainPages.forEach(mainPage => {
           if (mainPage.images) {
+            const preview = mainPage.previews ? mainPage.previews[0] : null
             let image = {
               src: mainPage.images[0].url,
-              preview: mainPage.previews[0],
+              preview,
               title: mainPage.name
             }
             images[mainPage.slug] = image
