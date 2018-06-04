@@ -459,9 +459,48 @@ describe('Fornby Cloud Functions', () => {
         assert.lengthOf(result, 2)
         assert.equal(result.every(promise => promise === true), true)
       })
+
+      it('when isEditing is true, isPublished is true and no _prodContent exists', async () => {
+        const fakeProdContent = {
+          name: 'Fake Prod Content',
+          slug: 'fake-prod-content'
+        }
+
+        childStub.withArgs('slug').returns({ set: setStub })
+        childStub.withArgs('_prodContent').returns({ set: setStub })
+        setStub.withArgs('is-edit-and-is-pub').returns(true)
+        setStub.withArgs(data_IsEdit_IsPub).returns(true)
+
+        const data_IsEdit_IsPub_WithoutProd = Object.assign(
+          {},
+          data_IsEdit_IsPub,
+          {
+            slug: 'is-edit-and-is-pub'
+          }
+        )
+        const changeData = test.makeChange(
+          {
+            val: () => data_IsEdit_IsPub_WithoutProd,
+            exists: () => true
+          },
+          {
+            val: () => data_IsEdit_IsPub,
+            exists: () => true,
+            ref: {
+              child: childStub
+            }
+          }
+        )
+        const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
+        const result = await wrapped(changeData)
+        // Result should contain an array with two promises that both resolves
+        // to true.
+        assert.lengthOf(result, 2)
+        assert.equal(result.every(promise => promise === true), true)
+      })
     })
     describe('should ignore _prodContent', () => {
-      it('when isEditing is true and no _prodContent exists', async () => {
+      it('when isEditing is true, isPublished is false and no _prodContent exists', async () => {
         const fakeProdContent = {
           name: 'Fake Prod Content',
           slug: 'fake-prod-content'
@@ -492,8 +531,7 @@ describe('Fornby Cloud Functions', () => {
         )
         const wrapped = test.wrap(fornbyFunctions.contentChangeDetected)
         const result = await wrapped(changeData)
-        // Result should contain an array with two promises that both resolves
-        // to true.
+        // Result should contain an array with one promise that resolves to true
         assert.lengthOf(result, 1)
         assert.equal(result.every(promise => promise === true), true)
       })

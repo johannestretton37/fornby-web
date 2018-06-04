@@ -122,6 +122,13 @@ exports.contentChangeDetected = functions.database
             `[EDIT PUSHED]: Update _prodContent ${previousItem._prodContent}`
           )
           console.log('[RETURN EDIT PROMISES]: length:', edits.length)
+        } else if (editedItem.isPublished === true) {
+          console.log(
+            'No _prodContent exists but item isPublished, create _prodContent.'
+          )
+          edits.push(change.after.ref.child('_prodContent').set(editedItem))
+          console.log(`[EDIT PUSHED]: Create _prodContent`)
+          console.log('[RETURN EDIT PROMISES]: length:', edits.length)
         }
         return Promise.all(edits)
       }
