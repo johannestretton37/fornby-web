@@ -449,14 +449,17 @@ class CMS {
       }
       // Check if data is in edit mode
       let dataObject = this.checkEditMode(value)
-      Object.entries(dataObject).forEach(([field, val]) => {
-        if (htmlFields.includes(field)) {
-          // This field may contain html - sanitize it
-          result[field] = sanitizeHtml(val, sanitizeSettings)
-        } else {
-          result[field] = val
-        }
-      })
+
+      if (dataObject) {
+        Object.entries(dataObject).forEach(([field, val]) => {
+          if (htmlFields.includes(field)) {
+            // This field may contain html - sanitize it
+            result[field] = sanitizeHtml(val, sanitizeSettings)
+          } else {
+            result[field] = val
+          }
+        })
+      }
       if (result.slug === undefined && result.name !== undefined) {
         console.warn("Didn't find a slug - creating one from", result.name)
         result.slug = getSlug(result.name, { lang: 'sv' })
@@ -486,7 +489,7 @@ class CMS {
       }
     })
   }
-  
+
   checkEditMode = value => {
     let dataObject = value
     if (value.isEditing) {
@@ -550,13 +553,13 @@ class CMS {
                 this.getCourseCategories(),
                 this.getCourses()
               ])
-            break
+              break
             case ContentGroup.SUB_PAGES:
               // Fetch Sub pages
               Promise.all([
                 this.getPageContent(PageSlug.PRAKTISK_INFO)
               ])
-            break
+              break
             default: break
           }
         }
@@ -651,7 +654,7 @@ class CMS {
         return content.url
       default:
         console.warn('No baseUrl defined for', content.contentGroup)
-      break
+        break
     }
     return baseUrl
   }

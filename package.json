@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "bootstrap": "4.0.0-beta.3",
-    "firebase": "^4.13.1",
+    "firebase": "4.13.1",
     "firebaseui": "^2.6.2",
     "flamelink": "^0.17.0",
     "lodash": "^4.17.5",
