@@ -320,7 +320,12 @@ class CMS {
           Object.values(staffPages).forEach(staffPage => {
             staffPage.contentGroup = ContentGroup.STAFF
             staffPage.url = this.baseUrlFor(staffPage) + staffPage.slug
-            this.indexForSearch(staffPage, [ColumnName.NAME, ColumnName.ROLE, ColumnName.PHONE, ColumnName.SUMMARY])
+            this.indexForSearch(staffPage, [
+              ColumnName.NAME,
+              ColumnName.ROLE,
+              ColumnName.PHONE,
+              ColumnName.SUMMARY
+            ])
           })
           // Cache staffPages
           this.cache[ContentGroup.STAFF_PAGES] = staffPages
@@ -418,7 +423,10 @@ class CMS {
                 courses: Array.from(otherCourses.values())
               }
               content.courseCategories.push(otherCoursesCategory)
-              this.indexForSearch(otherCoursesCategory, [ColumnName.NAME, ColumnName.SHORT_INFO])
+              this.indexForSearch(otherCoursesCategory, [
+                ColumnName.NAME,
+                ColumnName.SHORT_INFO
+              ])
             }
           }
           // If the mainPage has subPages
@@ -543,14 +551,17 @@ class CMS {
       }
       // Check if data is in edit mode
       let dataObject = this.checkEditMode(value)
-      Object.entries(dataObject).forEach(([field, val]) => {
-        if (htmlFields.includes(field)) {
-          // This field may contain html - sanitize it
-          result[field] = sanitizeHtml(val, sanitizeSettings)
-        } else {
-          result[field] = val
-        }
-      })
+
+      if (dataObject) {
+        Object.entries(dataObject).forEach(([field, val]) => {
+          if (htmlFields.includes(field)) {
+            // This field may contain html - sanitize it
+            result[field] = sanitizeHtml(val, sanitizeSettings)
+          } else {
+            result[field] = val
+          }
+        })
+      }
       if (result.slug === undefined && result.name !== undefined) {
         console.warn("Didn't find a slug - creating one from", result.name)
         result.slug = getSlug(result.name, { lang: 'sv' })
@@ -683,7 +694,8 @@ class CMS {
     return results.sort((resultA, resultB) => {
       if (resultA.field === resultB.field) return 0
       if (resultA.field === ColumnName.NAME) return -1
-      if (resultA.field === ColumnName.SHORT_INFO && resultB.field === 'body') return -1
+      if (resultA.field === ColumnName.SHORT_INFO && resultB.field === 'body')
+        return -1
       if (resultA.field === 'body') return 1
       return 1
     })
