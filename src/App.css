@@ -37,7 +37,10 @@
 /* Font colors */
 /* Brand colors */
 /* Footer */
-html, body, #app, #root {
+html,
+body,
+#app,
+#root {
   height: 100%; }
 
 body {
@@ -49,11 +52,18 @@ body {
 body {
   background-color: #f9f9f9; }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Source Sans Pro', 'Open Sans', sans-serif; }
 
-i, .short-info {
-  font-family: 'Libre Baskerville'; }
+i,
+.short-info {
+  font-family: 'Libre Baskerville';
+  font-style: italic; }
 
 a {
   color: #4f6791;
@@ -71,14 +81,16 @@ a {
 code {
   color: #ac285c; }
 
-ul, li {
+ul,
+li {
   margin: 0;
   padding: 0; }
 
 #app {
   display: flex;
   flex-direction: column; }
-  #app > .main-content, #app main {
+  #app > .main-content,
+  #app main {
     display: flex;
     flex: 1 0 auto;
     flex-direction: column; }

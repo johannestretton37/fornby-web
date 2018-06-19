@@ -73,21 +73,21 @@ exports.contentChangeDetected = functions.database
        * If entry has an images array, we need to add a preview array,
        * containing dataURI thumbnails
        */
-      if (previousItem.previews) {
+      if (previousItem.previews && previousItem.previews.length > 0) {
         // Check if there are images, otherwise there's no need for previews
-        if (editedItem.images) {
+        if (editedItem.images && editedItem.images.length > 0) {
           // Images exist, check for changes
           if (
             previousItem.images.length === editedItem.images.length &&
             previousItem.images.every((val, i) => val === editedItem.images[i])
           ) {
             // No change to images, preserve previews
-            edits.push(
-              change.after.ref.child('previews').set(previousItem.previews)
-            )
-            console.log(
-              `[EDIT PUSHED]: Preserve previews ${previousItem.previews}`
-            )
+            // edits.push(
+            //   change.after.ref.child('previews').set(previousItem.previews)
+            // )
+            // console.log(
+            //   `[EDIT PUSHED]: Preserve previews ${previousItem.previews}`
+            // )
           } else {
             console.warn(`[TODO]: WE SHOULD CREATE PREVIEWS FOR ${editedItem}`)
             // let previewPromises = []
