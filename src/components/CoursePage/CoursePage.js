@@ -73,7 +73,7 @@ class CoursePage extends Component {
     let fixedCity = city === 'borlange' ? 'Borlänge' : city;
     const firstColumn = [];
     courseStartDate && firstColumn.push(this.createBoxContent('Kursstart', <span><br />{DateHelper.formatDate(courseStartDate)}</span>, 'info'));
-    applicationDeadline && firstColumn.push(this.createBoxContent('Ansök senast', <span><br />{DateHelper.formatDate(applicationDeadline)}</span>, 'info'));
+    applicationDeadline && firstColumn.push(this.createBoxContent('Ansök senast', applicationDeadline, 'info'));
     courseType && firstColumn.push(this.createBoxContent('Kurstyp', courseType, 'info'));
     courseTempo && firstColumn.push(this.createBoxContent('Studietakt', (courseTempo + '%'), 'info'));
     internat && firstColumn.push(this.createBoxContent('Internat', internat ? 'Ja' : 'Nej', 'info'));
