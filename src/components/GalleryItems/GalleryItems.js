@@ -38,6 +38,8 @@ function GalleryItems({ items = [] }) {
                   {item.role}
                   <br />
                   <a href={'mailto:' + item.email}>{item.email}</a>
+                  {item.phone && <div>{item.phone}</div>}
+                  {item.mobile && <div>{item.mobile}</div>}
                 </div>
               </div>
             </div>

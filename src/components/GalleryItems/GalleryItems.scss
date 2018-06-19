@@ -10,12 +10,15 @@
     float: left;
     display: flex;
     position: relative;
-      
+    a{
+      word-break: break-all;
+    }
     .image-container {
         height: 320px;
         width: 100%;
         flex: 40%;
     }
+
     .itemInfoWrap {
       position: absolute;
       opacity: 0;
@@ -26,7 +29,7 @@
       left:0;
       right: 0;
       bottom: 0;
-      background-color: rgba(255,255,255,0.5)        
+      background-color: rgba(255,255,255,0.92)        
     }
     .itemInfoWrap:hover {
       opacity: 1;
