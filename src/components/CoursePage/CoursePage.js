@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import './CoursePage.css'
-import {bool, string, instanceOf, element, any, func, object} from 'prop-types'
-import {withRouter} from 'react-router-dom'
+import { bool, string, instanceOf, element, any, func, object } from 'prop-types'
+import { withRouter } from 'react-router-dom'
 import DateHelper from '../../Helpers'
 import SmoothImage from '../SmoothImage'
 import Gallery from '../Gallery'
@@ -42,7 +42,7 @@ class CoursePage extends Component {
       </p>
     );
   }
-  
+
   createBoxContent(bold, text, className) {
     if (!text) return null;
     return { bold: bold, text: text, className: className }
@@ -60,7 +60,8 @@ class CoursePage extends Component {
       city,
       courseAdmissionConditions,
       courseStartDate,
-      staff
+      staff,
+      internat
     } = this.props.content;
 
     let isFullText = courseIsFull && courseIsFull ? 'Nej' : 'Ja';
@@ -75,10 +76,11 @@ class CoursePage extends Component {
     applicationDeadline && firstColumn.push(this.createBoxContent('Ansök senast', <span><br />{DateHelper.formatDate(applicationDeadline)}</span>, 'info'));
     courseType && firstColumn.push(this.createBoxContent('Kurstyp', courseType, 'info'));
     courseTempo && firstColumn.push(this.createBoxContent('Studietakt', (courseTempo + '%'), 'info'));
+    internat && firstColumn.push(this.createBoxContent('Internat', internat ? 'Ja' : 'Nej', 'info'));
     courseAdmissionConditions && firstColumn.push(this.createBoxContent('Antagningsvillkor', courseAdmissionConditions, 'info'));
     courseLength && firstColumn.push(this.createBoxContent('Längd', courseLength, 'info'));
     isFullText && firstColumn.push(this.createBoxContent('Lediga platser', isFullText, 'info'));
-    fixedCity && firstColumn.push(this.createBoxContent('Internat', fixedCity, 'info'));
+    fixedCity && firstColumn.push(this.createBoxContent('Ort', fixedCity, 'info'));
     courseExpenses && firstColumn.push(this.createBoxContent('Kostnader', courseExpenses, 'info'));
     courseStudyLevel && firstColumn.push(this.createBoxContent('Studiestödsnivå(CSN)', courseStudyLevel, 'info'));
     contactName && firstColumn.push(this.createBoxContent('Kontakt',

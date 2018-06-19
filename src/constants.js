@@ -63,6 +63,7 @@ export const PageSlug = {
 export const defaultFields = [
   'id',
   'name',
+  'body',
   'slug',
   'images',
   'previews',
