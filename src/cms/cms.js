@@ -556,7 +556,7 @@ class CMS {
         Object.entries(dataObject).forEach(([field, val]) => {
           if (htmlFields.includes(field)) {
             // This field may contain html - sanitize it
-            result[field] = sanitizeHtml(val, sanitizeSettings)
+            result[field] = val//sanitizeHtml(val, sanitizeSettings)
           } else {
             result[field] = val
           }
