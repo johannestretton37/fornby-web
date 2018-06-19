@@ -31,7 +31,6 @@ exports.contentChangeDetected = functions.database
       // This is a delete action, do nothing
       return null
     }
-
     // If no isEditing switch exists, do nothing
     if (editedItem.isEditing === undefined) {
       return null
@@ -161,6 +160,9 @@ exports.contentChangeDetected = functions.database
       }
     } else {
       // This is a creation
+      // Create slug
+      const slug = getSlug(editedItem.name, { lang: 'sv' })
+      edits.push(change.after.ref.child('slug').set(slug))
       if (editedItem.isEditing === true) {
         if (editedItem.isPublished === false) {
           // Create no _prodContent since this should only be visible on staging
@@ -168,8 +170,6 @@ exports.contentChangeDetected = functions.database
             'Init item without _prodContent, since isPublished === false',
             editedItem
           )
-          const slug = getSlug(editedItem.name, { lang: 'sv' })
-          edits.push(change.after.ref.child('slug').set(slug))
           return Promise.all(edits)
         }
         console.log('Init item with _prodContent', editedItem)
