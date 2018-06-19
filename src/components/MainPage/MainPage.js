@@ -57,7 +57,7 @@ class MainPage extends Component {
           subMenuItems = this.getCoursesSubMenuItems(pageContent);
         } else if (pageContent.subPages) {
           subMenuItems = this.getSubPagesSubMenuItems(pageContent);
-        }  
+        }
         this.setState({
           title: pageContent.name,
           pageContent,
@@ -117,7 +117,7 @@ class MainPage extends Component {
           if (!menuItem.subItems) menuItem.subItems = []
           menuItem.subItems.push({
             title: name,
-            url: page + '/' + subPage.slug + '#' + slug
+            url: page + '/' + subPage.slug + '/' + slug
           })
         })
       }
@@ -133,43 +133,47 @@ class MainPage extends Component {
         {isLoading ?
           <Loading />
           :
-        error ?
-          <Container>
-            <Row>
-              <Col>
-                <ErrorPage error={error} />
-              </Col>
-            </Row>
-          </Container>
-          :
-          <Switch>
-            <Route path='/kurser/:category?/:slug?' render={props => {
-              return (
-                <CoursesPage
-                  {...props}
-                  title={title}
-                  content={pageContent}
-                  subMenuItems={subMenuItems} />
-              )}
-             } />
-            <Route path='/:page/:subpage?' render={props => {
-              return (
-                <PagesContainer
-                  {...props}
-                  content={pageContent}
-                  subMenuItems={subMenuItems} />
-              )}
-             } />
-            <Route path='/:page' component={PageContainer} />
-            <Route path='/' render={props => {
-              return (
-                <PagesContainer
-                  {...props}
-                  content={pageContent}
-                  subMenuItems={subMenuItems} />
-              )}
-             } />
-          </Switch>
+          error ?
+            <Container>
+              <Row>
+                <Col>
+                  <ErrorPage error={error} />
+                </Col>
+              </Row>
+            </Container>
+            :
+            <Switch>
+              <Route path='/kurser/:category?/:slug?' render={props => {
+                return (
+                  <CoursesPage
+                    {...props}
+                    title={title}
+                    content={pageContent}
+                    subMenuItems={subMenuItems} />
+                )
+              }
+              } />
+              <Route path='/:page/:subpage?/:detailslug?' render={props => { 
+                return (
+                  <PagesContainer
+                    {...props}
+                    content={pageContent}
+                    subMenuItems={subMenuItems} />
+                )
+              }
+              } />
+              <Route path='/:page' component={PageContainer} />
+
+              <Route path='/' render={props => {
+                return (
+                  <PagesContainer
+                    {...props}
+                    content={pageContent}
+                    subMenuItems={subMenuItems} />
+                )
+              }
+              } />
+            </Switch>
         }
       </Container>
     )

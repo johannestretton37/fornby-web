@@ -19,7 +19,7 @@ import { Container, Row, Col } from 'reactstrap'
  */
 class PagesContainer extends Component {
   state = {
-    content: this.props.content,
+    data: {},
     subPages: {},
     subPageSlug: this.props.match.params.subpage
   }
@@ -34,14 +34,17 @@ class PagesContainer extends Component {
     content: {},
     subMenuItems: []
   }
-
+  findCategory(categories, slug) {
+    return categories.find(category => category.slug === slug);
+  }
   componentDidMount() {
     let {
       content,
       match: {
-        params: { page }
+        params: { page, subpage, detailslug }
       }
     } = this.props
+    let { data } = this.state;
     switch (page) {
       case 'falun':
       case 'ludvika':
@@ -50,28 +53,22 @@ class PagesContainer extends Component {
       default:
         break
     }
-    if (content.subPages) {
-      // Map subPages by slug
-      let subPages = {}
-      let subPageSlug
-      content.subPages.forEach(subPageContent => {
-        if (subPageContent.showByDefault) {
-          // Sanity check
-          if (subPageSlug) {
-            console.error(
-              `Multiple SubPages are set to showByDefault. '${subPageSlug}', '${
-                subPageContent.slug
-              }' found. Please edit this in flamelink cms.`
-            )
-          }
-          subPageSlug = subPageContent.slug
+    this.setState({ data: content });
+    if (detailslug) {
+      let s = content.subPages.find(sub => sub.slug === subpage);
+      if (s && s.detailPages) {
+        let a = s.detailPages.find(sub => sub.detailPage[0].slug === detailslug);
+        if (a) {
+          this.setState({ data: a.detailPage[0] })
         }
-        subPages[subPageContent.slug] = (
-          <SubPage content={subPageContent} url={this.props.match.url} />
-        )
-      })
-      if (!subPageSlug) subPageSlug = this.props.match.params.subpage
-      this.setState({ content, subPageSlug, subPages })
+      }
+    } else if (subpage) {
+      let s = content.subPages.find(sub => sub.slug === subpage);
+      if (s) {
+        this.setState({ data: s })
+        console.log("Nej nu, r", s);
+      }
+    } else {
     }
   }
 
@@ -85,11 +82,8 @@ class PagesContainer extends Component {
   }
 
   render() {
-    const {
-      content,
-      content: { name, shortInfo, body, error },
-      subPageSlug,
-      subPages
+    const { data,
+      data: { name, shortInfo, body, error },
     } = this.state
     let {
       subMenuItems,
@@ -109,21 +103,11 @@ class PagesContainer extends Component {
             {error ? (
               <ErrorPage error={error} />
             ) : (
-              <div className={`${page ? page + ' ' : ''}pages-container`}>
-                <h2>{name}</h2>
-                <p className="short-info">{shortInfo}</p>
-                <p dangerouslySetInnerHTML={{ __html: body }} />
-                {page === PageSlug.ANSOK ? <ApplyForm /> : null}
-                {subPageSlug && subPages[subPageSlug]}
-                {content[ContentGroup.COURSE_CATEGORIES] && (
-                  <CoursesPage
-                    title=""
-                    subMenuItems={subMenuItems}
-                    content={content}
-                  />
-                )}
-              </div>
-            )}
+                <div className={`${page ? page + ' ' : ''} pages-container`}>
+                  <SubPage content={data} />
+                  {page === PageSlug.ANSOK ? <ApplyForm /> : null}
+                </div>
+              )}
           </Col>
         </Row>
       </Container>

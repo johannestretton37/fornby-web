@@ -82,14 +82,14 @@ export const searchableFields = ['name', 'shortInfo', 'body']
  */
 export const cities = [
   {
-    title: 'Falun',
-    slug: 'falun',
-    url: '/falun'
-  },
-  {
     title: 'Borlänge',
     slug: 'borlange',
     url: '/'
+  },
+  {
+    title: 'Falun',
+    slug: 'falun',
+    url: '/falun'
   },
   {
     title: 'Ludvika',

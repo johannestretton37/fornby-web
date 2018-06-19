@@ -5,15 +5,17 @@ import Gallery from '../Gallery'
 import './SubPage.css'
 
 const SubPage = ({ content = {}, url }) => {
-  let { name, detailPages, staff } = content
+  let { name, body, shortInfo, staff } = content
   return (
     <div>
-      <h3>{name}</h3>
-      {detailPages &&
+      <h2>{name}</h2>
+      {<p className="short-info">{shortInfo}</p>}
+      {body && <p className='main-body' dangerouslySetInnerHTML={{ __html: body }} />}
+      {/*detailPages &&
         detailPages.map(detailPageContent => {
           let detailPage = detailPageContent.detailPage[0]
           return <DetailPage key={detailPage.id} content={detailPage} url={url} />
-        })}
+        })*/}
       {staff && <Gallery items={staff} />}
     </div>
   )
