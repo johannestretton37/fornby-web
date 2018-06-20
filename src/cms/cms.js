@@ -459,6 +459,10 @@ class CMS {
                   ],
                   populate: [
                     {
+                      field: ColumnName.IMAGES,
+                      subfields: ColumnName.IMAGES
+                    },
+                    {
                       field: ContentGroup.DETAIL_PAGES,
                       subFields: ['detailPage']
                     }

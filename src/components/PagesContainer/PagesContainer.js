@@ -9,6 +9,7 @@ import cms from '../../cms'
 import './PagesContainer.css'
 import SubMenu from '../SubMenu'
 import { Container, Row, Col } from 'reactstrap'
+import SmoothImage from '../SmoothImage'
 
 /**
  * PagesContainer
@@ -59,6 +60,7 @@ class PagesContainer extends Component {
       if (s && s.detailPages) {
         let a = s.detailPages.find(sub => sub.detailPage[0].slug === detailslug);
         if (a) {
+          console.log("Wosan", a.detailPage[0])
           this.setState({ data: a.detailPage[0] })
         }
       }
@@ -83,34 +85,39 @@ class PagesContainer extends Component {
 
   render() {
     const { data,
-      data: { name, shortInfo, body, error },
+      data: { name, shortInfo, body, error, images, previews },
     } = this.state
     let {
       subMenuItems,
       match: {
-        params: { page }
+        params: { page, subpage }
       }
     } = this.props
+    const src = subpage ? images ? images[0].url : undefined : undefined;
+    const preview = previews ? previews[0] : undefined;
     return (
-      <Container>
-        <Row>
-          {subMenuItems.length > 0 && (
-            <Col md={4} className="sub-menu-container">
-              <SubMenu items={subMenuItems} />
+      <React.Fragment>
+        {src && <SmoothImage className='full-width' height={400} src={src} preview={preview} />}
+        <Container>
+          <Row>
+            {subMenuItems.length > 0 && (
+              <Col md={4} className="sub-menu-container">
+                <SubMenu items={subMenuItems} />
+              </Col>
+            )}
+            <Col md={subMenuItems.length > 0 ? 8 : 12}>
+              {error ? (
+                <ErrorPage error={error} />
+              ) : (
+                  <div className={`${page ? page + ' ' : ''} pages-container`}>
+                    <SubPage content={data} />
+                    {page === PageSlug.ANSOK ? <ApplyForm /> : null}
+                  </div>
+                )}
             </Col>
-          )}
-          <Col md={subMenuItems.length > 0 ? 8 : 12}>
-            {error ? (
-              <ErrorPage error={error} />
-            ) : (
-                <div className={`${page ? page + ' ' : ''} pages-container`}>
-                  <SubPage content={data} />
-                  {page === PageSlug.ANSOK ? <ApplyForm /> : null}
-                </div>
-              )}
-          </Col>
-        </Row>
-      </Container>
+          </Row>
+        </Container>
+      </React.Fragment>
     )
   }
 }
