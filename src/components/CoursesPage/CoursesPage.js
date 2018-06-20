@@ -165,7 +165,6 @@ class CoursesPage extends Component {
     let filterer = (!hideFilterer && !isCoursePage) ? <CourseFilterer items={cities} filter={this.filter} /> : null
     return (
       <div id={id} className={`courses-page${hideFilterer ? ' no-bg' : ''}`}>
-        <ScrollToContent id={scrollTarget} />
         <Container>
           <Row>
             <Col className='pages-container'>
