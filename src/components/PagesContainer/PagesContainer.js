@@ -8,6 +8,7 @@ import ApplyForm from '../ApplyForm'
 import cms from '../../cms'
 import './PagesContainer.css'
 import SubMenu from '../SubMenu'
+import SubMenuMobile from '../SubMenu/SubMenuMobile'
 import { Container, Row, Col } from 'reactstrap'
 
 /**
@@ -96,7 +97,8 @@ class PagesContainer extends Component {
         <Row>
           {subMenuItems.length > 0 && (
             <Col md={4} className="sub-menu-container">
-              <SubMenu items={subMenuItems} />
+              {true && <SubMenu items={subMenuItems} />}
+              {true && <SubMenuMobile items={subMenuItems} />}
             </Col>
           )}
           <Col md={subMenuItems.length > 0 ? 8 : 12}>

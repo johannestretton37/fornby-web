@@ -8,6 +8,10 @@
   padding: 1.5rem 1rem;
   overflow-y: auto;
   cursor: pointer;
+  // Fix styling for all browser
+  background: none;
+  appearance: none;
+  // end style fix
   ul.nav {
     padding-left: 1rem;
     li a {
@@ -54,9 +58,38 @@
   }
 }
 
-/* Hide submenu on small screens */
-@include media-breakpoint-down(sm) {
-  .sub-menu-container {
+.sub-menu-mobile {
     display: none;
+    width: 100%;
+    .sub-menu {
+      width: 100%;
+      border: 0;
+      border-radius: 0;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+    }
+}
+
+
+/* Hide submenu on small screens */
+
+@include media-breakpoint-down(sm) {
+  .sub-menu {
+    display: none;
+  }
+
+  .sub-menu__wrapper:after {
+    content: '+';
+    z-index: 1000;
+    position: absolute;
+    top: 1.3em;
+    right: 2em;
+  }
+
+  .sub-menu-mobile {
+    display: block;
+    .sub-menu {
+      display: block;
+    }
   }
 }

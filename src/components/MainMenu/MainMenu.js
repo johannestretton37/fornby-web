@@ -70,7 +70,7 @@ class MainMenu extends Component {
     this.setState({ isVertical })
   }
 
-  updateIndicator = () => {}
+  updateIndicator = () => { }
 
   moveIndicator = (
     activeItem,
@@ -112,6 +112,7 @@ class MainMenu extends Component {
       isVertical
     } = this.state
     const { items, isOpen } = this.props
+    console.log('main menu', items);
     // isVertical is true when mobile menu is visible
     let indicatorStyle = {
       opacity: items.length > 0 ? 1 : 0
@@ -134,7 +135,7 @@ class MainMenu extends Component {
           {items.map((menuItem, i, items) => {
             return (
               <CSSTransition
-                key={i}
+                key={menuItem.url}
                 in={true}
                 classNames="fade"
                 appear={true}
