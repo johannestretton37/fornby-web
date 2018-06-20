@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { object, number, bool, func } from 'prop-types'
+import {  object, number, bool, func } from 'prop-types'
 import Icon from '../Icon'
 import cms from '../../cms'
 import throttle from 'lodash/throttle'
@@ -67,15 +67,15 @@ class MainMenuItem extends Component {
     this.moveIndicator()
     this.navigate(url)
   }
-  
+
   titleSpanMeasurements = () => {
     const left = this.titleSpan.parentElement.parentElement.offsetLeft + this.titleSpan.parentElement.offsetLeft + this.titleSpan.offsetLeft + 'px'
     const top = this.titleSpan.parentElement.parentElement.offsetTop + this.titleSpan.parentElement.offsetTop + this.titleSpan.offsetTop + 'px'
     const width = this.titleSpan.offsetWidth + 'px'
     const height = this.titleSpan.offsetHeight + 'px'
-    return {left, top, width, height}
+    return { left, top, width, height }
   }
-  
+
   navigate = (href) => {
     const { navigate, item: { url } } = this.props
     this.setState({ showSubItems: false })
@@ -97,7 +97,7 @@ class MainMenuItem extends Component {
 
   toggleSubItem = e => {
     e.preventDefault()
-    this.setState(prevState => ({showSubItems: !prevState.showSubItems}))
+    this.setState(prevState => ({ showSubItems: !prevState.showSubItems }))
   }
 
   render() {
@@ -115,15 +115,20 @@ class MainMenuItem extends Component {
           {this.subItemsToggler()}
         </div>
         {children.length > 0 &&
-        <div className={`nav-sub-items ${this.state.showSubItems ? 'open' : 'closed'}`}>
-          {children.map(subItem => {
-            return (
-              <a onClick={this.handleClick} href={subItem.url} key={subItem.url} className={`nav-item nav-link nav-sub-item`}>
-                <i>{subItem.title}</i>
-              </a>
-            )
-          })}
-        </div>
+          <div className={`nav-sub-items ${this.state.showSubItems ? 'open' : 'closed'}`}>
+            {children.map(subItem => {
+              return (
+                <a
+                  onClick={this.handleClick}
+                  href={subItem.url}
+                  key={subItem.url}
+                  className={`nav-item nav-link nav-sub-item`}
+                >
+                  <i>{subItem.title}</i>
+                </a>
+              )
+            })}
+          </div>
         }
       </div>
     )

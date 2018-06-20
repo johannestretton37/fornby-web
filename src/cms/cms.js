@@ -82,6 +82,8 @@ class CMS {
             fields: [ColumnName.ITEMS]
           }
         )
+        console.log('mainMenuItems', mainNavigation)
+
         if (!mainNavigation)
           throw new CustomError(
             'Ett fel uppstod',
@@ -99,6 +101,7 @@ class CMS {
         )
         // Convert root links to mainMenuItems
         let mainMenu = rootLinks.map(item => this.createMainMenuItem(item))
+        console.log('mainMenuItems mainMenu', mainMenu)
         // Populate root links with children
         mainNavigation.items.forEach(item => {
           item.contentGroup = ContentGroup.MAIN_MENU_ITEMS
@@ -360,6 +363,7 @@ class CMS {
         let content = {}
         // Get array of main pages
         let mainPages = await this.getMainPages()
+        console.log('cms mainPages', mainPages)
         if (!mainPages)
           throw new CustomError(
             'Ett fel uppstod',

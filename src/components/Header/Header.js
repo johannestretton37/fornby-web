@@ -25,6 +25,7 @@ class Header extends Component {
 
   getMainMenuItems = async () => {
     const mainMenuItems = await cms.mainMenuItems()
+    console.log('header', mainMenuItems);
     const { location } = this.props
     const mainPath = location.pathname.split('/')[1]
     let activeItem = 0
@@ -58,7 +59,7 @@ class Header extends Component {
   handleSearchBarToggle = () => {
     this.toggleSearchBar()
   }
-  
+
   toggleSearchBar = () => {
     this.setState(prevState => {
       return { isSearchBarOpen: !prevState.isSearchBarOpen }
@@ -77,7 +78,7 @@ class Header extends Component {
             iconOpen='menu'
             iconClosed='close'
             align='left'
-            />
+          />
           <div className="brand-header">
             <a href="/">
               <h1>Fornby Folkhögskola</h1>
@@ -91,17 +92,26 @@ class Header extends Component {
             iconOpen='search'
             iconClosed='search'
             align='right'
-            />
-            <Search
-              isSearchBarOpen={isSearchBarOpen}
-              toggleSearchBar={this.toggleSearchBar}
-              expandHorizontal={true} />
+          />
+          <Search
+            isSearchBarOpen={isSearchBarOpen}
+            toggleSearchBar={this.toggleSearchBar}
+            expandHorizontal={true} />
         </div>
-        <Route path='/:page?' render={props => <MainMenu {...props} closeMenu={this.closeMenu} items={mainMenuItems} isOpen={isMainMenuOpen} />} />
+        <Route path='/:page?' render={
+          props =>
+            <MainMenu
+              {...props}
+              closeMenu={this.closeMenu}
+              items={mainMenuItems}
+              isOpen={isMainMenuOpen}
+            />
+        }
+        />
         <Search
           isSearchBarOpen={isSearchBarOpen}
           toggleSearchBar={this.toggleSearchBar}
-          expandHorizontal={false}/>
+          expandHorizontal={false} />
       </header>
     )
   }
