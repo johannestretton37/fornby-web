@@ -112,7 +112,6 @@ class MainMenu extends Component {
       isVertical
     } = this.state
     const { items, isOpen } = this.props
-    console.log('main menu', items);
     // isVertical is true when mobile menu is visible
     let indicatorStyle = {
       opacity: items.length > 0 ? 1 : 0

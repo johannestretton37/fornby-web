@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 import { Nav, NavItem } from 'reactstrap'
 import { array } from 'prop-types'
+import Icon from '../Icon'
 import './SubMenu.css'
 
 
@@ -14,15 +15,26 @@ class SubMenu extends Component {
     items: []
   }
 
+  getParentUrl(url) {
+    const parts = url.split('/');
+    const indexOfParentRoute = 2;
+    return parts[indexOfParentRoute];
+  }
+
   menuItem = (item, i) => {
+    const location = this.props.history.location.pathname;
+
     return (
       <NavItem key={i}>
-        <Link to={item.url} className={item.cssClass}>{item.title}</Link>
-        {item.subItems &&
+        <Link to={item.url} className={item.cssClass}>
+          {item.title}
+        </Link>
+        {this.getParentUrl(item.url).indexOf(this.getParentUrl(location)) !== -1 && item.subItems &&
           <Nav vertical>
             {item.subItems.map(this.menuItem)}
           </Nav>
         }
+
       </NavItem>
     )
   }
