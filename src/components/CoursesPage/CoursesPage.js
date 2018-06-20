@@ -9,7 +9,6 @@ import cms from '../../cms'
 import { cities } from '../../constants';
 import BannerBoxContainer from '../BannerBoxContainer'
 import SubMenu from '../SubMenu'
-import ScrollToContent from '../ScrollToContent/ScrollToContent';
 import BackButton from '../BackButton'
 
 class CoursesPage extends Component {
