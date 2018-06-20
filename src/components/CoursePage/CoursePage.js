@@ -115,12 +115,13 @@ class CoursePage extends Component {
       <div id={slug} className='course' >
         {name && <div className='course-image_wrapper'>
           <SmoothImage className='full-width' src={src} preview={preview} height={400}>
-            <p className='course-title'>{name}</p>
+
             <div className='course-attend_button' onClick={this.handleClick}>
               <span>ANSÖK NU</span>
             </div>
           </SmoothImage>
         </div>}
+        {name && <h1>{name}</h1>}
         {summary && <div className='course-header'>
           <p className='course-summary' dangerouslySetInnerHTML={{ __html: summary }} />
         </div>}

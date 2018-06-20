@@ -15,6 +15,7 @@
     margin-bottom: inherit;
     
     .course-title {
+      text-align: left;
       margin: 30px auto auto 40px;
       font-family: 'Barlow Condensed';
       text-transform: uppercase;
@@ -70,9 +71,9 @@
     margin-bottom: 50px;
   }
   &-summary {
-    text-align: center;
+    text-align: left;
     width:100%;
-    padding: 0 5% 0 5%;
+    padding: 0;
     margin-bottom: 50px;
   }
   &-date {
