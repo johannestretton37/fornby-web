@@ -5,10 +5,11 @@ import Gallery from '../Gallery'
 import './SubPage.css'
 
 const SubPage = ({ content = {}, url }) => {
-  let { name, body, shortInfo, staff } = content
+  let { name, body, shortInfo, staff, header } = content
   return (
     <div>
-      <h2>{name}</h2>
+      {header ? <h2>{header}</h2> : <h2>{name}</h2>}
+
       {<p className="short-info">{shortInfo}</p>}
       {body && <p className='main-body' dangerouslySetInnerHTML={{ __html: body }} />}
       {/*detailPages &&
