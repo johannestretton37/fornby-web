@@ -104,7 +104,7 @@ class PagesContainer extends Component {
             {subMenuItems.length > 0 && (
               <Col md={4} className="sub-menu-container">
                 <SubMenu items={subMenuItems} />
-                <SubMenuMobile items={subMenuItems} />}
+                <SubMenuMobile items={subMenuItems} />
               </Col>
             )}
             <Col md={subMenuItems.length > 0 ? 8 : 12}>
