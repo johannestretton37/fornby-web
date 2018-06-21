@@ -462,15 +462,11 @@ class CMS {
                     ContentGroup.STAFF
                   ],
                   populate: [
-                    {
-                      field: ColumnName.IMAGES,
-                      subfields: ColumnName.IMAGES
-                    },
+                    ColumnName.IMAGES,
                     {
                       field: ContentGroup.DETAIL_PAGES,
                       subFields: ['detailPage']
-                    }
-                  ]
+                    }]
                 }
               )
               if (subPages) {
@@ -539,6 +535,17 @@ class CMS {
     return this.pending[page]
   }
 
+  getDetailPageImages = (id) => {
+    return this.flamelinkApp.content
+      .get(
+        ContentGroup.DETAIL_PAGES, id,
+        {
+          field: ColumnName.IMAGES,
+          populate: [ColumnName.IMAGES]
+        }
+      )
+      .then(detailpage => detailpage.images);
+  }
   /**
    * Helper function to transform a firebase object into an array
    * @param {object} data - The data returned from a flamelink operation, such as `get`
@@ -777,7 +784,7 @@ class CMS {
       case ContentGroup.SUB_PAGES:
         return content.parentUrl + '/'
       case ContentGroup.DETAIL_PAGES:
-        return content.parentUrl + '#'
+        return content.parentUrl + '/'
       case ContentGroup.MAIN_MENU_ITEMS:
         return content.url
       default:

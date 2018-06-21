@@ -46,7 +46,6 @@ class PagesContainer extends Component {
         params: { page, subpage, detailslug }
       }
     } = this.props
-    let { data } = this.state;
     switch (page) {
       case 'falun':
       case 'ludvika':
@@ -60,8 +59,13 @@ class PagesContainer extends Component {
       let s = content.subPages.find(sub => sub.slug === subpage);
       if (s && s.detailPages) {
         let a = s.detailPages.find(sub => sub.detailPage[0].slug === detailslug);
-        if (a) {
-          console.log("Wosan", a.detailPage[0])
+        if (a && a.detailPage[0].images && a.detailPage[0].images.length > 0) {
+          cms.getDetailPageImages(a.detailPage[0].id).then(
+            images => {
+              a.detailPage[0].images = images;
+              this.setState({ data: a.detailPage[0] })
+            }
+          )
           this.setState({ data: a.detailPage[0] })
         }
       }
@@ -69,9 +73,7 @@ class PagesContainer extends Component {
       let s = content.subPages.find(sub => sub.slug === subpage);
       if (s) {
         this.setState({ data: s })
-        console.log("Nej nu, r", s);
       }
-    } else {
     }
   }
 
@@ -86,7 +88,7 @@ class PagesContainer extends Component {
 
   render() {
     const { data,
-      data: { name, shortInfo, body, error, images, previews },
+      data: { error, images, previews },
     } = this.state
     let {
       subMenuItems,
@@ -98,7 +100,7 @@ class PagesContainer extends Component {
     const preview = previews ? previews[0] : undefined;
     return (
       <React.Fragment>
-        {src && <SmoothImage className='full-width' height={400} src={src} preview={preview} />}
+        {subpage && <SmoothImage className='full-width' height={400} src={src} preview={preview} />}
         <Container>
           <Row>
             {subMenuItems.length > 0 && (
